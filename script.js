@@ -84,6 +84,65 @@
     });
   });
 
+  const injectEventJsonLd = () => {
+    if (!document.body || !document.body.classList.contains('event-page')) return;
+    const title = document.querySelector('.event-article h1')?.textContent?.trim() || document.title;
+    const metaLine = document.querySelector('[data-event-start]');
+    const startDate = metaLine?.dataset.eventStart || '';
+    const endDate = metaLine?.dataset.eventEnd || '';
+    const locationText = document.querySelector('.event-article__location')?.textContent || '';
+    const [city, venue] = locationText.split('·').map((part) => part.trim());
+    const organizerEl = document.querySelector('.organizer__name');
+    const organizerName =
+      organizerEl?.childNodes?.[0]?.textContent?.trim() ||
+      organizerEl?.textContent?.trim() ||
+      'Organizer';
+    const priceEl = document.querySelector('.event-sidebar__price');
+    const priceMin = priceEl?.dataset.priceMin || '';
+    const priceMax = priceEl?.dataset.priceMax || '';
+    const priceValue = priceMin || priceMax || '0';
+    const ticketUrl = ticketCta?.getAttribute('href') || window.location.href;
+    const description =
+      document.querySelector('[data-i18n="event_description_body"]')?.textContent?.trim() || '';
+
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: title,
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      eventStatus: 'https://schema.org/EventScheduled',
+      location: {
+        '@type': 'Place',
+        name: venue || city || 'Venue',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: city || '',
+          addressCountry: 'DK'
+        }
+      },
+      description,
+      organizer: {
+        '@type': 'Organization',
+        name: organizerName
+      },
+      offers: {
+        '@type': 'Offer',
+        price: priceValue,
+        priceCurrency: 'DKK',
+        availability: 'https://schema.org/InStock',
+        url: ticketUrl
+      }
+    };
+
+    if (startDate) jsonLd.startDate = startDate;
+    if (endDate) jsonLd.endDate = endDate;
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(jsonLd);
+    document.head.appendChild(script);
+  };
+
   const translations = {
     uk: {
       title_home: 'Події для українців у Данії',
@@ -1414,6 +1473,7 @@
   const urlLang = params.get('lang');
   const initialLang = urlLang || getStoredLang() || 'uk';
   applyTranslations(initialLang);
+  injectEventJsonLd();
 
   const getPreferredTheme = () => {
     const stored = localStorage.getItem('theme');
@@ -1939,7 +1999,7 @@
 
     const loadOrganizerStatus = async () => {
       try {
-        const response = await fetch('data/organizers.json');
+        const response = await fetch('./data/organizers.json');
         if (!response.ok) return;
         const list = await response.json();
         const organizer = Array.isArray(list)
