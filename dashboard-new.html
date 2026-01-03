@@ -26,7 +26,7 @@
     <header class="site-header">
       <div class="container">
         <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
-          <img class="brand__logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <img class="brand__logo" data-testid="logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
           <span class="visually-hidden">What's on DK?</span>
         </div>
         <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
@@ -40,8 +40,8 @@
           <a href="./index.html#contact" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
-          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" data-testid="lang-en" aria-pressed="false" aria-label="Choose English">EN</button>
         </div>
         <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
         <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
@@ -236,7 +236,7 @@
 
           <section class="form-step" data-step="5" aria-labelledby="step-title-5" hidden>
             <h2 id="step-title-5" data-i18n="step_preview">Прев’ю</h2>
-            <div class="preview">
+            <div class="preview" data-testid="preview">
               <dl class="preview__list">
                 <div>
                   <dt data-i18n="preview_title">Назва</dt>

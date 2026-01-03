@@ -1501,6 +1501,14 @@ button:disabled,
   display: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .info-banner {
   display: flex;
   flex-wrap: wrap;

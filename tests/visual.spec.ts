@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test-setup';
 
 const routes = ['/', '/events', '/dashboard.html', '/dashboard-new.html', '/event.html'];
 

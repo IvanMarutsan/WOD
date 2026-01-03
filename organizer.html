@@ -27,7 +27,7 @@
     <header class="site-header">
       <div class="container">
         <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
-          <img class="brand__logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <img class="brand__logo" data-testid="logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
           <span class="visually-hidden">What's on DK?</span>
         </div>
         <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
@@ -41,8 +41,8 @@
           <a href="./index.html#contact" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
-          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" data-testid="lang-en" aria-pressed="false" aria-label="Choose English">EN</button>
         </div>
         <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
         <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
@@ -77,7 +77,7 @@
             <p class="section-summary" data-i18n="organizer_events_summary">Останні події цього організатора.</p>
           </header>
           <div class="catalog-grid">
-            <article class="event-card event-card--paid">
+            <article class="event-card event-card--paid" data-testid="event-card">
               <img class="event-card__image" src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop" alt="Laptop with code editor on desk" loading="lazy" width="800" height="540" />
               <div class="event-card__body">
                 <div class="event-card__meta">
@@ -97,7 +97,7 @@
               </div>
             </article>
 
-            <article class="event-card event-card--paid">
+            <article class="event-card event-card--paid" data-testid="event-card">
               <img class="event-card__image" src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&auto=format&fit=crop" alt="Concert stage with lighting" loading="lazy" width="800" height="540" />
               <div class="event-card__body">
                 <div class="event-card__meta">
@@ -117,7 +117,7 @@
               </div>
             </article>
 
-            <article class="event-card event-card--free">
+            <article class="event-card event-card--free" data-testid="event-card">
               <span class="event-card__badge">Безкоштовно</span>
               <img class="event-card__image" src="https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=800&auto=format&fit=crop" alt="Food market stall" loading="lazy" width="800" height="540" />
               <div class="event-card__body">

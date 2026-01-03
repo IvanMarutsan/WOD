@@ -2277,7 +2277,7 @@
       ].join('');
       const detailsLabel = formatMessage('cta_details', {});
       const location = `${event.city} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\">\n          ${badgeMarkup}\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta\" href=\"event.html\">${detailsLabel}</a>\n          </div>\n        </article>\n      `;
+      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${badgeMarkup}\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta\" href=\"event.html\">${detailsLabel}</a>\n          </div>\n        </article>\n      `;
     };
 
     const updateCount = (count) => {
@@ -2684,6 +2684,7 @@
       pastBanner.hidden = false;
       if (ticketCta) {
         ticketCta.textContent = formatMessage('cta_similar', {});
+        ticketCta.setAttribute('data-testid', 'similar-cta');
       }
       if (ticketNote) {
         ticketNote.textContent = formatMessage('cta_similar', {});

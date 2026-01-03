@@ -27,7 +27,7 @@
     <header class="site-header">
       <div class="container">
         <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
-          <img class="brand__logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <img class="brand__logo" data-testid="logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
           <span class="visually-hidden">What's on DK?</span>
         </div>
         <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
@@ -41,9 +41,9 @@
           <a href="#contact" data-i18n="nav_contacts">Контакти</a>
         </nav>
 <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-                    <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
-          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
-          <button class="lang-switch__button" type="button" data-lang="da" aria-pressed="false" aria-label="Vælg dansk">DA</button>
+                    <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" data-testid="lang-en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="da" data-testid="lang-da" aria-pressed="false" aria-label="Vælg dansk">DA</button>
         </div>
         <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
         <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
@@ -72,6 +72,7 @@
                   id="event-search"
                   name="query"
                   type="search"
+                  data-testid="search-input"
                   placeholder="Пошук за містом, тематикою або датою"
                   data-i18n-placeholder="search_placeholder"
                   required
@@ -185,7 +186,7 @@
                   <span data-i18n="filters_tomorrow">Завтра</span>
                 </label>
                 <label class="filters__toggle">
-                  <input type="checkbox" name="quick-weekend" />
+                  <input type="checkbox" name="quick-weekend" data-testid="filters-weekend" />
                   <span data-i18n="filters_weekend">Вихідні</span>
                 </label>
                 <label class="filters__toggle">

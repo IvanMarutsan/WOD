@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test-setup';
 
 test('create event without end time', async ({ page }) => {
   await page.goto('/dashboard-new.html');
@@ -10,7 +10,7 @@ test('create event without end time', async ({ page }) => {
   // Step 2: set only start, no end
   await page.getByLabel(/Початок|Start/i).fill('2030-05-01T18:00');
   // Ensure timezone selector is absent
-  await expect(page.getByText(/Часовий пояс|Timezone|Tidszone/i)).toHaveCount(0);
+  await expect(page.locator('[name=\"timezone\"]')).toHaveCount(0);
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 3: Free event
@@ -21,6 +21,6 @@ test('create event without end time', async ({ page }) => {
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 5: Preview shows only start date/time
-  await expect(page.locator('.preview')).toContainText(/2030/);
-  await expect(page.locator('.preview')).not.toContainText(/—/); // no range if no end
+  await expect(page.getByTestId('preview')).toContainText(/2030/);
+  await expect(page.getByTestId('preview')).not.toContainText(/—/); // no range if no end
 });

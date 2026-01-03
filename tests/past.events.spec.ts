@@ -1,7 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test-setup';
+import { waitForEventsRendered } from './helpers';
 
 test('past events hidden by default and banner on detail', async ({ page }) => {
   await page.goto('/');
+  await waitForEventsRendered(page);
 
   // Ensure there is a toggle to show past events and it is off
   const toggle = page.getByRole('checkbox', { name: /Показати минулі|Show past|Vis tidligere/i });
@@ -16,8 +18,8 @@ test('past events hidden by default and banner on detail', async ({ page }) => {
 
   // Navigate to a past event detail (assume first after toggle)
   await page.locator('.event-card__title a').first().click();
-  await expect(page.getByText(/подія вже минула|has passed|er afholdt/i)).toBeVisible();
+  await expect(page.getByTestId('event-detail-banner-past')).toBeVisible();
   // Ticket CTA replaced
-  await expect(page.getByRole('link', { name: /Купити|Buy|Køb/i })).toHaveCount(0);
-  await expect(page.getByRole('link', { name: /Схожі події|Similar|Lignende/i })).toBeVisible();
+  await expect(page.getByTestId('ticket-cta')).toHaveCount(0);
+  await expect(page.getByTestId('similar-cta')).toBeVisible();
 });

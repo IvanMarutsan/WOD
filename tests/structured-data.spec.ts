@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test-setup';
 
 test('event page exposes valid Event JSON-LD', async ({ page }) => {
   await page.goto('/event.html');
