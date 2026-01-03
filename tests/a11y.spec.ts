@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const pages = ['/', '/events', '/organizer.html', '/dashboard-new.html', '/legal-privacy.html'];

@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 import { gotoHome, waitForEventsRendered } from './helpers';
 
 test('home loads with logo and hero', async ({ page }) => {

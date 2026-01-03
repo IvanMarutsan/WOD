@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 
 test('submission blocked until organizer is verified', async ({ page }) => {
   await page.goto('/dashboard-new.html');

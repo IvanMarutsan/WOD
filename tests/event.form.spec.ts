@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 
 test('create event without end time', async ({ page }) => {
   await page.goto('/dashboard-new.html');

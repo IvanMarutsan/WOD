@@ -1,7 +1,9 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
+import { setupPage } from './test-setup';
 import { waitForEventsRendered } from './helpers';
 
 test('past events hidden by default and banner on detail', async ({ page }) => {
+  await setupPage(page);
   await page.goto('/');
   await waitForEventsRendered(page);
 

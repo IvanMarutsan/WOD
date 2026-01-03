@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 import { waitForEventsRendered } from './helpers';
 
 test('filters update URL and back/forward restores state', async ({ page }) => {

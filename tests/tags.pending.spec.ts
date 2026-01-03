@@ -1,4 +1,4 @@
-import { test, expect } from './test-setup';
+import { test, expect } from '@playwright/test';
 
 test('organizer can propose new tag/category with pending label', async ({ page }) => {
   await page.goto('/dashboard-new.html');
