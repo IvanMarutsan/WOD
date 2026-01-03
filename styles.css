@@ -19,6 +19,9 @@
   --radius: 12px;
   --space: 12px;
   --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
+  --logo-min: 88px;
+  --logo-mid: 12vw;
+  --logo-max: 140px;
 
   /* Focus ring (high contrast) */
   --focus-ring: 0 0 0 3px rgba(0, 87, 183, 0.25), 0 0 0 6px rgba(200, 16, 46, 0.25);
@@ -98,9 +101,9 @@ button:disabled,
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
-  padding: calc(var(--space) * 1.5) 0;
-  background: #ffffff;
+  z-index: 50;
+  padding: 0;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
   box-shadow: none;
 }
@@ -109,11 +112,13 @@ button:disabled,
   box-shadow: var(--shadow);
 }
 
-.site-header .container {
+.header__inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+  min-height: 64px;
+  padding: calc(var(--space) * 1.5) 0;
 }
 
 .brand {
@@ -121,14 +126,22 @@ button:disabled,
   align-items: center;
   gap: 10px;
   font-weight: 700;
+  text-decoration: none;
+  color: inherit;
 }
 
 .brand__logo {
-  width: 120px;
-  height: 120px;
+  width: clamp(var(--logo-min), var(--logo-mid), var(--logo-max));
   object-fit: contain;
   max-width: 100%;
   height: auto;
+  max-height: clamp(var(--logo-min), var(--logo-mid), var(--logo-max));
+  display: block;
+}
+
+.site-header.is-scrolled .brand__logo {
+  width: clamp(calc(var(--logo-min) - 8px), 10vw, calc(var(--logo-max) - 12px));
+  max-height: clamp(calc(var(--logo-min) - 8px), 10vw, calc(var(--logo-max) - 12px));
 }
 
 .brand__name {
@@ -1856,10 +1869,6 @@ button:disabled,
 }
 
 @media (min-width: 768px) {
-  .site-header {
-    padding: calc(var(--space) * 2) 0;
-  }
-
   .menu-toggle {
     display: none;
   }
@@ -1923,6 +1932,16 @@ button:disabled,
   .moderation-card {
     grid-template-columns: 2fr 1fr auto;
     align-items: center;
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --logo-max: 160px;
+  }
+
+  .header__inner {
+    min-height: 72px;
   }
 }
 

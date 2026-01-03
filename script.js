@@ -1704,11 +1704,22 @@
   }
 
   if (header) {
+    let ticking = false;
     const updateHeaderShadow = () => {
       header.classList.toggle('site-header--scrolled', window.scrollY > 4);
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+      ticking = false;
     };
     updateHeaderShadow();
-    window.addEventListener('scroll', updateHeaderShadow, { passive: true });
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(updateHeaderShadow);
+      },
+      { passive: true }
+    );
   }
 
   filterToggles.forEach((button) => {
