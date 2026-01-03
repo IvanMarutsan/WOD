@@ -1,0 +1,36 @@
+[
+  {
+    "id": "org-001",
+    "name": "Evently Community",
+    "verified": true,
+    "verificationStatus": "email_verified",
+    "contactEmail": "hello@evently.test",
+    "phone": "+45 44 12 34 567",
+    "links": [
+      "https://evently.test",
+      "https://instagram.com/evently"
+    ]
+  },
+  {
+    "id": "org-002",
+    "name": "Food & Culture Denmark",
+    "verified": false,
+    "verificationStatus": "pending_manual",
+    "contactEmail": "contact@foodculture.dk",
+    "phone": "+45 22 45 11 98",
+    "links": [
+      "https://foodculture.dk"
+    ]
+  },
+  {
+    "id": "org-003",
+    "name": "Newcomers Network",
+    "verified": false,
+    "verificationStatus": "none",
+    "contactEmail": "hello@newcomers.dk",
+    "links": [
+      "https://newcomers.dk",
+      "https://facebook.com/newcomers.dk"
+    ]
+  }
+]

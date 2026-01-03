@@ -1,0 +1,482 @@
+[
+  {
+    "id": "evt-001",
+    "slug": "design-systems-meetup",
+    "title": "Design Systems Meetup",
+    "description": "A community meetup focused on scalable design systems and product design.",
+    "category": {
+      "label": "education",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "design", "status": "approved"},
+      {"label": "meetup", "status": "approved"},
+      {"label": "community", "status": "approved"}
+    ],
+    "start": "2024-11-12T19:00:00+01:00",
+    "end": "2024-11-12T21:30:00+01:00",
+    "format": "offline",
+    "venue": "Design Hub Copenhagen",
+    "address": "Bernstorffsgade 16, 1577 København",
+    "city": "Copenhagen",
+    "geo": {"lat": 55.6679, "lng": 12.5720},
+    "priceType": "paid",
+    "priceMin": 350,
+    "priceMax": 520,
+    "ticketUrl": "https://example.com/tickets/design-systems",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Olena K.",
+      "email": "olena@whatsondk.test",
+      "phone": "+45 12 34 56 78"
+    }
+  },
+  {
+    "id": "evt-002",
+    "slug": "local-food-fest",
+    "title": "Local Food Fest",
+    "description": "Street food, local vendors, and live cooking demos in the city center.",
+    "category": {
+      "label": "community",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "food", "status": "approved"},
+      {"label": "family", "status": "approved"},
+      {"label": "festival", "status": "approved"}
+    ],
+    "start": "2024-10-20T14:00:00+02:00",
+    "end": "2024-10-20T19:00:00+02:00",
+    "format": "offline",
+    "venue": "Latin Quarter Square",
+    "address": "Klostertorvet 4, 8000 Aarhus",
+    "city": "Aarhus",
+    "geo": {"lat": 56.1568, "lng": 10.2039},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-002",
+    "images": [
+      "https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Sofie M.",
+      "email": "hello@foodfest.dk",
+      "phone": "+45 22 45 11 98"
+    }
+  },
+  {
+    "id": "evt-003",
+    "slug": "city-night-run",
+    "title": "City Night Run",
+    "description": "Evening run with music, water stations, and a community warm-up.",
+    "category": {
+      "label": "community",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "sports", "status": "approved"},
+      {"label": "night", "status": "approved"},
+      {"label": "community", "status": "approved"}
+    ],
+    "start": "2024-10-12T19:00:00+02:00",
+    "end": "2024-10-12T21:00:00+02:00",
+    "format": "offline",
+    "venue": "Odense Stadium",
+    "address": "Højstrupvej 7B, 5200 Odense",
+    "city": "Odense",
+    "geo": {"lat": 55.3656, "lng": 10.4130},
+    "priceType": "paid",
+    "priceMin": 300,
+    "priceMax": 450,
+    "ticketUrl": "https://example.com/tickets/night-run",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Maksym V.",
+      "email": "run@whatsondk.test",
+      "phone": "+45 31 22 44 55"
+    }
+  },
+  {
+    "id": "evt-004",
+    "slug": "creative-coding-jam",
+    "title": "Creative Coding Jam",
+    "description": "Live coding performances and a hands-on workshop for creatives.",
+    "category": {
+      "label": "education",
+      "status": "pending"
+    },
+    "tags": [
+      {"label": "creative", "status": "approved"},
+      {"label": "coding", "status": "approved"},
+      {"label": "art", "status": "pending"}
+    ],
+    "start": "2024-11-03T18:30:00+01:00",
+    "end": "2024-11-03T21:15:00+01:00",
+    "format": "offline",
+    "venue": "Nordkraft",
+    "address": "Teglgårds Plads 1, 9000 Aalborg",
+    "city": "Aalborg",
+    "geo": {"lat": 57.0480, "lng": 9.9191},
+    "priceType": "paid",
+    "priceMin": 200,
+    "priceMax": 350,
+    "ticketUrl": "https://example.com/tickets/creative-coding",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "mixed",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": true,
+    "contactPerson": {
+      "name": "Kateryna P.",
+      "email": "coding@whatsondk.test",
+      "phone": "+45 20 11 08 45"
+    }
+  },
+  {
+    "id": "evt-005",
+    "slug": "family-film-night",
+    "title": "Family Film Night",
+    "description": "Animated movie screening with kids activities and snacks.",
+    "category": {
+      "label": "kids",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "kids", "status": "approved"},
+      {"label": "cinema", "status": "approved"},
+      {"label": "family", "status": "approved"}
+    ],
+    "start": "2024-10-25T17:00:00+02:00",
+    "end": null,
+    "format": "offline",
+    "venue": "Esbjerg Library",
+    "address": "Nørregade 19, 6700 Esbjerg",
+    "city": "Esbjerg",
+    "geo": {"lat": 55.4763, "lng": 8.4534},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-002",
+    "images": [
+      "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Lene G.",
+      "email": "esbjerg@library.dk",
+      "phone": "+45 75 13 55 88"
+    }
+  },
+  {
+    "id": "evt-006",
+    "slug": "community-breakfast",
+    "title": "Community Breakfast",
+    "description": "Morning coffee and networking for newcomers in Denmark.",
+    "category": {
+      "label": "networking",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "networking", "status": "approved"},
+      {"label": "welcome", "status": "approved"},
+      {"label": "support", "status": "approved"}
+    ],
+    "start": "2024-11-08T09:00:00+01:00",
+    "end": "2024-11-08T11:00:00+01:00",
+    "format": "offline",
+    "venue": "Union Kitchen",
+    "address": "Åboulevarden 18, 8000 Aarhus",
+    "city": "Aarhus",
+    "geo": {"lat": 56.1532, "lng": 10.2072},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": true,
+    "volunteer": true,
+    "contactPerson": {
+      "name": "Dmytro H.",
+      "email": "support@whatsondk.test",
+      "phone": "+45 28 64 90 10"
+    }
+  },
+  {
+    "id": "evt-007",
+    "slug": "copenhagen-concert-night",
+    "title": "Copenhagen Concert Night",
+    "description": "Indie bands from Denmark and Ukraine on one stage.",
+    "category": {
+      "label": "music",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "music", "status": "approved"},
+      {"label": "indie", "status": "approved"},
+      {"label": "live", "status": "approved"}
+    ],
+    "start": "2024-11-18T20:00:00+01:00",
+    "end": "2024-11-18T23:00:00+01:00",
+    "format": "offline",
+    "venue": "Vega",
+    "address": "Enghavevej 40, 1674 København",
+    "city": "Copenhagen",
+    "geo": {"lat": 55.6647, "lng": 12.5514},
+    "priceType": "paid",
+    "priceMin": 280,
+    "priceMax": 420,
+    "ticketUrl": "https://example.com/tickets/concert-night",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "mixed",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Svitlana O.",
+      "email": "concerts@whatsondk.test",
+      "phone": "+45 40 22 18 07"
+    }
+  },
+  {
+    "id": "evt-008",
+    "slug": "ukrainian-film-screening",
+    "title": "Ukrainian Film Screening",
+    "description": "Documentary screening with a director Q&A session.",
+    "category": {
+      "label": "cinema",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "cinema", "status": "approved"},
+      {"label": "ua", "status": "approved"},
+      {"label": "discussion", "status": "approved"}
+    ],
+    "start": "2024-10-28T19:30:00+02:00",
+    "end": "2024-10-28T22:00:00+02:00",
+    "format": "offline",
+    "venue": "Cinemateket",
+    "address": "Gothersgade 55, 1123 København",
+    "city": "Copenhagen",
+    "geo": {"lat": 55.6812, "lng": 12.5756},
+    "priceType": "paid",
+    "priceMin": 120,
+    "priceMax": 180,
+    "ticketUrl": "https://example.com/tickets/ua-film",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Iryna L.",
+      "email": "film@whatsondk.test",
+      "phone": "+45 26 90 33 21"
+    }
+  },
+  {
+    "id": "evt-009",
+    "slug": "danish-language-club",
+    "title": "Danish Language Club",
+    "description": "Weekly language practice for newcomers with volunteers.",
+    "category": {
+      "label": "education",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "language", "status": "approved"},
+      {"label": "danish", "status": "approved"},
+      {"label": "volunteers", "status": "approved"}
+    ],
+    "start": "2024-11-05T17:30:00+01:00",
+    "end": null,
+    "format": "offline",
+    "venue": "Culture House",
+    "address": "Østerbro 12, 9000 Aalborg",
+    "city": "Aalborg",
+    "geo": {"lat": 57.0466, "lng": 9.9282},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": true,
+    "contactPerson": {
+      "name": "Nadia R.",
+      "email": "language@whatsondk.test",
+      "phone": "+45 71 22 40 88"
+    }
+  },
+  {
+    "id": "evt-010",
+    "slug": "startup-networking-lunch",
+    "title": "Startup Networking Lunch",
+    "description": "Meet founders and investors over lunch in central Odense.",
+    "category": {
+      "label": "networking",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "startup", "status": "approved"},
+      {"label": "networking", "status": "approved"},
+      {"label": "lunch", "status": "approved"}
+    ],
+    "start": "2024-11-14T12:00:00+01:00",
+    "end": "2024-11-14T14:00:00+01:00",
+    "format": "offline",
+    "venue": "Storms Pakhus",
+    "address": "Lerchesgade 4, 5000 Odense",
+    "city": "Odense",
+    "geo": {"lat": 55.3982, "lng": 10.3856},
+    "priceType": "paid",
+    "priceMin": 150,
+    "priceMax": 250,
+    "ticketUrl": "https://example.com/tickets/startup-lunch",
+    "organizerId": "org-002",
+    "images": [
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": false,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Jonas H.",
+      "email": "startup@whatsondk.test",
+      "phone": "+45 27 11 70 05"
+    }
+  },
+  {
+    "id": "evt-011",
+    "slug": "kids-art-workshop",
+    "title": "Kids Art Workshop",
+    "description": "Painting and clay workshop for families in Copenhagen.",
+    "category": {
+      "label": "kids",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "art", "status": "approved"},
+      {"label": "kids", "status": "approved"},
+      {"label": "workshop", "status": "approved"}
+    ],
+    "start": "2024-11-09T10:30:00+01:00",
+    "end": "2024-11-09T12:00:00+01:00",
+    "format": "offline",
+    "venue": "Kulturhuset Indre By",
+    "address": "Charlotte Ammundsens Pl. 3, 1359 København",
+    "city": "Copenhagen",
+    "geo": {"lat": 55.6817, "lng": 12.5788},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-002",
+    "images": [
+      "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Oksana S.",
+      "email": "kids@whatsondk.test",
+      "phone": "+45 91 44 08 31"
+    }
+  },
+  {
+    "id": "evt-012",
+    "slug": "online-education-session",
+    "title": "Online Education Session",
+    "description": "Evening webinar on Danish education pathways for newcomers.",
+    "category": {
+      "label": "education",
+      "status": "approved"
+    },
+    "tags": [
+      {"label": "online", "status": "approved"},
+      {"label": "education", "status": "approved"},
+      {"label": "qa", "status": "approved"}
+    ],
+    "start": "2024-11-01T18:00:00+01:00",
+    "end": "2024-11-01T19:30:00+01:00",
+    "format": "online",
+    "venue": "Zoom",
+    "address": "Online",
+    "city": "Copenhagen",
+    "geo": {"lat": 55.6761, "lng": 12.5683},
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "https://example.com/tickets/education-session",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": true,
+    "contactPerson": {
+      "name": "Taras M.",
+      "email": "education@whatsondk.test",
+      "phone": "+45 88 22 11 09"
+    }
+  }
+]

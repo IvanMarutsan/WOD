@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Event - Evently</title>
+    <meta name="description" content="Multi-step event creation form for the events listing platform." />
+    <meta property="og:title" content="Create Event - Evently" />
+    <meta property="og:description" content="Placeholder event creation flow." />
+    <meta property="og:type" content="website" />
+    <!-- TODO: Replace OG image URL -->
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Create Event - Evently" />
+    <meta name="twitter:description" content="Placeholder event creation flow." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="dashboard-new.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="dashboard-new.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="dashboard-new.html?lang=da" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dashboard-page">
+    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header">
+      <div class="container">
+        <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
+          <img class="brand__logo" src="static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </div>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only" data-i18n="nav_toggle">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <a href="index.html#catalog" data-i18n="nav_events">Події</a>
+          <a href="organizer.html" data-i18n="nav_organizers">Організатори</a>
+          <a href="index.html#about" data-i18n="nav_about">Про нас</a>
+          <a href="index.html#contact" data-i18n="nav_contacts">Контакти</a>
+        </nav>
+        <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+        </div>
+        <a class="btn primary header__cta" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content" class="dashboard">
+      <div class="container">
+        <header class="dashboard__header">
+          <div>
+            <p class="eyebrow" data-i18n="create_event_eyebrow">Створення події</p>
+            <h1>Нова подія</h1>
+          </div>
+          <a class="btn ghost" href="dashboard.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
+        </header>
+
+        <ol class="stepper" aria-label="Кроки створення події" data-i18n-aria="stepper_aria">
+          <li class="stepper__item" aria-current="step" data-i18n="step_basic">1. Основне</li>
+          <li class="stepper__item" data-i18n="step_time">2. Час/місце</li>
+          <li class="stepper__item" data-i18n="step_tickets">3. Квитки</li>
+          <li class="stepper__item" data-i18n="step_media">4. Медіа</li>
+          <li class="stepper__item" data-i18n="step_preview">5. Прев’ю</li>
+        </ol>
+
+        <form class="multi-step" novalidate data-organizer-id="org-003">
+          <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <section class="form-step is-active" data-step="1" aria-labelledby="step-title-1">
+            <h2 id="step-title-1" data-i18n="step_basic">Основне</h2>
+            <div class="form-grid">
+              <label class="form-field">
+                <span data-i18n="form_title_label">Назва події</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <input type="text" name="title" required minlength="3" aria-describedby="title-help" />
+                <small id="title-help" data-i18n="form_title_help">Мінімум 3 символи.</small>
+              </label>
+              <div class="form-field">
+                <div class="form-field__header">
+                  <span data-i18n="form_category_label">Категорія</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                  <button class="btn ghost form-field__action" type="button" data-action="add-category" aria-haspopup="dialog">
+                    <span data-i18n="form_add_category">Додати категорію</span>
+                  </button>
+                </div>
+                <select name="category" required>
+                  <option value="" data-i18n="form_category_placeholder">Оберіть категорію</option>
+                  <option value="music" data-i18n="form_category_music">Музика</option>
+                  <option value="food" data-i18n="form_category_food">Їжа</option>
+                  <option value="sport" data-i18n="form_category_sport">Спорт</option>
+                  <option value="tech" data-i18n="form_category_tech">Tech</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <span data-i18n="form_tags_label">Теги</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <div class="tags-input" aria-describedby="tags-help">
+                  <div class="tags-input__list" role="list"></div>
+                  <input
+                    type="text"
+                    class="tags-input__field"
+                    name="tags-input"
+                    aria-label="Додати тег"
+                    data-i18n-aria="form_tags_input_label"
+                    placeholder="дизайн"
+                    data-i18n-placeholder="form_tags_placeholder"
+                  />
+                  <input type="hidden" name="tags" required />
+                </div>
+                <small id="tags-help" data-i18n="form_tags_help">Натисніть Enter, щоб додати тег.</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="2" aria-labelledby="step-title-2" hidden>
+            <h2 id="step-title-2" data-i18n="step_time">Час та місце</h2>
+            <div class="form-grid">
+              <label class="form-field">
+                <span data-i18n="form_start_label">Початок</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <input type="datetime-local" name="start" required aria-describedby="start-help" />
+                <small id="start-help" data-i18n="form_start_help">Вкажіть локальний час.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_end_label">Завершення</span>
+                <input type="datetime-local" name="end" />
+                <small data-i18n="form_optional_hint">(необов'язково)</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_format_label">Формат</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <select name="format" required>
+                  <option value="" data-i18n="form_format_placeholder">Оберіть формат</option>
+                  <option value="offline" data-i18n="form_format_offline">Офлайн</option>
+                  <option value="online" data-i18n="form_format_online">Онлайн</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_address_label">Адреса</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <input type="text" name="address" required aria-describedby="address-help" placeholder="Копенгаген, Main St 10" data-i18n-placeholder="form_address_placeholder" />
+                <small id="address-help" data-i18n="form_address_help">Для онлайн-подій вкажіть платформу.</small>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="3" aria-labelledby="step-title-3" hidden>
+            <h2 id="step-title-3" data-i18n="step_tickets">Квитки</h2>
+            <div class="form-grid">
+              <fieldset class="form-fieldset">
+                <legend>
+                  <span data-i18n="form_ticket_type_label">Тип події</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </legend>
+                <label class="form-choice">
+                  <input type="radio" name="ticket-type" value="free" required />
+                  <span data-i18n="form_ticket_free">Безкоштовно</span>
+                </label>
+                <label class="form-choice">
+                  <input type="radio" name="ticket-type" value="paid" required />
+                  <span data-i18n="form_ticket_paid">Платно</span>
+                </label>
+              </fieldset>
+              <label class="form-field">
+                <span data-i18n="form_price_min">Мінімальна ціна</span>
+                <input type="number" name="price-min" min="0" step="1" />
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_price_max">Максимальна ціна</span>
+                <input type="number" name="price-max" min="0" step="1" />
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_ticket_url">Зовнішній лінк на квитки</span>
+                <input type="url" name="ticket-url" aria-describedby="ticket-help" placeholder="https://" />
+                <small id="ticket-help" data-i18n="form_ticket_help">Необов’язково.</small>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="4" aria-labelledby="step-title-4" hidden>
+            <h2 id="step-title-4" data-i18n="step_media">Медіа</h2>
+            <div class="form-grid">
+              <label class="form-field">
+                <span data-i18n="form_image_label">Зображення події</span>
+                <input type="file" name="image" accept="image/*" />
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_image_alt_label">Alt текст</span>
+                <input type="text" name="image-alt" aria-describedby="alt-help" placeholder="Опис зображення" data-i18n-placeholder="form_image_alt_placeholder" />
+                <small id="alt-help" data-i18n="form_image_alt_help">Наприклад: сцена з освітленням.</small>
+              </label>
+            </div>
+            <fieldset class="form-fieldset">
+              <legend data-i18n="form_contact_legend">Контактна особа</legend>
+              <label class="form-field">
+                <span data-i18n="form_contact_name">Імʼя</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <input type="text" name="contact-name" required aria-describedby="contact-name-help" />
+                <small id="contact-name-help" data-i18n="form_contact_name_help">Вкажіть імʼя контактної особи.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_email">Email</span>
+                <span class="required" aria-hidden="true">*</span>
+                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <input
+                  type="email"
+                  name="contact-email"
+                  required
+                  aria-describedby="contact-email-help"
+                  pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+                />
+                <small id="contact-email-help" data-i18n="form_contact_email_help">Наприклад: name@example.com.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_phone">Телефон</span>
+                <input
+                  type="tel"
+                  name="contact-phone"
+                  aria-describedby="contact-phone-help"
+                  pattern="^\\+45\\s?[0-9]{2}(\\s?[0-9]{2}){3}$"
+                />
+                <small id="contact-phone-help" data-i18n="form_contact_phone_help">Формат: +45 12 34 56 78.</small>
+              </label>
+            </fieldset>
+          </section>
+
+          <section class="form-step" data-step="5" aria-labelledby="step-title-5" hidden>
+            <h2 id="step-title-5" data-i18n="step_preview">Прев’ю</h2>
+            <div class="preview">
+              <dl class="preview__list">
+                <div>
+                  <dt data-i18n="preview_title">Назва</dt>
+                  <dd id="preview-title">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_category">Категорія</dt>
+                  <dd id="preview-category">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_tags">Теги</dt>
+                  <dd id="preview-tags">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_time">Час</dt>
+                  <dd id="preview-time">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_location">Місце</dt>
+                  <dd id="preview-location">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_tickets">Квитки</dt>
+                  <dd id="preview-tickets">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_format">Формат</dt>
+                  <dd id="preview-format">—</dd>
+                </div>
+              </dl>
+            </div>
+            <input type="hidden" name="status" value="draft" />
+            <div class="info-banner" data-verification-banner hidden>
+              <p data-i18n="verification_banner_text">
+                Щоб опублікувати подію, потрібна верифікація організатора.
+              </p>
+              <button class="btn ghost" type="button" data-action="open-verification" data-i18n="verification_banner_action">
+                Перейти до верифікації
+              </button>
+            </div>
+            <button class="btn primary" type="submit" data-i18n="form_submit_moderation">Надіслати на модерацію</button>
+            <p class="form-note" data-submit-status role="status" aria-live="polite"></p>
+            <p class="form-note form-note--warning" data-verification-warning hidden data-i18n="verification_blocked">
+              Щоб опублікувати подію, підтвердьте верифікацію організатора.
+            </p>
+          </section>
+
+          <div class="form-actions">
+            <button class="btn ghost" type="button" data-action="back" data-i18n="form_back">Назад</button>
+            <button class="btn primary" type="button" data-action="next" data-i18n="form_next">Далі</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <a class="footer__help" href="docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <div class="modal modal--category" hidden>
+      <div class="modal__overlay" data-modal-close></div>
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
+        <h2 id="category-modal-title" data-i18n="form_category_modal_title">Нова категорія</h2>
+        <label class="form-field">
+          <span data-i18n="form_category_input_label">Назва категорії</span>
+          <input type="text" name="new-category" required aria-describedby="category-modal-help" />
+          <small id="category-modal-help" data-i18n="form_category_help">Категорію перевірить модератор.</small>
+        </label>
+        <div class="modal__actions">
+          <button class="btn ghost" type="button" data-modal-close data-i18n="form_category_cancel">Скасувати</button>
+          <button class="btn primary" type="button" data-modal-submit data-i18n="form_category_submit">Надіслати на затвердження</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

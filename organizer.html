@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Evently Community — Organizer Profile</title>
+    <meta name="description" content="Placeholder: organizer profile with upcoming events and contact information." />
+    <meta property="og:title" content="Evently Community — Organizer Profile" />
+    <meta property="og:description" content="Placeholder: organizer profile with upcoming events and contact information." />
+    <meta property="og:type" content="website" />
+    <!-- TODO: Replace OG image URL -->
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="https://example.com/organizer.html" />
+    <meta property="og:locale" content="uk_UA" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Evently Community — Organizer Profile" />
+    <meta name="twitter:description" content="Placeholder: organizer profile with upcoming events and contact information." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="organizer.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="organizer.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="organizer.html?lang=da" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="organizer-page">
+    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header">
+      <div class="container">
+        <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
+          <img class="brand__logo" src="static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </div>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only" data-i18n="nav_toggle">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <a href="index.html#catalog" data-i18n="nav_events">Події</a>
+          <a href="organizer.html" data-i18n="nav_organizers">Організатори</a>
+          <a href="index.html#about" data-i18n="nav_about">Про нас</a>
+          <a href="index.html#contact" data-i18n="nav_contacts">Контакти</a>
+        </nav>
+        <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+        </div>
+        <a class="btn primary header__cta" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content" class="organizer-detail">
+      <div class="container">
+        <a class="back-link" href="index.html#catalog" data-i18n="back_to_catalog">До каталогу</a>
+        <section class="organizer-hero" aria-labelledby="organizer-title">
+          <div class="organizer-hero__logo" role="presentation" data-i18n="organizer_logo_placeholder">Лого</div>
+          <div class="organizer-hero__content">
+            <div class="organizer-hero__heading">
+              <h1 id="organizer-title">Evently Community</h1>
+              <span class="organizer-hero__badge" data-verified-badge data-i18n="verified_badge" hidden>Verified organizer</span>
+            </div>
+            <p class="organizer-hero__meta" data-i18n="organizer_location">Організатор у Данії</p>
+            <p class="organizer-hero__description" data-i18n="organizer_description">
+              Некомерційна спільнота, що проводить події для дизайнерів, креаторів і лідерів спільнот.
+            </p>
+            <div class="organizer-hero__contacts">
+              <a href="https://example.com" rel="noopener">example.com</a>
+              <a href="mailto:hello@evently.test" data-i18n="organizer_contact_email">Email</a>
+              <a href="tel:+45441234567" data-i18n="organizer_contact_phone">Телефон</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="organizer-events" aria-labelledby="organizer-events-title">
+          <header class="section-header">
+            <h2 id="organizer-events-title" data-i18n="organizer_events_title">Події</h2>
+            <p class="section-summary" data-i18n="organizer_events_summary">Останні події цього організатора.</p>
+          </header>
+          <div class="catalog-grid">
+            <article class="event-card event-card--paid">
+              <img class="event-card__image" src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop" alt="Laptop with code editor on desk" loading="lazy" width="800" height="540" />
+              <div class="event-card__body">
+                <div class="event-card__meta">
+                  <span class="event-card__datetime">12.11.2024 · 19:00</span>
+                  <span class="event-card__price event-card__price--paid">DKK 350</span>
+                </div>
+                <h3 class="event-card__title">
+                  <a class="event-card__link" href="event.html">Design Systems Meetup</a>
+                </h3>
+                <p class="event-card__location">Kyiv · Design Hub</p>
+                <div class="event-card__tags">
+                  <span class="event-card__tag" data-tag-label="Education" data-tag-type="category">Education</span>
+                  <span class="event-card__tag" data-tag-label="Design">Design</span>
+                  <span class="event-card__tag" data-tag-label="Meetup">Meetup</span>
+                </div>
+                <a class="event-card__cta" href="event.html" data-i18n="cta_details">Детальніше</a>
+              </div>
+            </article>
+
+            <article class="event-card event-card--paid">
+              <img class="event-card__image" src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&auto=format&fit=crop" alt="Concert stage with lighting" loading="lazy" width="800" height="540" />
+              <div class="event-card__body">
+                <div class="event-card__meta">
+                  <span class="event-card__datetime">23.11.2024 · 18:00</span>
+                  <span class="event-card__price event-card__price--paid">DKK 520</span>
+                </div>
+                <h3 class="event-card__title">
+                  <a class="event-card__link" href="event.html">Creative Culture Night</a>
+                </h3>
+                <p class="event-card__location">Odesa · Sea Point</p>
+                <div class="event-card__tags">
+                  <span class="event-card__tag" data-tag-label="Music" data-tag-type="category">Music</span>
+                  <span class="event-card__tag" data-tag-label="Culture">Culture</span>
+                  <span class="event-card__tag" data-tag-label="Live">Live</span>
+                </div>
+                <a class="event-card__cta" href="event.html" data-i18n="cta_details">Детальніше</a>
+              </div>
+            </article>
+
+            <article class="event-card event-card--free">
+              <span class="event-card__badge">Безкоштовно</span>
+              <img class="event-card__image" src="https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=800&auto=format&fit=crop" alt="Food market stall" loading="lazy" width="800" height="540" />
+              <div class="event-card__body">
+                <div class="event-card__meta">
+                  <span class="event-card__datetime">01.12.2024 · 13:00</span>
+                  <span class="event-card__price event-card__price--free">Gratis</span>
+                </div>
+                <h3 class="event-card__title">
+                  <a class="event-card__link" href="event.html">Local Food Festival</a>
+                </h3>
+                <p class="event-card__location">Lviv · Market Square</p>
+                <div class="event-card__tags">
+                  <span class="event-card__tag" data-tag-label="Community" data-tag-type="category">Community</span>
+                  <span class="event-card__tag" data-tag-label="Food">Food</span>
+                  <span class="event-card__tag" data-tag-label="Family">Family</span>
+                </div>
+                <a class="event-card__cta" href="event.html" data-i18n="cta_details">Детальніше</a>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <a class="footer__help" href="docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

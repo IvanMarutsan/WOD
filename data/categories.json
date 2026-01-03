@@ -1,0 +1,8 @@
+[
+  {"id":"music","name":"Музика","slug":"music"},
+  {"id":"networking","name":"Networking","slug":"networking"},
+  {"id":"cinema","name":"Кіно","slug":"cinema"},
+  {"id":"education","name":"Освіта","slug":"education"},
+  {"id":"kids","name":"Для дітей","slug":"kids"},
+  {"id":"community","name":"Спільнота","slug":"community"}
+]

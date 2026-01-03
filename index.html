@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Evently — Каталог подій по всій Україні</title>
+    <meta name="description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
+    <meta property="og:title" content="Evently — Каталог подій по всій Україні" />
+    <meta property="og:description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
+    <meta property="og:type" content="website" />
+    <!-- TODO: Replace OG image URL -->
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="https://example.com/index.html" />
+    <meta property="og:locale" content="uk_UA" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Evently — Каталог подій по всій Україні" />
+    <meta name="twitter:description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="index.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="index.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="index.html?lang=da" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header">
+      <div class="container">
+        <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
+          <img class="brand__logo" src="static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </div>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only" data-i18n="nav_toggle">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <a href="#catalog" data-i18n="nav_events">Події</a>
+          <a href="#about" data-i18n="nav_organizers">Організатори</a>
+          <a href="#about" data-i18n="nav_about">Про нас</a>
+          <a href="#contact" data-i18n="nav_contacts">Контакти</a>
+        </nav>
+<div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+                    <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="da" aria-pressed="false" aria-label="Vælg dansk">DA</button>
+        </div>
+        <a class="btn primary header__cta" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="container">
+          <div class="hero__content">
+            <p class="eyebrow" data-i18n="hero_eyebrow">Найближчі події</p>
+            <h1 id="hero-title" data-i18n="title_home">Події для українців у Данії</h1>
+            <span class="hero__accent-bar" aria-hidden="true"></span>
+            <p class="hero-summary" data-i18n="tagline">
+              <span class="hero__marker" aria-hidden="true"></span>
+              Концерти, зустрічі, освітні події — у містах Данії та онлайн.
+            </p>
+            <div class="hero-actions">
+              <a class="btn primary" href="#catalog" data-i18n="cta_explore">Переглянути події</a>
+              <a class="btn secondary" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+            </div>
+            <form class="hero-search" role="search" aria-describedby="search-help">
+              <label class="sr-only" for="event-search" data-i18n="search_label">Пошук подій</label>
+              <div class="hero-search__field">
+                <input
+                  id="event-search"
+                  name="query"
+                  type="search"
+                  placeholder="Пошук за містом, тематикою або датою"
+                  data-i18n-placeholder="search_placeholder"
+                  required
+                />
+                <button class="btn primary" type="submit" data-i18n="cta_explore">Переглянути події</button>
+                <span class="hero__cta-marker" aria-hidden="true"></span>
+              </div>
+              <p id="search-help" class="hero-search__help" data-i18n="search_help">
+                Наприклад: Копенгаген, музика або вихідні.
+              </p>
+            </form>
+          </div>
+          <div class="hero-card" role="presentation">
+            <div class="hero-card__header">
+              <span>Next up</span>
+              <span class="status">Live</span>
+            </div>
+            <div class="hero-card__body">
+              <p class="hero-card__title">Design Systems Meetup</p>
+              <p class="hero-card__meta">Kyiv · Fri 7:00 PM</p>
+              <div class="hero-card__tags">
+                <span>Community</span>
+                <span>Workshop</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="highlights" aria-labelledby="highlights-title">
+        <div class="container">
+          <div class="highlights__header">
+            <h2 id="highlights-title" data-i18n="highlights_title">Тижневі добірки</h2>
+            <div class="highlights__controls">
+              <button class="btn ghost highlights__button" type="button" data-action="prev" aria-label="Previous highlights" data-i18n="highlights_prev" data-i18n-aria="highlights_prev_aria">
+                Назад
+              </button>
+              <button class="btn ghost highlights__button" type="button" data-action="next" aria-label="Next highlights" data-i18n="highlights_next" data-i18n-aria="highlights_next_aria">
+                Далі
+              </button>
+            </div>
+          </div>
+          <div class="highlights__track" tabindex="0" aria-label="Список тижневих добірок" data-i18n-aria="highlights_list_aria">
+            <article class="highlights__card">
+              <span class="highlights__date">12.11</span>
+              <h3>Music at Dock</h3>
+              <span class="highlights__city">Copenhagen</span>
+            </article>
+            <article class="highlights__card">
+              <span class="highlights__date">14.11</span>
+              <h3>Networking Brunch</h3>
+              <span class="highlights__city">Aarhus</span>
+            </article>
+            <article class="highlights__card">
+              <span class="highlights__date">16.11</span>
+              <h3>Kids Story Time</h3>
+              <span class="highlights__city">Odense</span>
+            </article>
+            <article class="highlights__card">
+              <span class="highlights__date">18.11</span>
+              <h3>Film Screening</h3>
+              <span class="highlights__city">Aalborg</span>
+            </article>
+            <article class="highlights__card">
+              <span class="highlights__date">20.11</span>
+              <h3>Community Meetup</h3>
+              <span class="highlights__city">Esbjerg</span>
+            </article>
+            <article class="highlights__card">
+              <span class="highlights__date">22.11</span>
+              <h3>Design Workshop</h3>
+              <span class="highlights__city">Copenhagen</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="catalog" class="catalog" aria-labelledby="catalog-title">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="catalog-title" data-i18n="filter_title">Каталог</h2>
+            <p class="section-summary" data-i18n="catalog_summary">
+              Додавайте фільтри та переглядайте події у зручному списку.
+            </p>
+          </header>
+          <form class="filters" aria-label="Фільтри каталогу" data-i18n-aria="filters_aria">
+            <fieldset class="filters__group">
+              <legend>
+                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-date">
+                  <span data-i18n="filters_date">Дата</span>
+                </button>
+              </legend>
+              <div class="filters__panel" id="filters-date">
+                <div class="filters__row">
+                <label class="filters__field">
+                  <span data-i18n="filters_from">Від</span>
+                  <input type="date" name="date-from" />
+                </label>
+                <label class="filters__field">
+                  <span data-i18n="filters_to">До</span>
+                  <input type="date" name="date-to" />
+                </label>
+                </div>
+                <div class="filters__row">
+                <label class="filters__toggle">
+                  <input type="checkbox" name="quick-today" />
+                  <span data-i18n="filters_today">Сьогодні</span>
+                </label>
+                <label class="filters__toggle">
+                  <input type="checkbox" name="quick-tomorrow" />
+                  <span data-i18n="filters_tomorrow">Завтра</span>
+                </label>
+                <label class="filters__toggle">
+                  <input type="checkbox" name="quick-weekend" />
+                  <span data-i18n="filters_weekend">Вихідні</span>
+                </label>
+                <label class="filters__toggle">
+                  <input type="checkbox" name="quick-online" />
+                  <span data-i18n="filters_online">Онлайн</span>
+                </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="filters__group">
+              <legend>
+                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-location">
+                  <span data-i18n="filters_location">Місце та категорія</span>
+                </button>
+              </legend>
+              <div class="filters__panel" id="filters-location">
+                <div class="filters__row">
+                <label class="filters__field">
+                  <span data-i18n="filters_city">Місто</span>
+                  <select name="city">
+                    <option value="" data-i18n="filters_all_cities">Усі міста</option>
+                    <option value="copenhagen" selected>Копенгаген</option>
+                    <option value="aarhus">Орхус</option>
+                    <option value="odense">Оденсе</option>
+                    <option value="aalborg">Ольборг</option>
+                    <option value="esbjerg">Есб'єрг</option>
+                  </select>
+                </label>
+                <label class="filters__field">
+                  <span data-i18n="filters_category">Категорія</span>
+                  <select name="category">
+                    <option value="" data-i18n="filters_all_categories">Усі категорії</option>
+                    <option value="music" data-i18n="category_music">Музика</option>
+                    <option value="networking" data-i18n="category_networking">Networking</option>
+                    <option value="cinema" data-i18n="category_cinema">Кіно</option>
+                    <option value="education" data-i18n="category_education">Освіта</option>
+                    <option value="kids" data-i18n="category_kids">Для дітей</option>
+                    <option value="community" data-i18n="category_community">Спільнота</option>
+                  </select>
+                </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="filters__group">
+              <legend>
+                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-preferences">
+                  <span data-i18n="filters_preferences">Параметри</span>
+                </button>
+              </legend>
+              <div class="filters__panel" id="filters-preferences">
+                <div class="filters__row">
+                  <label class="filters__field">
+                    <span data-i18n="filters_price">Ціна</span>
+                    <select name="price">
+                      <option value="" data-i18n="filters_any_price">Будь-яка</option>
+                      <option value="free" data-i18n="filters_free">Безкоштовно</option>
+                      <option value="paid" data-i18n="filters_paid">Платно</option>
+                    </select>
+                  </label>
+                  <label class="filters__field">
+                    <span data-i18n="filters_format">Формат</span>
+                    <select name="format">
+                      <option value="" data-i18n="filters_any_format">Будь-який</option>
+                      <option value="online" data-i18n="filters_online">Онлайн</option>
+                      <option value="offline" data-i18n="filters_offline">Офлайн</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="filters__group">
+              <legend>
+                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-audience">
+                  <span data-i18n="filters_audience">Аудиторія</span>
+                </button>
+              </legend>
+              <div class="filters__panel" id="filters-audience">
+                <div class="filters__row">
+                  <label class="filters__toggle">
+                    <input type="checkbox" name="audience-ua" />
+                    <span data-i18n="filters_ua">UA</span>
+                  </label>
+                  <label class="filters__toggle">
+                    <input type="checkbox" name="audience-family" />
+                    <span data-i18n="filters_family">Сім'ям</span>
+                  </label>
+                  <label class="filters__toggle">
+                    <input type="checkbox" name="audience-volunteer" />
+                    <span data-i18n="filters_volunteer">Волонтерам</span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="filters__actions">
+              <label class="filters__toggle">
+                <input type="checkbox" name="show-past" />
+                <span data-i18n="filters_past">Показати минулі</span>
+              </label>
+              <p class="filters__count" aria-live="polite" role="status">N знайдено</p>
+              <button class="btn ghost" type="reset" data-i18n="filters_reset">Скинути</button>
+            </div>
+          </form>
+          <div class="catalog-grid" aria-live="polite">
+          </div>
+          <div class="empty-state catalog-empty" hidden>
+            <div>
+              <p class="empty-state__eyebrow" data-i18n="empty_eyebrow">Немає результатів</p>
+              <h2 data-i18n="empty_title">Немає подій за цими фільтрами.</h2>
+              <p class="empty-state__summary" data-i18n="empty_summary">Спробуйте змінити критерії пошуку.</p>
+            </div>
+          </div>
+          <div class="load-more">
+            <button class="btn ghost load-more__button" type="button" data-i18n="cta_explore">Показати ще</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="about" aria-labelledby="about-title">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="about-title" data-i18n="home_about_title">Про нас</h2>
+            <p class="section-summary" data-i18n="home_about_summary">
+              Коротко про платформу та принципи модерації подій.
+            </p>
+          </header>
+        </div>
+      </section>
+
+      <section id="contact" class="contact" aria-labelledby="contact-title">
+        <div class="container">
+          <header class="section-header">
+            <h2 id="contact-title" data-i18n="home_contact_title">Контакти</h2>
+            <p class="section-summary" data-i18n="home_contact_summary">
+              Напишіть нам, якщо маєте питання або хочете додати подію.
+            </p>
+          </header>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 Evently. All rights reserved.</p>
+        <a class="footer__help" href="docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

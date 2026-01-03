@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://example.com/</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events</loc>
+  </url>
+  <url>
+    <loc>https://example.com/about</loc>
+  </url>
+  <url>
+    <loc>https://example.com/contacts</loc>
+  </url>
+  <url>
+    <loc>https://example.com/legal-privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://example.com/legal-terms.html</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events/design-systems-meetup</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events/local-food-fest</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events/city-night-run</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events/creative-coding-jam</loc>
+  </url>
+  <url>
+    <loc>https://example.com/events/family-film-night</loc>
+  </url>
+</urlset>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - Evently</title>
+    <meta name="description" content="Dashboard skeleton for the events listing platform." />
+    <meta property="og:title" content="Dashboard - Evently" />
+    <meta property="og:description" content="Placeholder dashboard for managing events." />
+    <meta property="og:type" content="website" />
+    <!-- TODO: Replace OG image URL -->
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dashboard - Evently" />
+    <meta name="twitter:description" content="Placeholder dashboard for managing events." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="dashboard.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="dashboard.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="dashboard.html?lang=da" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dashboard-page">
+    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header">
+      <div class="container">
+        <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
+          <img class="brand__logo" src="static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </div>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only" data-i18n="nav_toggle">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <a href="index.html#catalog" data-i18n="nav_events">Події</a>
+          <a href="organizer.html" data-i18n="nav_organizers">Організатори</a>
+          <a href="index.html#about" data-i18n="nav_about">Про нас</a>
+          <a href="index.html#contact" data-i18n="nav_contacts">Контакти</a>
+        </nav>
+        <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+        </div>
+        <a class="btn primary header__cta" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content" class="dashboard">
+      <div class="container">
+        <header class="dashboard__header">
+          <div>
+            <p class="eyebrow" data-i18n="dashboard_eyebrow">Робочий простір організатора</p>
+            <h1 data-i18n="dashboard_title">Дашборд</h1>
+          </div>
+          <a class="btn primary" href="#" data-i18n="dashboard_create_cta">Створити подію</a>
+        </header>
+
+        <nav class="dashboard-tabs" aria-label="Розділи дашборду" data-i18n-aria="dashboard_tabs_aria">
+          <a class="dashboard-tabs__link" href="#events" aria-current="page" data-i18n="dashboard_tab_events">Мої події</a>
+          <a class="dashboard-tabs__link" href="#create" data-i18n="dashboard_tab_create">Створити подію</a>
+          <a class="dashboard-tabs__link" href="#settings" data-i18n="dashboard_tab_settings">Налаштування</a>
+        </nav>
+
+        <section id="events" class="dashboard__section" aria-labelledby="events-title">
+          <header class="section-header">
+            <h2 id="events-title">Мої події</h2>
+            <p class="section-summary" data-i18n="dashboard_events_summary">Керуйте чернетками та опублікованими подіями.</p>
+          </header>
+          <div class="dashboard-table" role="table" aria-label="Статуси подій" data-i18n-aria="dashboard_table_aria">
+            <div class="dashboard-table__row dashboard-table__row--head" role="row">
+              <span role="columnheader" data-i18n="dashboard_table_event">Подія</span>
+              <span role="columnheader" data-i18n="dashboard_table_date">Дата</span>
+              <span role="columnheader" data-i18n="dashboard_table_status">Статус</span>
+              <span role="columnheader" data-i18n="dashboard_table_actions">Дії</span>
+            </div>
+            <div class="dashboard-table__row" role="row">
+              <span role="cell">Design Systems Meetup</span>
+              <span role="cell">12 Nov · 19:00</span>
+              <span role="cell" class="status-pill status-pill--published" data-i18n="dashboard_status_published">Опубліковано</span>
+              <span role="cell"><a href="event.html" data-i18n="dashboard_action_view">Переглянути</a></span>
+            </div>
+            <div class="dashboard-table__row" role="row">
+              <span role="cell">Creative Coding Jam</span>
+              <span role="cell">30 Oct · 18:30</span>
+              <span role="cell" class="status-pill status-pill--pending" data-i18n="dashboard_status_pending">На модерації</span>
+              <span role="cell"><a href="#" data-i18n="dashboard_action_edit">Редагувати</a></span>
+            </div>
+            <div class="dashboard-table__row" role="row">
+              <span role="cell">Community Breakfast</span>
+              <span role="cell" data-i18n="dashboard_status_draft">Чернетка</span>
+              <span role="cell" class="status-pill status-pill--draft" data-i18n="dashboard_status_draft">Чернетка</span>
+              <span role="cell"><a href="#" data-i18n="dashboard_action_continue">Продовжити</a></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard__section" aria-labelledby="empty-title">
+          <div class="empty-state">
+            <div>
+              <p class="empty-state__eyebrow" data-i18n="dashboard_empty_eyebrow">Немає майбутніх подій</p>
+              <h2 id="empty-title" data-i18n="dashboard_empty_title">Почніть планувати наступну подію.</h2>
+              <p class="empty-state__summary" data-i18n="dashboard_empty_summary">Створіть чернетку, щоб зафіксувати ідеї.</p>
+            </div>
+            <a class="btn primary" href="#" data-i18n="dashboard_create_cta">Створити подію</a>
+          </div>
+        </section>
+
+        <section id="settings" class="dashboard__section" aria-labelledby="settings-title">
+          <header class="section-header">
+            <h2 id="settings-title">Налаштування</h2>
+            <p class="section-summary" data-i18n="dashboard_settings_summary">Налаштуйте профіль та верифікацію організатора.</p>
+          </header>
+          <div class="verification" data-verification>
+            <p class="verification__status" role="status" aria-live="polite"></p>
+            <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="verification__option">
+              <h3 data-i18n="verification_email_title">Верифікація через email</h3>
+              <label class="form-field">
+                <span data-i18n="verification_email_label">Email для верифікації</span>
+                <input type="email" name="verification-email" autocomplete="email" required />
+                <small data-i18n="verification_email_help">Ми надішлемо 6-значний код.</small>
+              </label>
+              <div class="verification__actions">
+                <button class="btn secondary" type="button" data-action="send-code" data-i18n="verification_send_code">Надіслати код</button>
+              </div>
+              <div class="verification__code" hidden>
+                <label class="form-field">
+                  <span data-i18n="verification_code_label">Код підтвердження</span>
+                  <input type="text" name="verification-code" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="one-time-code" aria-describedby="verification-code-help" />
+                  <small id="verification-code-help" data-i18n="verification_code_help">Введіть 6 цифр із листа.</small>
+                </label>
+                <button class="btn primary" type="button" data-action="verify-code" data-i18n="verification_verify_code">Підтвердити код</button>
+              </div>
+            </div>
+
+            <div class="verification__option">
+              <h3 data-i18n="verification_link_title">Сайт або соцмережа</h3>
+              <label class="form-field">
+                <span data-i18n="verification_link_label">Посилання</span>
+                <input type="url" name="verification-link" placeholder="https://example.com" />
+                <small data-i18n="verification_link_help">Ми перевіримо вручну.</small>
+              </label>
+              <div class="verification__actions">
+                <button class="btn ghost" type="button" data-action="submit-link" data-i18n="verification_link_submit">Перевіримо вручну</button>
+              </div>
+              <p class="verification__pending" hidden data-i18n="verification_pending">Очікує підтвердження</p>
+            </div>
+
+            <p class="verification__note" data-i18n="verification_note">Для публікації подій потрібна верифікація організатора.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <a class="footer__help" href="docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

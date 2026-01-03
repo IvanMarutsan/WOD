@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design Systems Meetup — Evently</title>
+    <meta name="description" content="Placeholder: full event details, agenda, and ticket information for Design Systems Meetup." />
+    <meta property="og:title" content="Design Systems Meetup — Evently" />
+    <meta property="og:description" content="Placeholder: full event details, agenda, and ticket information for Design Systems Meetup." />
+    <meta property="og:type" content="website" />
+    <!-- TODO: Replace OG image URL -->
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="https://example.com/event.html" />
+    <meta property="og:locale" content="uk_UA" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Design Systems Meetup — Evently" />
+    <meta name="twitter:description" content="Placeholder: full event details, agenda, and ticket information for Design Systems Meetup." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="event.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="event.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="event.html?lang=da" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": "Design Systems Meetup",
+        "startDate": "2024-11-12T19:00:00+02:00",
+        "endDate": "2024-11-12T21:30:00+02:00",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "location": {
+          "@type": "Place",
+          "name": "Design Hub",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "12 Khreschatyk St",
+            "addressLocality": "Kyiv",
+            "addressCountry": "DK"
+          }
+        },
+        "image": [
+          "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&auto=format&fit=crop"
+        ],
+        "description": "A community meetup focused on design systems and product design.",
+        "organizer": {
+          "@type": "Organization",
+          "name": "Evently Community",
+          "url": "https://example.com"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "350",
+          "priceCurrency": "DKK",
+          "availability": "https://schema.org/InStock",
+          "url": "https://example.com/tickets"
+        }
+      }
+    </script>
+  </head>
+  <body class="event-page">
+    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header">
+      <div class="container">
+        <div class="brand" aria-label="Бренд платформи" data-i18n-aria="brand_aria">
+          <img class="brand__logo" src="static/wod_logo.PNG" alt="What's on DK? логотип" width="120" height="120" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </div>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only" data-i18n="nav_toggle">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <a href="index.html#catalog" data-i18n="nav_events">Події</a>
+          <a href="index.html#about" data-i18n="nav_organizers">Організатори</a>
+          <a href="index.html#about" data-i18n="nav_about">Про нас</a>
+          <a href="index.html#contact" data-i18n="nav_contacts">Контакти</a>
+        </nav>
+        <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+        </div>
+        <a class="btn primary header__cta" href="dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content" class="event-detail">
+      <div class="container">
+        <a class="back-link" href="index.html#catalog" data-i18n="back_to_catalog">До каталогу</a>
+        <div class="event-layout">
+          <article class="event-article">
+            <header class="event-article__header">
+              <p class="eyebrow" data-i18n="event_eyebrow">Дизайн і продукт</p>
+              <h1>Design Systems Meetup</h1>
+              <p
+                class="event-article__meta"
+                data-event-start="2024-11-12T19:00:00+01:00"
+                data-event-end="2024-11-12T21:30:00+01:00"
+                data-event-city="Copenhagen"
+              >
+                12.11.2024 · 19:00–21:30 · Copenhagen
+              </p>
+            </header>
+            <div class="event-banner" data-past-banner hidden>
+              <p data-i18n="event_past_banner">Ця подія вже минула</p>
+            </div>
+
+            <section class="event-article__section">
+              <h2 data-i18n="event_description_title">Опис</h2>
+              <p data-i18n="event_description_body">
+                Зустріч спільноти про масштабовані дизайн-системи. Обговоримо кейси, проведемо
+                воркшоп і познайомимося ближче.
+              </p>
+            </section>
+
+            <section class="event-article__section">
+              <h2 data-i18n="event_where_title">Де</h2>
+              <p class="event-article__location">Copenhagen · Design Hub</p>
+              <div class="event-map" aria-label="Мапа події (плейсхолдер)">
+                <p data-i18n="event_map_placeholder">Плейсхолдер мапи</p>
+              </div>
+            </section>
+
+            <section class="event-article__section">
+              <h2 data-i18n="event_language_title">Мова події</h2>
+              <p data-i18n="event_language_value">uk / en</p>
+            </section>
+
+            <section class="event-article__section" aria-labelledby="event-contact-title">
+              <h2 id="event-contact-title" data-i18n="event_contact_title">Контакти</h2>
+              <p>
+                <span data-i18n="event_contact_name">Імʼя</span>:
+                <span>Olena K.</span>
+              </p>
+              <p>
+                <a href="mailto:hello@whatsondk.test" data-i18n="event_contact_email_label">Email</a>:
+                <a href="mailto:hello@whatsondk.test">hello@whatsondk.test</a>
+              </p>
+              <p>
+                <a href="tel:+4512345678" data-i18n="event_contact_phone_label">Телефон</a>:
+                <a href="tel:+4512345678">+45 12 34 56 78</a>
+              </p>
+            </section>
+
+            <section class="event-article__section">
+              <h2 data-i18n="event_tags_title">Теги</h2>
+              <div class="event-tags">
+                <span class="event-tag" data-tag-label="Education" data-tag-type="category">Education</span>
+                <span class="event-tag" data-tag-label="Design">Design</span>
+                <span class="event-tag" data-tag-label="Community">Community</span>
+                <span class="event-tag event-tag--pending" data-tag-label="Volunteer" data-i18n-title="pending_tooltip">Volunteer</span>
+                <span class="event-tag" data-tag-label="Workshop">Workshop</span>
+              </div>
+            </section>
+
+            <section class="event-article__section">
+              <h2 data-i18n="event_organizer_title">Організатор</h2>
+              <div class="organizer">
+              <div class="organizer__info">
+                  <p class="organizer__name">
+                    Evently Community
+                    <span class="verified-badge" data-verified-badge data-i18n="verified_badge" hidden>Verified</span>
+                  </p>
+                  <p class="organizer__meta" data-i18n="organizer_meta">Некомерційна спільнота зустрічей</p>
+              </div>
+                <div class="organizer__contacts">
+                  <a href="mailto:hello@evently.test" data-i18n="organizer_contact_email">Email</a>
+                  <a href="tel:+380441234567" data-i18n="organizer_contact_phone">Телефон</a>
+                  <a href="#" data-i18n="organizer_contact_website">Сайт</a>
+                </div>
+              </div>
+            </section>
+          </article>
+
+          <aside class="event-sidebar" aria-label="Панель квитків" data-i18n-aria="ticket_panel_aria">
+            <div class="event-sidebar__card">
+              <p class="event-sidebar__price" data-price-type="paid" data-price-min="350" data-price-max="520">
+                DKK 350–520
+              </p>
+              <p class="event-sidebar__note" data-i18n="event_ticket_note">Купити квитки (DKK 350–520)</p>
+              <a class="event-sidebar__cta" href="#" data-event-id="evt-001" data-i18n="cta_tickets">Квитки</a>
+            </div>
+            <div class="event-sidebar__card">
+              <h2 data-i18n="event_share_title">Поділитися</h2>
+              <div class="event-share">
+                <a href="#" data-i18n="event_share_facebook">Facebook</a>
+                <a href="#" data-i18n="event_share_x">X</a>
+                <a href="#" data-i18n="event_share_linkedin">LinkedIn</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <a class="footer__help" href="docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

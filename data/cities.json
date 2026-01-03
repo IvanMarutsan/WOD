@@ -1,0 +1,7 @@
+[
+  {"id":"copenhagen","name":"Копенгаген","slug":"copenhagen"},
+  {"id":"aarhus","name":"Орхус","slug":"aarhus"},
+  {"id":"odense","name":"Оденсе","slug":"odense"},
+  {"id":"aalborg","name":"Ольборг","slug":"aalborg"},
+  {"id":"esbjerg","name":"Есб'єрг","slug":"esbjerg"}
+]
