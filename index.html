@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+    <a class="skip-link" href="./index.html#content" data-i18n="skip_link">Перейти до вмісту</a>
 
     <header class="site-header" role="banner">
       <div class="container header__inner">
@@ -35,10 +35,9 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="#catalog" data-i18n="nav_events">Події</a>
-          <a href="#about" data-i18n="nav_organizers">Організатори</a>
-          <a href="#about" data-i18n="nav_about">Про нас</a>
-          <a href="#contact" data-i18n="nav_contacts">Контакти</a>
+          <a href="./index.html#events" aria-current="page" data-i18n="nav_events">Події</a>
+          <a href="./about.html" data-i18n="nav_about">Про нас</a>
+          <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
 <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
                     <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
@@ -62,7 +61,7 @@
               Концерти, зустрічі, освітні події — у містах Данії та онлайн.
             </p>
             <div class="hero-actions">
-              <a class="btn primary" href="#catalog" data-i18n="cta_explore">Переглянути події</a>
+              <a class="btn primary" href="./index.html#events" data-i18n="cta_explore">Переглянути події</a>
               <a class="btn secondary" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
             </div>
             <form class="hero-search" role="search" aria-describedby="search-help">
@@ -150,7 +149,7 @@
         </div>
       </section>
 
-      <section id="catalog" class="catalog" aria-labelledby="catalog-title">
+      <section id="events" class="catalog" aria-labelledby="catalog-title">
         <div class="container">
           <header class="section-header">
             <h2 id="catalog-title" data-i18n="filter_title">Каталог</h2>
@@ -176,23 +175,18 @@
                   <input type="date" name="date-to" />
                 </label>
                 </div>
-                <div class="filters__row">
-                <label class="filters__toggle">
-                  <input type="checkbox" name="quick-today" />
-                  <span data-i18n="filters_today">Сьогодні</span>
-                </label>
-                <label class="filters__toggle">
-                  <input type="checkbox" name="quick-tomorrow" />
-                  <span data-i18n="filters_tomorrow">Завтра</span>
-                </label>
-                <label class="filters__toggle">
-                  <input type="checkbox" name="quick-weekend" data-testid="filters-weekend" />
-                  <span data-i18n="filters_weekend">Вихідні</span>
-                </label>
-                <label class="filters__toggle">
-                  <input type="checkbox" name="quick-online" />
-                  <span data-i18n="filters_online">Онлайн</span>
-                </label>
+                <div class="filters__row filters__row--presets">
+                <input class="filters__preset-input" type="checkbox" name="quick-today" />
+                <input class="filters__preset-input" type="checkbox" name="quick-tomorrow" />
+                <input class="filters__preset-input" type="checkbox" name="quick-weekend" data-testid="filters-weekend" />
+                <input class="filters__preset-input" type="checkbox" name="quick-online" />
+                <div class="filters__preset-group" role="group" aria-label="Швидкі пресети">
+                  <button class="filters__toggle filters__preset" type="button" data-quick="today" data-preset="today" aria-pressed="false" data-i18n="presets">Сьогодні</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="tomorrow" data-preset="tomorrow" aria-pressed="false" data-i18n="presets">Завтра</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="weekend" data-preset="weekend" aria-pressed="false" data-i18n="presets" data-testid="filters-weekend">Вихідні</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="online" data-preset="online" aria-pressed="false" data-i18n="presets">Онлайн</button>
+                </div>
+                <button class="filters__reset-inline" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
                 </div>
               </div>
             </fieldset>
@@ -290,17 +284,28 @@
                 <span data-i18n="filters_past">Показати минулі</span>
               </label>
               <p class="filters__count" aria-live="polite" role="status">N знайдено</p>
-              <button class="btn ghost" type="reset" data-i18n="filters_reset">Скинути</button>
+              <button class="btn ghost" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
             </div>
           </form>
           <div class="catalog-grid" aria-live="polite">
           </div>
           <div class="empty-state catalog-empty" hidden>
             <div>
-              <p class="empty-state__eyebrow" data-i18n="empty_eyebrow">Немає результатів</p>
-              <h2 data-i18n="empty_title">Немає подій за цими фільтрами.</h2>
-              <p class="empty-state__summary" data-i18n="empty_summary">Спробуйте змінити критерії пошуку.</p>
+              <h2 data-i18n="empty_state">Немає подій за цим запитом.</h2>
             </div>
+            <button class="btn ghost" type="button" data-action="reset-filters" data-i18n="reset_filters">
+              Скинути фільтри
+            </button>
+          </div>
+          <div class="empty-state catalog-error" role="status" hidden>
+            <div>
+              <p class="empty-state__eyebrow" data-i18n="error_eyebrow">Помилка</p>
+              <h2 data-i18n="error_title">Не вдалося завантажити події.</h2>
+              <p class="empty-state__summary" data-i18n="error_summary">Перевірте з'єднання та спробуйте ще раз.</p>
+            </div>
+            <button class="btn ghost" type="button" data-action="retry-load" data-i18n="error_retry">
+              Повторити
+            </button>
           </div>
           <div class="load-more">
             <button class="btn ghost load-more__button" type="button" data-i18n="cta_explore">Показати ще</button>

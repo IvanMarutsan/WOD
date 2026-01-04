@@ -1,35 +1,47 @@
 [
   {
     "id": "evt-001",
-    "slug": "design-systems-meetup",
-    "title": "Design Systems Meetup",
-    "description": "A community meetup focused on scalable design systems and product design.",
+    "slug": "copenhagen-design-week-open-studio",
+    "title": "Copenhagen Design Week: Open Studio",
+    "description": "Guided studio visits with Danish and Ukrainian designers.",
     "category": {
-      "label": "education",
+      "label": "art",
       "status": "approved"
     },
     "tags": [
-      {"label": "design", "status": "approved"},
-      {"label": "meetup", "status": "approved"},
-      {"label": "community", "status": "approved"}
+      {
+        "label": "design",
+        "status": "approved"
+      },
+      {
+        "label": "studio",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-12T19:00:00+01:00",
-    "end": "2024-11-12T21:30:00+01:00",
+    "start": "2026-01-12T17:30:00+01:00",
+    "end": "2026-01-12T20:00:00+01:00",
     "format": "offline",
-    "venue": "Design Hub Copenhagen",
-    "address": "Bernstorffsgade 16, 1577 København",
+    "venue": "K\u00f8dbyen Creative Hub",
+    "address": "Fl\u00e6sketorvet 10, 1711 K\u00f8benhavn",
     "city": "Copenhagen",
-    "geo": {"lat": 55.6679, "lng": 12.5720},
+    "geo": {
+      "lat": 55.6674,
+      "lng": 12.5591
+    },
     "priceType": "paid",
-    "priceMin": 350,
-    "priceMax": 520,
-    "ticketUrl": "https://example.com/tickets/design-systems",
+    "priceMin": 120,
+    "priceMax": 220,
+    "ticketUrl": "https://example.com/tickets/design-week-open-studio",
     "organizerId": "org-001",
     "images": [
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&auto=format&fit=crop"
     ],
     "status": "published",
-    "language": "uk",
+    "language": "en",
     "forUkrainians": true,
     "familyFriendly": false,
     "volunteer": false,
@@ -41,25 +53,37 @@
   },
   {
     "id": "evt-002",
-    "slug": "local-food-fest",
-    "title": "Local Food Fest",
-    "description": "Street food, local vendors, and live cooking demos in the city center.",
+    "slug": "aarhus-winter-food-fest",
+    "title": "Aarhus Winter Food Fest",
+    "description": "Local vendors, hot drinks, and live cooking demos.",
     "category": {
-      "label": "community",
+      "label": "food",
       "status": "approved"
     },
     "tags": [
-      {"label": "food", "status": "approved"},
-      {"label": "family", "status": "approved"},
-      {"label": "festival", "status": "approved"}
+      {
+        "label": "food",
+        "status": "approved"
+      },
+      {
+        "label": "festival",
+        "status": "approved"
+      },
+      {
+        "label": "family",
+        "status": "approved"
+      }
     ],
-    "start": "2024-10-20T14:00:00+02:00",
-    "end": "2024-10-20T19:00:00+02:00",
+    "start": "2026-01-18T12:00:00+01:00",
+    "end": "2026-01-18T18:30:00+01:00",
     "format": "offline",
     "venue": "Latin Quarter Square",
     "address": "Klostertorvet 4, 8000 Aarhus",
     "city": "Aarhus",
-    "geo": {"lat": 56.1568, "lng": 10.2039},
+    "geo": {
+      "lat": 56.1568,
+      "lng": 10.2039
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
@@ -81,29 +105,41 @@
   },
   {
     "id": "evt-003",
-    "slug": "city-night-run",
-    "title": "City Night Run",
-    "description": "Evening run with music, water stations, and a community warm-up.",
+    "slug": "odense-night-run-bridge",
+    "title": "Odense Night Run by the River",
+    "description": "Evening run with music, warm-up, and refreshments.",
     "category": {
-      "label": "community",
+      "label": "sports",
       "status": "approved"
     },
     "tags": [
-      {"label": "sports", "status": "approved"},
-      {"label": "night", "status": "approved"},
-      {"label": "community", "status": "approved"}
+      {
+        "label": "sports",
+        "status": "approved"
+      },
+      {
+        "label": "night",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      }
     ],
-    "start": "2024-10-12T19:00:00+02:00",
-    "end": "2024-10-12T21:00:00+02:00",
+    "start": "2026-02-02T19:00:00+01:00",
+    "end": "2026-02-02T21:00:00+01:00",
     "format": "offline",
-    "venue": "Odense Stadium",
-    "address": "Højstrupvej 7B, 5200 Odense",
+    "venue": "Odense Harbor",
+    "address": "Havnegade 7, 5000 Odense",
     "city": "Odense",
-    "geo": {"lat": 55.3656, "lng": 10.4130},
+    "geo": {
+      "lat": 55.4038,
+      "lng": 10.4014
+    },
     "priceType": "paid",
-    "priceMin": 300,
-    "priceMax": 450,
-    "ticketUrl": "https://example.com/tickets/night-run",
+    "priceMin": 180,
+    "priceMax": 280,
+    "ticketUrl": "https://example.com/tickets/odense-night-run",
     "organizerId": "org-003",
     "images": [
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop"
@@ -121,29 +157,41 @@
   },
   {
     "id": "evt-004",
-    "slug": "creative-coding-jam",
-    "title": "Creative Coding Jam",
-    "description": "Live coding performances and a hands-on workshop for creatives.",
+    "slug": "aalborg-creative-coding-jam",
+    "title": "Aalborg Creative Coding Jam",
+    "description": "Live coding performances and a hands-on workshop.",
     "category": {
       "label": "education",
-      "status": "pending"
+      "status": "approved"
     },
     "tags": [
-      {"label": "creative", "status": "approved"},
-      {"label": "coding", "status": "approved"},
-      {"label": "art", "status": "pending"}
+      {
+        "label": "creative",
+        "status": "approved"
+      },
+      {
+        "label": "coding",
+        "status": "approved"
+      },
+      {
+        "label": "art",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-03T18:30:00+01:00",
-    "end": "2024-11-03T21:15:00+01:00",
+    "start": "2026-01-22T18:30:00+01:00",
+    "end": "2026-01-22T21:15:00+01:00",
     "format": "offline",
     "venue": "Nordkraft",
-    "address": "Teglgårds Plads 1, 9000 Aalborg",
+    "address": "Teglg\u00e5rds Plads 1, 9000 Aalborg",
     "city": "Aalborg",
-    "geo": {"lat": 57.0480, "lng": 9.9191},
+    "geo": {
+      "lat": 57.048,
+      "lng": 9.9191
+    },
     "priceType": "paid",
     "priceMin": 200,
     "priceMax": 350,
-    "ticketUrl": "https://example.com/tickets/creative-coding",
+    "ticketUrl": "https://example.com/tickets/aalborg-creative-coding",
     "organizerId": "org-001",
     "images": [
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&auto=format&fit=crop"
@@ -161,25 +209,37 @@
   },
   {
     "id": "evt-005",
-    "slug": "family-film-night",
-    "title": "Family Film Night",
+    "slug": "esbjerg-family-film-night",
+    "title": "Esbjerg Family Film Night",
     "description": "Animated movie screening with kids activities and snacks.",
     "category": {
       "label": "kids",
       "status": "approved"
     },
     "tags": [
-      {"label": "kids", "status": "approved"},
-      {"label": "cinema", "status": "approved"},
-      {"label": "family", "status": "approved"}
+      {
+        "label": "kids",
+        "status": "approved"
+      },
+      {
+        "label": "cinema",
+        "status": "approved"
+      },
+      {
+        "label": "family",
+        "status": "approved"
+      }
     ],
-    "start": "2024-10-25T17:00:00+02:00",
+    "start": "2026-01-24T17:00:00+01:00",
     "end": null,
     "format": "offline",
     "venue": "Esbjerg Library",
-    "address": "Nørregade 19, 6700 Esbjerg",
+    "address": "N\u00f8rregade 19, 6700 Esbjerg",
     "city": "Esbjerg",
-    "geo": {"lat": 55.4763, "lng": 8.4534},
+    "geo": {
+      "lat": 55.4763,
+      "lng": 8.4534
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
@@ -201,25 +261,37 @@
   },
   {
     "id": "evt-006",
-    "slug": "community-breakfast",
-    "title": "Community Breakfast",
+    "slug": "aarhus-community-breakfast",
+    "title": "Community Breakfast for Newcomers",
     "description": "Morning coffee and networking for newcomers in Denmark.",
     "category": {
       "label": "networking",
       "status": "approved"
     },
     "tags": [
-      {"label": "networking", "status": "approved"},
-      {"label": "welcome", "status": "approved"},
-      {"label": "support", "status": "approved"}
+      {
+        "label": "networking",
+        "status": "approved"
+      },
+      {
+        "label": "welcome",
+        "status": "approved"
+      },
+      {
+        "label": "support",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-08T09:00:00+01:00",
-    "end": "2024-11-08T11:00:00+01:00",
+    "start": "2026-01-15T09:00:00+01:00",
+    "end": "2026-01-15T11:00:00+01:00",
     "format": "offline",
     "venue": "Union Kitchen",
-    "address": "Åboulevarden 18, 8000 Aarhus",
+    "address": "\u00c5boulevarden 18, 8000 Aarhus",
     "city": "Aarhus",
-    "geo": {"lat": 56.1532, "lng": 10.2072},
+    "geo": {
+      "lat": 56.1532,
+      "lng": 10.2072
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
@@ -249,17 +321,29 @@
       "status": "approved"
     },
     "tags": [
-      {"label": "music", "status": "approved"},
-      {"label": "indie", "status": "approved"},
-      {"label": "live", "status": "approved"}
+      {
+        "label": "music",
+        "status": "approved"
+      },
+      {
+        "label": "indie",
+        "status": "approved"
+      },
+      {
+        "label": "live",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-18T20:00:00+01:00",
-    "end": "2024-11-18T23:00:00+01:00",
+    "start": "2026-02-08T20:00:00+01:00",
+    "end": "2026-02-08T23:00:00+01:00",
     "format": "offline",
     "venue": "Vega",
-    "address": "Enghavevej 40, 1674 København",
+    "address": "Enghavevej 40, 1674 K\u00f8benhavn",
     "city": "Copenhagen",
-    "geo": {"lat": 55.6647, "lng": 12.5514},
+    "geo": {
+      "lat": 55.6647,
+      "lng": 12.5514
+    },
     "priceType": "paid",
     "priceMin": 280,
     "priceMax": 420,
@@ -281,7 +365,7 @@
   },
   {
     "id": "evt-008",
-    "slug": "ukrainian-film-screening",
+    "slug": "copenhagen-ukrainian-film",
     "title": "Ukrainian Film Screening",
     "description": "Documentary screening with a director Q&A session.",
     "category": {
@@ -289,17 +373,29 @@
       "status": "approved"
     },
     "tags": [
-      {"label": "cinema", "status": "approved"},
-      {"label": "ua", "status": "approved"},
-      {"label": "discussion", "status": "approved"}
+      {
+        "label": "cinema",
+        "status": "approved"
+      },
+      {
+        "label": "ua",
+        "status": "approved"
+      },
+      {
+        "label": "discussion",
+        "status": "approved"
+      }
     ],
-    "start": "2024-10-28T19:30:00+02:00",
-    "end": "2024-10-28T22:00:00+02:00",
+    "start": "2026-01-30T19:30:00+01:00",
+    "end": "2026-01-30T22:00:00+01:00",
     "format": "offline",
     "venue": "Cinemateket",
-    "address": "Gothersgade 55, 1123 København",
+    "address": "Gothersgade 55, 1123 K\u00f8benhavn",
     "city": "Copenhagen",
-    "geo": {"lat": 55.6812, "lng": 12.5756},
+    "geo": {
+      "lat": 55.6812,
+      "lng": 12.5756
+    },
     "priceType": "paid",
     "priceMin": 120,
     "priceMax": 180,
@@ -321,7 +417,7 @@
   },
   {
     "id": "evt-009",
-    "slug": "danish-language-club",
+    "slug": "aalborg-danish-language-club",
     "title": "Danish Language Club",
     "description": "Weekly language practice for newcomers with volunteers.",
     "category": {
@@ -329,17 +425,29 @@
       "status": "approved"
     },
     "tags": [
-      {"label": "language", "status": "approved"},
-      {"label": "danish", "status": "approved"},
-      {"label": "volunteers", "status": "approved"}
+      {
+        "label": "language",
+        "status": "approved"
+      },
+      {
+        "label": "danish",
+        "status": "approved"
+      },
+      {
+        "label": "volunteers",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-05T17:30:00+01:00",
+    "start": "2026-02-04T17:30:00+01:00",
     "end": null,
     "format": "offline",
     "venue": "Culture House",
-    "address": "Østerbro 12, 9000 Aalborg",
+    "address": "\u00d8sterbro 12, 9000 Aalborg",
     "city": "Aalborg",
-    "geo": {"lat": 57.0466, "lng": 9.9282},
+    "geo": {
+      "lat": 57.0466,
+      "lng": 9.9282
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
@@ -361,29 +469,41 @@
   },
   {
     "id": "evt-010",
-    "slug": "startup-networking-lunch",
+    "slug": "odense-startup-lunch",
     "title": "Startup Networking Lunch",
     "description": "Meet founders and investors over lunch in central Odense.",
     "category": {
-      "label": "networking",
+      "label": "business",
       "status": "approved"
     },
     "tags": [
-      {"label": "startup", "status": "approved"},
-      {"label": "networking", "status": "approved"},
-      {"label": "lunch", "status": "approved"}
+      {
+        "label": "startup",
+        "status": "approved"
+      },
+      {
+        "label": "networking",
+        "status": "approved"
+      },
+      {
+        "label": "lunch",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-14T12:00:00+01:00",
-    "end": "2024-11-14T14:00:00+01:00",
+    "start": "2026-01-28T12:00:00+01:00",
+    "end": "2026-01-28T14:00:00+01:00",
     "format": "offline",
     "venue": "Storms Pakhus",
     "address": "Lerchesgade 4, 5000 Odense",
     "city": "Odense",
-    "geo": {"lat": 55.3982, "lng": 10.3856},
+    "geo": {
+      "lat": 55.3982,
+      "lng": 10.3856
+    },
     "priceType": "paid",
     "priceMin": 150,
     "priceMax": 250,
-    "ticketUrl": "https://example.com/tickets/startup-lunch",
+    "ticketUrl": "https://example.com/tickets/odense-startup-lunch",
     "organizerId": "org-002",
     "images": [
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
@@ -401,72 +521,356 @@
   },
   {
     "id": "evt-011",
-    "slug": "kids-art-workshop",
-    "title": "Kids Art Workshop",
-    "description": "Painting and clay workshop for families in Copenhagen.",
+    "slug": "kolding-craft-market",
+    "title": "Kolding Craft & Makers Market",
+    "description": "Local makers selling ceramics, prints, and textiles.",
     "category": {
-      "label": "kids",
+      "label": "market",
       "status": "approved"
     },
     "tags": [
-      {"label": "art", "status": "approved"},
-      {"label": "kids", "status": "approved"},
-      {"label": "workshop", "status": "approved"}
+      {
+        "label": "market",
+        "status": "approved"
+      },
+      {
+        "label": "craft",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-09T10:30:00+01:00",
-    "end": "2024-11-09T12:00:00+01:00",
+    "start": "2026-02-14T10:00:00+01:00",
+    "end": "2026-02-14T16:00:00+01:00",
     "format": "offline",
-    "venue": "Kulturhuset Indre By",
-    "address": "Charlotte Ammundsens Pl. 3, 1359 København",
-    "city": "Copenhagen",
-    "geo": {"lat": 55.6817, "lng": 12.5788},
+    "venue": "Kolding Hallerne",
+    "address": "Ambolten 2, 6000 Kolding",
+    "city": "Kolding",
+    "geo": {
+      "lat": 55.4925,
+      "lng": 9.4731
+    },
+    "priceType": "paid",
+    "priceMin": 40,
+    "priceMax": 80,
+    "ticketUrl": "https://example.com/tickets/kolding-craft-market",
+    "organizerId": "org-004",
+    "images": [
+      "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Anne S.",
+      "email": "market@whatsondk.test",
+      "phone": "+45 30 11 23 77"
+    }
+  },
+  {
+    "id": "evt-012",
+    "slug": "roskilde-history-walk",
+    "title": "Roskilde History Walk",
+    "description": "City walk focused on Danish history and UNESCO landmarks.",
+    "category": {
+      "label": "history",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "history",
+        "status": "approved"
+      },
+      {
+        "label": "walking",
+        "status": "approved"
+      },
+      {
+        "label": "culture",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-01-20T13:00:00+01:00",
+    "end": "2026-01-20T15:30:00+01:00",
+    "format": "offline",
+    "venue": "Roskilde Cathedral",
+    "address": "Domkirkepladsen 3, 4000 Roskilde",
+    "city": "Roskilde",
+    "geo": {
+      "lat": 55.64,
+      "lng": 12.0809
+    },
+    "priceType": "paid",
+    "priceMin": 90,
+    "priceMax": 140,
+    "ticketUrl": "https://example.com/tickets/roskilde-history-walk",
+    "organizerId": "org-005",
+    "images": [
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Peter N.",
+      "email": "heritage@whatsondk.test",
+      "phone": "+45 44 18 07 55"
+    }
+  },
+  {
+    "id": "evt-013",
+    "slug": "silkeborg-lake-kayak",
+    "title": "Silkeborg Lake Kayak Day",
+    "description": "Guided kayak intro with safety briefing and gear.",
+    "category": {
+      "label": "outdoors",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "outdoors",
+        "status": "approved"
+      },
+      {
+        "label": "kayak",
+        "status": "approved"
+      },
+      {
+        "label": "adventure",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-03-07T09:30:00+01:00",
+    "end": "2026-03-07T13:00:00+01:00",
+    "format": "offline",
+    "venue": "Silkeborg Langs\u00f8",
+    "address": "S\u00f8vej 2, 8600 Silkeborg",
+    "city": "Silkeborg",
+    "geo": {
+      "lat": 56.1669,
+      "lng": 9.5451
+    },
+    "priceType": "paid",
+    "priceMin": 260,
+    "priceMax": 360,
+    "ticketUrl": "https://example.com/tickets/silkeborg-kayak",
+    "organizerId": "org-006",
+    "images": [
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": false,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Mikkel T.",
+      "email": "outdoors@whatsondk.test",
+      "phone": "+45 25 88 61 02"
+    }
+  },
+  {
+    "id": "evt-014",
+    "slug": "vejle-family-science-day",
+    "title": "Vejle Family Science Day",
+    "description": "Hands-on science demos for kids and parents.",
+    "category": {
+      "label": "science",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "science",
+        "status": "approved"
+      },
+      {
+        "label": "kids",
+        "status": "approved"
+      },
+      {
+        "label": "family",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-02-21T11:00:00+01:00",
+    "end": "2026-02-21T15:00:00+01:00",
+    "format": "offline",
+    "venue": "\u00d8kolariet",
+    "address": "D\u00e6mningen 11, 7100 Vejle",
+    "city": "Vejle",
+    "geo": {
+      "lat": 55.7093,
+      "lng": 9.5357
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
     "ticketUrl": "",
-    "organizerId": "org-002",
+    "organizerId": "org-004",
     "images": [
-      "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?w=900&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Camilla J.",
+      "email": "science@whatsondk.test",
+      "phone": "+45 88 10 04 36"
+    }
+  },
+  {
+    "id": "evt-015",
+    "slug": "aalborg-volunteer-day",
+    "title": "Volunteer Day: City Clean-Up",
+    "description": "Community clean-up with supplies provided by organizers.",
+    "category": {
+      "label": "volunteer",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "volunteer",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      },
+      {
+        "label": "outdoors",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-02-01T10:00:00+01:00",
+    "end": "2026-02-01T13:00:00+01:00",
+    "format": "offline",
+    "venue": "Kildeparken",
+    "address": "Kildeparken 1, 9000 Aalborg",
+    "city": "Aalborg",
+    "geo": {
+      "lat": 57.0435,
+      "lng": 9.9189
+    },
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&auto=format&fit=crop"
     ],
     "status": "published",
     "language": "uk",
     "forUkrainians": true,
     "familyFriendly": true,
-    "volunteer": false,
+    "volunteer": true,
     "contactPerson": {
-      "name": "Oksana S.",
-      "email": "kids@whatsondk.test",
-      "phone": "+45 91 44 08 31"
+      "name": "Andrii S.",
+      "email": "volunteer@whatsondk.test",
+      "phone": "+45 60 21 19 09"
     }
   },
   {
-    "id": "evt-012",
-    "slug": "online-education-session",
-    "title": "Online Education Session",
-    "description": "Evening webinar on Danish education pathways for newcomers.",
+    "id": "evt-016",
+    "slug": "copenhagen-family-museum-day",
+    "title": "Copenhagen Museum Family Day",
+    "description": "Kids-friendly tours and creative workshops at the museum.",
     "category": {
-      "label": "education",
+      "label": "culture",
       "status": "approved"
     },
     "tags": [
-      {"label": "online", "status": "approved"},
-      {"label": "education", "status": "approved"},
-      {"label": "qa", "status": "approved"}
+      {
+        "label": "museum",
+        "status": "approved"
+      },
+      {
+        "label": "family",
+        "status": "approved"
+      },
+      {
+        "label": "culture",
+        "status": "approved"
+      }
     ],
-    "start": "2024-11-01T18:00:00+01:00",
-    "end": "2024-11-01T19:30:00+01:00",
-    "format": "online",
-    "venue": "Zoom",
-    "address": "Online",
+    "start": "2026-02-15T10:30:00+01:00",
+    "end": "2026-02-15T14:30:00+01:00",
+    "format": "offline",
+    "venue": "National Museum",
+    "address": "Ny Vestergade 10, 1471 K\u00f8benhavn",
     "city": "Copenhagen",
-    "geo": {"lat": 55.6761, "lng": 12.5683},
+    "geo": {
+      "lat": 55.6734,
+      "lng": 12.5692
+    },
+    "priceType": "paid",
+    "priceMin": 60,
+    "priceMax": 120,
+    "ticketUrl": "https://example.com/tickets/cph-museum-family",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "da",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Louise A.",
+      "email": "museum@whatsondk.test",
+      "phone": "+45 36 10 55 41"
+    }
+  },
+  {
+    "id": "evt-017",
+    "slug": "fredericia-job-clinic",
+    "title": "Job Clinic for Newcomers",
+    "description": "CV review and interview prep with HR volunteers.",
+    "category": {
+      "label": "career",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "career",
+        "status": "approved"
+      },
+      {
+        "label": "workshop",
+        "status": "approved"
+      },
+      {
+        "label": "support",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-01-27T16:00:00+01:00",
+    "end": "2026-01-27T19:00:00+01:00",
+    "format": "offline",
+    "venue": "Fredericia Jobcenter",
+    "address": "Gothersgade 20, 7000 Fredericia",
+    "city": "Fredericia",
+    "geo": {
+      "lat": 55.5657,
+      "lng": 9.7571
+    },
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "https://example.com/tickets/education-session",
-    "organizerId": "org-003",
+    "ticketUrl": "",
+    "organizerId": "org-004",
     "images": [
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
     ],
     "status": "published",
     "language": "uk",
@@ -474,9 +878,165 @@
     "familyFriendly": false,
     "volunteer": true,
     "contactPerson": {
-      "name": "Taras M.",
-      "email": "education@whatsondk.test",
-      "phone": "+45 88 22 11 09"
+      "name": "Yulia M.",
+      "email": "jobs@whatsondk.test",
+      "phone": "+45 70 18 22 13"
+    }
+  },
+  {
+    "id": "evt-018",
+    "slug": "odense-art-therapy",
+    "title": "Art Therapy Evening",
+    "description": "Relaxed art session with a facilitator and snacks.",
+    "category": {
+      "label": "wellbeing",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "wellbeing",
+        "status": "approved"
+      },
+      {
+        "label": "art",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-02-12T18:00:00+01:00",
+    "end": "2026-02-12T20:30:00+01:00",
+    "format": "offline",
+    "venue": "Odense Kulturhavn",
+    "address": "Havnegade 13, 5000 Odense",
+    "city": "Odense",
+    "geo": {
+      "lat": 55.401,
+      "lng": 10.4002
+    },
+    "priceType": "paid",
+    "priceMin": 110,
+    "priceMax": 190,
+    "ticketUrl": "https://example.com/tickets/odense-art-therapy",
+    "organizerId": "org-002",
+    "images": [
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Ihor B.",
+      "email": "wellbeing@whatsondk.test",
+      "phone": "+45 21 90 07 63"
+    }
+  },
+  {
+    "id": "evt-019",
+    "slug": "helsingor-heritage-day",
+    "title": "Helsing\u00f8r Heritage Day",
+    "description": "Castle tours and heritage talks in English and Danish.",
+    "category": {
+      "label": "history",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "heritage",
+        "status": "approved"
+      },
+      {
+        "label": "castle",
+        "status": "approved"
+      },
+      {
+        "label": "culture",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-03-01T11:00:00+01:00",
+    "end": "2026-03-01T16:00:00+01:00",
+    "format": "offline",
+    "venue": "Kronborg Castle",
+    "address": "Kronborg 2, 3000 Helsing\u00f8r",
+    "city": "Helsing\u00f8r",
+    "geo": {
+      "lat": 56.0383,
+      "lng": 12.621
+    },
+    "priceType": "paid",
+    "priceMin": 160,
+    "priceMax": 260,
+    "ticketUrl": "https://example.com/tickets/helsingor-heritage",
+    "organizerId": "org-005",
+    "images": [
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": false,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Maria F.",
+      "email": "heritage@whatsondk.test",
+      "phone": "+45 25 44 33 12"
+    }
+  },
+  {
+    "id": "evt-020",
+    "slug": "copenhagen-ukr-community-forum",
+    "title": "Ukrainian Community Forum",
+    "description": "Updates on local initiatives and community support groups.",
+    "category": {
+      "label": "community",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "community",
+        "status": "approved"
+      },
+      {
+        "label": "support",
+        "status": "approved"
+      },
+      {
+        "label": "talk",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-02-25T17:00:00+01:00",
+    "end": "2026-02-25T19:00:00+01:00",
+    "format": "offline",
+    "venue": "Union Hall",
+    "address": "N\u00f8rre Voldgade 12, 1358 K\u00f8benhavn",
+    "city": "Copenhagen",
+    "geo": {
+      "lat": 55.6818,
+      "lng": 12.5793
+    },
+    "priceType": "paid",
+    "priceMin": 50,
+    "priceMax": 80,
+    "ticketUrl": "https://example.com/tickets/ukr-community-forum",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Vira D.",
+      "email": "community@whatsondk.test",
+      "phone": "+45 33 22 19 04"
     }
   }
 ]

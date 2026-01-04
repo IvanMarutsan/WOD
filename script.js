@@ -8,7 +8,8 @@
   const moderationList = document.querySelector('.moderation-list');
   const modal = document.querySelector('.modal');
   const catalogGrid = document.querySelector('.catalog-grid');
-  const ticketCta = document.querySelector('.event-sidebar__cta[data-event-id]');
+  const ticketCtas = document.querySelectorAll('.event-sidebar__cta--ticket');
+  const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const langButtons = document.querySelectorAll('.lang-switch__button');
   const themeToggle = document.querySelector('.theme-toggle');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
@@ -164,13 +165,20 @@
       back_to_catalog: 'До каталогу',
       back_to_dashboard: 'Назад до дашборду',
       search_placeholder: 'Пошук за містом, тематикою або датою',
+      presets: {
+        today: 'Сьогодні',
+        tomorrow: 'Завтра',
+        weekend: 'Вихідні',
+        online: 'Онлайн'
+      },
       search_label: 'Пошук подій',
       search_help: 'Наприклад: Копенгаген, музика або вихідні.',
       cta_explore: 'Переглянути події',
       cta_add_event: 'Додати подію',
       home_link: 'Домівка',
       cta_details: 'Детальніше',
-      cta_tickets: 'Квитки',
+      ticket_cta: 'Квитки',
+      register_cta: 'Реєстрація',
       dashboard_create_cta: 'Створити подію',
       dashboard_tab_events: 'Мої події',
       dashboard_tab_create: 'Створити подію',
@@ -378,10 +386,13 @@
       filters_family: 'Сім\'ям',
       filters_volunteer: 'Волонтерам',
       filters_past: 'Показати минулі',
-      filters_reset: 'Скинути',
-      empty_eyebrow: 'Немає результатів',
-      empty_title: 'Немає подій за цими фільтрами.',
-      empty_summary: 'Спробуйте змінити критерії пошуку.',
+      reset_filters: 'Скинути фільтри',
+      empty_state: 'Немає подій за цим запитом.',
+      similar_cta: 'Схожі події',
+      error_eyebrow: 'Помилка',
+      error_title: 'Не вдалося завантажити події.',
+      error_summary: "Перевірте з'єднання та спробуйте ще раз.",
+      error_retry: 'Повторити',
       home_about_title: 'Про нас',
       home_about_summary: 'Коротко про платформу та принципи модерації подій.',
       home_contact_title: 'Контакти',
@@ -451,7 +462,6 @@
       verification_spam: 'Запит відхилено. Спробуйте ще раз.',
       archived_label: 'Архівовано',
       event_past_banner: 'Ця подія вже минула',
-      cta_similar: 'Схожі події',
       tag_aria: 'Тег: {label}',
       tag_pending_aria: 'Тег: {label}, очікує підтвердження',
       category_aria: 'Категорія: {label}',
@@ -522,13 +532,20 @@
       back_to_catalog: 'Back to catalog',
       back_to_dashboard: 'Back to dashboard',
       search_placeholder: 'Search by city, theme, or date',
+      presets: {
+        today: 'Today',
+        tomorrow: 'Tomorrow',
+        weekend: 'Weekend',
+        online: 'Online'
+      },
       search_label: 'Search events',
       search_help: 'For example: Copenhagen, music, or weekend.',
       cta_explore: 'Browse events',
       cta_add_event: 'Add event',
       home_link: 'Home',
       cta_details: 'Details',
-      cta_tickets: 'Tickets',
+      ticket_cta: 'Tickets',
+      register_cta: 'Register',
       dashboard_create_cta: 'Create event',
       dashboard_tab_events: 'My events',
       dashboard_tab_create: 'Create event',
@@ -736,10 +753,13 @@
       filters_family: 'For families',
       filters_volunteer: 'For volunteers',
       filters_past: 'Show past',
-      filters_reset: 'Reset',
-      empty_eyebrow: 'No results',
-      empty_title: 'No events match these filters.',
-      empty_summary: 'Try adjusting your criteria.',
+      reset_filters: 'Reset filters',
+      empty_state: 'No events match your search.',
+      similar_cta: 'Similar events',
+      error_eyebrow: 'Error',
+      error_title: 'We could not load events.',
+      error_summary: 'Check your connection and try again.',
+      error_retry: 'Try again',
       home_about_title: 'About',
       home_about_summary: 'A quick overview of the platform and moderation approach.',
       home_contact_title: 'Contacts',
@@ -809,7 +829,6 @@
       verification_spam: 'Request rejected. Please try again.',
       archived_label: 'Archived',
       event_past_banner: 'This event has passed',
-      cta_similar: 'Similar events',
       tag_aria: 'Tag: {label}',
       tag_pending_aria: 'Tag: {label}, pending approval',
       category_aria: 'Category: {label}',
@@ -880,13 +899,20 @@
       back_to_catalog: 'Tilbage til katalog',
       back_to_dashboard: 'Tilbage til dashboard',
       search_placeholder: 'Søg efter by, tema eller dato',
+      presets: {
+        today: 'I dag',
+        tomorrow: 'I morgen',
+        weekend: 'Weekend',
+        online: 'Online'
+      },
       search_label: 'Søg efter events',
       search_help: 'For eksempel: København, musik eller weekend.',
       cta_explore: 'Se begivenheder',
       cta_add_event: 'Tilføj begivenhed',
       home_link: 'Forside',
       cta_details: 'Detaljer',
-      cta_tickets: 'Billetter',
+      ticket_cta: 'Billetter',
+      register_cta: 'Tilmelding',
       dashboard_create_cta: 'Opret event',
       dashboard_tab_events: 'Mine events',
       dashboard_tab_create: 'Opret event',
@@ -1094,10 +1120,13 @@
       filters_family: 'For familier',
       filters_volunteer: 'For frivillige',
       filters_past: 'Vis tidligere',
-      filters_reset: 'Nulstil',
-      empty_eyebrow: 'Ingen resultater',
-      empty_title: 'Ingen begivenheder matcher disse filtre.',
-      empty_summary: 'Prøv at justere dine kriterier.',
+      reset_filters: 'Nulstil filtre',
+      empty_state: 'Ingen begivenheder matcher din søgning.',
+      similar_cta: 'Lignende begivenheder',
+      error_eyebrow: 'Fejl',
+      error_title: 'Vi kunne ikke hente events.',
+      error_summary: 'Tjek forbindelsen og prøv igen.',
+      error_retry: 'Prøv igen',
       home_about_title: 'Om',
       home_about_summary: 'En kort oversigt over platformen og moderationen.',
       home_contact_title: 'Kontakt',
@@ -1167,7 +1196,6 @@
       verification_spam: 'Anmodning afvist. Prøv igen.',
       archived_label: 'Arkiveret',
       event_past_banner: 'Denne begivenhed er allerede afholdt',
-      cta_similar: 'Lignende begivenheder',
       tag_aria: 'Tag: {label}',
       tag_pending_aria: 'Tag: {label}, afventer godkendelse',
       category_aria: 'Kategori: {label}',
@@ -1225,14 +1253,24 @@
   let refreshVerificationUI = () => {};
   let updatePublishState = () => {};
   let updateStaticTagAria = () => {};
+  let updateCatalogI18n = () => {};
 
   const applyTranslations = (lang) => {
     const dictionary = getDictionary(lang);
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach((element) => {
       const key = element.dataset.i18n;
-      if (dictionary[key]) {
-        element.textContent = dictionary[key];
+      const value = dictionary[key];
+      if (!value) return;
+      if (typeof value === 'string') {
+        element.textContent = value;
+        return;
+      }
+      if (typeof value === 'object') {
+        const variant = element.dataset.preset;
+        if (variant && value[variant]) {
+          element.textContent = value[variant];
+        }
       }
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
@@ -1312,6 +1350,7 @@
     }
     refreshVerificationUI();
     updateStaticTagAria();
+    updateCatalogI18n();
     if (themeToggle) {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       themeToggle.textContent = isDark
@@ -1764,13 +1803,6 @@
     const previewTickets = document.querySelector('#preview-tickets');
     const previewFormat = document.querySelector('#preview-format');
     const categorySelect = multiStepForm.querySelector('select[name="category"]');
-    const addCategoryButton = multiStepForm.querySelector('[data-action="add-category"]');
-    const categoryModal = document.querySelector('.modal--category');
-    const categoryInput = categoryModal ? categoryModal.querySelector('input[name="new-category"]') : null;
-    const categorySubmit = categoryModal ? categoryModal.querySelector('[data-modal-submit]') : null;
-    const categoryClose = categoryModal ? categoryModal.querySelectorAll('[data-modal-close]') : [];
-    const modalFocusableSelector =
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const tagsInput = multiStepForm.querySelector('.tags-input__field');
     const tagsList = multiStepForm.querySelector('.tags-input__list');
     const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
@@ -1781,7 +1813,6 @@
     const pendingCategories = new Set();
     const pendingTags = new Set();
     let currentStep = 0;
-    let lastCategoryFocus = null;
     const publishButton = multiStepForm.querySelector('button[type="submit"]');
     const verificationWarning = multiStepForm.querySelector('[data-verification-warning]');
     const submitStatus = multiStepForm.querySelector('[data-submit-status]');
@@ -1879,81 +1910,6 @@
       tagsHidden.value = Array.from(pendingTags).join(', ');
     };
 
-    const openCategoryModal = () => {
-      if (!categoryModal || !categoryInput) return;
-      lastCategoryFocus = document.activeElement;
-      categoryModal.hidden = false;
-      categoryInput.value = '';
-      categoryInput.focus();
-    };
-
-    const closeCategoryModal = () => {
-      if (!categoryModal) return;
-      categoryModal.hidden = true;
-      if (lastCategoryFocus instanceof HTMLElement) {
-        lastCategoryFocus.focus();
-      } else if (addCategoryButton) {
-        addCategoryButton.focus();
-      }
-    };
-
-    if (addCategoryButton) {
-      addCategoryButton.addEventListener('click', openCategoryModal);
-    }
-
-    if (categoryClose.length) {
-      categoryClose.forEach((button) => {
-        button.addEventListener('click', closeCategoryModal);
-      });
-    }
-
-    if (categorySubmit && categoryInput && categorySelect) {
-      categorySubmit.addEventListener('click', () => {
-        const value = categoryInput.value.trim();
-        if (!value) {
-          categoryInput.reportValidity();
-          return;
-        }
-        const exists = Array.from(categorySelect.options).some(
-          (option) => option.value.toLowerCase() === value.toLowerCase()
-        );
-        if (!exists) {
-          const option = document.createElement('option');
-          option.value = value;
-          option.textContent = value;
-          option.dataset.pending = 'true';
-          categorySelect.append(option);
-        }
-        categorySelect.value = value;
-        pendingCategories.add(value);
-        closeCategoryModal();
-        updatePreview();
-      });
-    }
-
-    if (categoryModal) {
-      categoryModal.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          closeCategoryModal();
-          return;
-        }
-        if (event.key !== 'Tab') return;
-        const dialog = categoryModal.querySelector('.modal__dialog');
-        if (!dialog) return;
-        const focusable = Array.from(dialog.querySelectorAll(modalFocusableSelector));
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      });
-    }
 
     if (tagsInput && tagsList) {
       tagsInput.addEventListener('keydown', (event) => {
@@ -2219,8 +2175,20 @@
     const filtersForm = document.querySelector('.filters');
     const resultsCount = document.querySelector('.filters__count');
     const emptyState = document.querySelector('.catalog-empty');
+    const errorState = document.querySelector('.catalog-error');
     const loadMoreButton = document.querySelector('.load-more__button');
     const searchInput = document.querySelector('#event-search');
+    const presetButtons = filtersForm ? Array.from(filtersForm.querySelectorAll('.filters__preset')) : [];
+    const presetInputs = filtersForm
+      ? {
+          today: filtersForm.elements['quick-today'],
+          tomorrow: filtersForm.elements['quick-tomorrow'],
+          weekend: filtersForm.elements['quick-weekend'],
+          online: filtersForm.elements['quick-online']
+        }
+      : {};
+    const emptyResetButton = document.querySelector('[data-action="reset-filters"]');
+    const errorRetryButton = errorState ? errorState.querySelector('[data-action="retry-load"]') : null;
     let events = [];
     let filteredEvents = [];
     let visibleCount = 0;
@@ -2286,15 +2254,21 @@
         ...(categoryTag ? [buildTag(categoryTag, 'category')] : []),
         ...baseTags.map((tag) => buildTag(tag, 'tag'))
       ].join('');
-      const detailsLabel = formatMessage('cta_details', {});
+      const ticketKey = event.priceType === 'free' ? 'register_cta' : 'ticket_cta';
+      const ticketLabel = formatMessage(ticketKey, {});
+      const ticketUrl = event.ticketUrl ? event.ticketUrl : 'event.html';
       const location = `${event.city} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${badgeMarkup}\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta\" href=\"event.html\">${detailsLabel}</a>\n          </div>\n        </article>\n      `;
+      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${badgeMarkup}\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n          </div>\n        </article>\n      `;
     };
 
     const updateCount = (count) => {
       if (resultsCount) {
         resultsCount.textContent = formatMessage('found_count', { count });
       }
+    };
+
+    updateCatalogI18n = () => {
+      updateCount(filteredEvents.length);
     };
 
     const seenCards = new Set();
@@ -2336,8 +2310,28 @@
       if (emptyState) {
         emptyState.hidden = hasResults;
       }
+      if (errorState) {
+        errorState.hidden = true;
+      }
       updateCount(list.length);
       observeCards();
+    };
+
+    const setErrorState = (hasError) => {
+      if (errorState) {
+        errorState.hidden = !hasError;
+      }
+      if (emptyState) {
+        emptyState.hidden = true;
+      }
+      if (hasError) {
+        catalogGrid.innerHTML = '';
+        updateCount(0);
+        if (loadMoreButton) {
+          loadMoreButton.hidden = true;
+          loadMoreButton.disabled = true;
+        }
+      }
     };
 
     const matchesFilters = (event) => {
@@ -2433,6 +2427,7 @@
     };
 
     const applyFilters = () => {
+      setErrorState(false);
       filteredEvents = events.filter(matchesFilters);
       const showPast = filtersForm && filtersForm.elements['show-past']?.checked;
       if (showPast) {
@@ -2472,6 +2467,46 @@
       }
       if (toField) {
         toField.value = end ? getLocalDateString(end) : '';
+      }
+    };
+
+    const syncPresetButtons = () => {
+      presetButtons.forEach((button) => {
+        const key = button.dataset.quick;
+        const input = presetInputs[key];
+        if (!input) return;
+        button.setAttribute('aria-pressed', input.checked ? 'true' : 'false');
+      });
+    };
+
+    const clearOtherDatePresets = (activeKey) => {
+      ['today', 'tomorrow', 'weekend'].forEach((key) => {
+        if (activeKey && key === activeKey) return;
+        const input = presetInputs[key];
+        if (input) {
+          input.checked = false;
+        }
+      });
+    };
+
+    const applyDatePreset = (key) => {
+      if (key === 'today') {
+        setDateRange(new Date(), new Date());
+      }
+      if (key === 'tomorrow') {
+        const date = new Date();
+        date.setDate(date.getDate() + 1);
+        setDateRange(date, date);
+      }
+      if (key === 'weekend') {
+        const now = new Date();
+        const day = now.getDay();
+        const saturdayOffset = day === 6 ? 0 : (6 - day + 7) % 7;
+        const saturday = new Date(now);
+        saturday.setDate(now.getDate() + saturdayOffset);
+        const sunday = new Date(saturday);
+        sunday.setDate(saturday.getDate() + 1);
+        setDateRange(saturday, sunday);
       }
     };
 
@@ -2534,6 +2569,7 @@
         if (showPast) {
           showPast.checked = params.get('past') === '1';
         }
+        syncPresetButtons();
       }
       if (searchInput) {
         searchInput.value = params.get('q') || '';
@@ -2589,14 +2625,40 @@
           throw new Error('Failed to load events');
         }
         events = await response.json();
+        setErrorState(false);
         readQueryParams();
         applyFilters();
       } catch (error) {
-        renderEvents([]);
+        setErrorState(true);
       }
     };
 
     if (filtersForm) {
+      presetButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const key = button.dataset.quick;
+          const input = presetInputs[key];
+          if (!input) return;
+          const nextState = !input.checked;
+          input.checked = nextState;
+          if (key === 'online' && nextState) {
+            const formatField = filtersForm.elements.format;
+            if (formatField) {
+              formatField.value = 'online';
+            }
+          }
+          if (['today', 'tomorrow', 'weekend'].includes(key)) {
+            if (nextState) {
+              clearOtherDatePresets(key);
+              applyDatePreset(key);
+            }
+          }
+          syncPresetButtons();
+          updateQueryParams();
+          applyFilters();
+        });
+      });
+
       filtersForm.addEventListener('input', (event) => {
         const target = event.target;
         if (target instanceof HTMLInputElement && target.type === 'checkbox') {
@@ -2605,28 +2667,16 @@
           const weekend = filtersForm.elements['quick-weekend'];
           const online = filtersForm.elements['quick-online'];
           if (target === today && today.checked) {
-            setDateRange(new Date(), new Date());
-            if (tomorrow) tomorrow.checked = false;
-            if (weekend) weekend.checked = false;
+            clearOtherDatePresets('today');
+            applyDatePreset('today');
           }
           if (target === tomorrow && tomorrow.checked) {
-            const date = new Date();
-            date.setDate(date.getDate() + 1);
-            setDateRange(date, date);
-            if (today) today.checked = false;
-            if (weekend) weekend.checked = false;
+            clearOtherDatePresets('tomorrow');
+            applyDatePreset('tomorrow');
           }
           if (target === weekend && weekend.checked) {
-            const now = new Date();
-            const day = now.getDay();
-            const saturdayOffset = day === 6 ? 0 : (6 - day + 7) % 7;
-            const saturday = new Date(now);
-            saturday.setDate(now.getDate() + saturdayOffset);
-            const sunday = new Date(saturday);
-            sunday.setDate(saturday.getDate() + 1);
-            setDateRange(saturday, sunday);
-            if (today) today.checked = false;
-            if (tomorrow) tomorrow.checked = false;
+            clearOtherDatePresets('weekend');
+            applyDatePreset('weekend');
           }
           if (target === online && online.checked) {
             const formatField = filtersForm.elements.format;
@@ -2634,6 +2684,18 @@
               formatField.value = 'online';
             }
           }
+          syncPresetButtons();
+        }
+        if (target instanceof HTMLInputElement && target.type === 'date') {
+          clearOtherDatePresets();
+          syncPresetButtons();
+        }
+        if (target instanceof HTMLSelectElement && target.name === 'format') {
+          const onlineInput = presetInputs.online;
+          if (onlineInput) {
+            onlineInput.checked = target.value === 'online';
+          }
+          syncPresetButtons();
         }
         updateQueryParams();
         applyFilters();
@@ -2645,6 +2707,10 @@
       });
       filtersForm.addEventListener('reset', () => {
         setTimeout(() => {
+          if (searchInput) {
+            searchInput.value = '';
+          }
+          syncPresetButtons();
           updateQueryParams();
           applyFilters();
         }, 0);
@@ -2662,6 +2728,7 @@
           event.preventDefault();
           updateQueryParams();
           applyFilters();
+          searchInput.focus({ preventScroll: true });
         });
       }
     }
@@ -2677,6 +2744,18 @@
       applyFilters();
     });
 
+    if (emptyResetButton && filtersForm) {
+      emptyResetButton.addEventListener('click', () => {
+        filtersForm.reset();
+      });
+    }
+
+    if (errorRetryButton) {
+      errorRetryButton.addEventListener('click', () => {
+        loadEvents();
+      });
+    }
+
     loadEvents();
   }
 
@@ -2691,14 +2770,26 @@
     const city = eventMeta.dataset.eventCity;
     const label = formatDateRange(start, end);
     eventMeta.textContent = city ? `${label} · ${city}` : label;
-    if (pastBanner && isPast({ start, end })) {
+    const isPastEvent = isPast({ start, end });
+    if (!isPastEvent && eventPrice && ticketCtas.length) {
+      const priceType = eventPrice.dataset.priceType;
+      const ctaKey = priceType === 'free' ? 'register_cta' : 'ticket_cta';
+      const labelText = formatMessage(ctaKey, {});
+      ticketCtas.forEach((cta) => {
+        cta.setAttribute('data-i18n', ctaKey);
+        cta.textContent = labelText;
+      });
+    }
+    if (pastBanner && isPastEvent) {
       pastBanner.hidden = false;
-      if (ticketCta) {
-        ticketCta.textContent = formatMessage('cta_similar', {});
-        ticketCta.setAttribute('data-testid', 'similar-cta');
-      }
+      ticketCtas.forEach((cta) => {
+        cta.hidden = true;
+      });
+      similarCtas.forEach((cta) => {
+        cta.hidden = false;
+      });
       if (ticketNote) {
-        ticketNote.textContent = formatMessage('cta_similar', {});
+        ticketNote.textContent = formatMessage('similar_cta', {});
       }
     }
   }
@@ -2712,25 +2803,24 @@
     eventPrice.textContent = formatPriceLabel(type, minValue, maxValue);
   }
 
-  if (ticketCta) {
-    ticketCta.addEventListener('click', async () => {
-      const eventId = ticketCta.dataset.eventId;
-      const payload = {
-        eventId,
-        action: 'ticket_click',
-        ts: Date.now()
-      };
-      try {
-        await fetch('/api/metrics', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (error) {
-        console.log('metrics', payload);
-      }
-    });
-  }
+  document.addEventListener('click', async (event) => {
+    const target = event.target.closest('[data-testid="ticket-cta"]');
+    if (!target) return;
+    const eventId = target.dataset.eventId || target.closest('[data-event-id]')?.dataset.eventId || null;
+    const payload = {
+      eventId,
+      action: 'ticket_click',
+      ts: Date.now()
+    };
+    try {
+      await fetch('/.netlify/functions/metrics', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    } catch (error) {
+      console.info('metrics', payload);
+    }
+  });
 
   const highlightsTrack = document.querySelector('.highlights__track');
   if (highlightsTrack) {

@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body class="dashboard-page">
-    <a class="skip-link" href="#content" data-i18n="skip_link">Перейти до вмісту</a>
+    <a class="skip-link" href="./dashboard-new.html#content" data-i18n="skip_link">Перейти до вмісту</a>
 
     <header class="site-header" role="banner">
       <div class="container header__inner">
@@ -34,10 +34,9 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="./index.html#catalog" data-i18n="nav_events">Події</a>
-          <a href="./organizer.html" data-i18n="nav_organizers">Організатори</a>
-          <a href="./index.html#about" data-i18n="nav_about">Про нас</a>
-          <a href="./index.html#contact" data-i18n="nav_contacts">Контакти</a>
+          <a href="./index.html#events" aria-current="page" data-i18n="nav_events">Події</a>
+          <a href="./about.html" data-i18n="nav_about">Про нас</a>
+          <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
           <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
@@ -83,9 +82,6 @@
                   <span data-i18n="form_category_label">Категорія</span>
                   <span class="required" aria-hidden="true">*</span>
                   <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
-                  <button class="btn ghost form-field__action" type="button" data-action="add-category" aria-haspopup="dialog">
-                    <span data-i18n="form_add_category">Додати категорію</span>
-                  </button>
                 </div>
                 <select name="category" required>
                   <option value="" data-i18n="form_category_placeholder">Оберіть категорію</option>
@@ -301,21 +297,6 @@
       </div>
     </footer>
 
-    <div class="modal modal--category" hidden>
-      <div class="modal__overlay" data-modal-close></div>
-      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
-        <h2 id="category-modal-title" data-i18n="form_category_modal_title">Нова категорія</h2>
-        <label class="form-field">
-          <span data-i18n="form_category_input_label">Назва категорії</span>
-          <input type="text" name="new-category" required aria-describedby="category-modal-help" />
-          <small id="category-modal-help" data-i18n="form_category_help">Категорію перевірить модератор.</small>
-        </label>
-        <div class="modal__actions">
-          <button class="btn ghost" type="button" data-modal-close data-i18n="form_category_cancel">Скасувати</button>
-          <button class="btn primary" type="button" data-modal-submit data-i18n="form_category_submit">Надіслати на затвердження</button>
-        </div>
-      </div>
-    </div>
 
     <script src="./script.js" defer></script>
   </body>
