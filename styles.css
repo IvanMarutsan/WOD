@@ -41,6 +41,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -1592,6 +1596,10 @@ button:disabled,
   gap: 16px;
   align-items: center;
   justify-content: space-between;
+}
+
+.empty-state[hidden] {
+  display: none;
 }
 
 .empty-state__eyebrow {

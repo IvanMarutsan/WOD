@@ -4,9 +4,14 @@
 
 - npm i && npm run dev
 
-## E2E tests
+## Tests
 
-- npx playwright install && npm run test:e2e
+- Run locally:
+  - npm i
+  - npx playwright install
+  - npm run test:e2e
+- Open report:
+  - npm run test:e2e:report
 
 ## Deployment (Netlify)
 

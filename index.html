@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Evently — Каталог подій по всій Україні</title>
+    <title>What's on DK? — Події для українців у Данії</title>
     <meta name="description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
     <meta property="og:title" content="Evently — Каталог подій по всій Україні" />
     <meta property="og:description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
@@ -176,10 +176,10 @@
                 </label>
                 </div>
                 <div class="filters__row filters__row--presets">
-                <input class="filters__preset-input" type="checkbox" name="quick-today" />
-                <input class="filters__preset-input" type="checkbox" name="quick-tomorrow" />
-                <input class="filters__preset-input" type="checkbox" name="quick-weekend" data-testid="filters-weekend" />
-                <input class="filters__preset-input" type="checkbox" name="quick-online" />
+                <input class="filters__preset-input" type="checkbox" name="quick-today" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-tomorrow" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-weekend" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-online" aria-hidden="true" tabindex="-1" />
                 <div class="filters__preset-group" role="group" aria-label="Швидкі пресети">
                   <button class="filters__toggle filters__preset" type="button" data-quick="today" data-preset="today" aria-pressed="false" data-i18n="presets">Сьогодні</button>
                   <button class="filters__toggle filters__preset" type="button" data-quick="tomorrow" data-preset="tomorrow" aria-pressed="false" data-i18n="presets">Завтра</button>
@@ -283,7 +283,7 @@
                 <input type="checkbox" name="show-past" />
                 <span data-i18n="filters_past">Показати минулі</span>
               </label>
-              <p class="filters__count" aria-live="polite" role="status">N знайдено</p>
+              <p class="filters__count" aria-live="polite" role="status" data-i18n="found_count">N знайдено</p>
               <button class="btn ghost" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
             </div>
           </form>

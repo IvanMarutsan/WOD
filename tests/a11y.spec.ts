@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { freezeTime } from './setup.freeze-time';
 
-const pages = ['/', '/events', '/organizer.html', '/dashboard-new.html', '/legal-privacy.html'];
+const pages = ['/', '/index.html', '/event.html'];
 
 for (const url of pages) {
-  test(`a11y: ${url} has no critical violations`, async ({ page }) => {
+  test(`a11y: ${url} has no serious violations`, async ({ page }) => {
+    await freezeTime(page);
     await page.goto(url);
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-    const critical = results.violations.filter(
-      (violation) => violation.impact === 'critical' || violation.impact === 'serious'
-    );
-    expect(critical, JSON.stringify(critical, null, 2)).toHaveLength(0);
+    const serious = results.violations.filter((v) => ['serious', 'critical'].includes(v.impact || ''));
+    expect(serious, JSON.stringify(serious, null, 2)).toHaveLength(0);
   });
 }

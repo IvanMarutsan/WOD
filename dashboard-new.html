@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Create Event - Evently</title>
+    <title>Create Event — What's on DK?</title>
     <meta name="description" content="Multi-step event creation form for the events listing platform." />
     <meta property="og:title" content="Create Event - Evently" />
     <meta property="og:description" content="Placeholder event creation flow." />
@@ -83,7 +83,8 @@
                   <span class="required" aria-hidden="true">*</span>
                   <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
                 </div>
-                <select name="category" required>
+                <label class="sr-only" for="event-category" data-i18n="form_category_label">Категорія</label>
+                <select id="event-category" name="category" required>
                   <option value="" data-i18n="form_category_placeholder">Оберіть категорію</option>
                   <option value="music" data-i18n="form_category_music">Музика</option>
                   <option value="food" data-i18n="form_category_food">Їжа</option>
@@ -213,7 +214,7 @@
                   name="contact-email"
                   required
                   aria-describedby="contact-email-help"
-                  pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+                  pattern="^[^@\s]+@[^\s@]+\.[^\s@]+$"
                 />
                 <small id="contact-email-help" data-i18n="form_contact_email_help">Наприклад: name@example.com.</small>
               </label>
@@ -223,7 +224,7 @@
                   type="tel"
                   name="contact-phone"
                   aria-describedby="contact-phone-help"
-                  pattern="^\\+45\\s?[0-9]{2}(\\s?[0-9]{2}){3}$"
+                  pattern="^\+45\s?[0-9]{2}(\s?[0-9]{2}){3}$"
                 />
                 <small id="contact-phone-help" data-i18n="form_contact_phone_help">Формат: +45 12 34 56 78.</small>
               </label>

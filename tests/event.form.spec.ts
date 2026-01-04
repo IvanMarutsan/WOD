@@ -9,6 +9,8 @@ test('create event without end time', async ({ page }) => {
 
   // Step 2: set only start, no end
   await page.getByLabel(/Початок|Start/i).fill('2030-05-01T18:00');
+  await page.locator('select[name="format"]').selectOption({ value: 'offline' });
+  await page.getByLabel(/Адреса|Address|Adresse/i).fill('Copenhagen, Main St 10');
   // Ensure timezone selector is absent
   await expect(page.locator('[name=\"timezone\"]')).toHaveCount(0);
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
@@ -18,9 +20,12 @@ test('create event without end time', async ({ page }) => {
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 4: skip media
+  await page.locator('input[name="contact-name"]').fill('Olena K.');
+  await page.locator('input[name="contact-email"]').fill('verify@example.com');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 5: Preview shows only start date/time
-  await expect(page.getByTestId('preview')).toContainText(/2030/);
-  await expect(page.getByTestId('preview')).not.toContainText(/—/); // no range if no end
+  const previewTime = page.locator('#preview-time');
+  await expect(previewTime).toContainText(/2030/);
+  await expect(previewTime).not.toContainText(/→/); // no end time range
 });

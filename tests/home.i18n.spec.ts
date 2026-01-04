@@ -11,10 +11,11 @@ test('home loads with logo and hero', async ({ page }) => {
 test('language switch updates UI', async ({ page }) => {
   await gotoHome(page);
   await waitForEventsRendered(page);
+  const heroCta = page.locator('.hero-actions [data-i18n="cta_explore"]');
   await page.getByTestId('lang-en').click();
-  await expect(page.locator('[data-i18n="cta_explore"]')).toContainText(/Browse events/i);
+  await expect(heroCta).toContainText(/Browse events/i);
   await page.getByTestId('lang-da').click();
-  await expect(page.locator('[data-i18n="cta_explore"]')).toContainText(/Se begivenheder/i);
+  await expect(heroCta).toContainText(/Se begivenheder/i);
   await page.getByTestId('lang-uk').click();
-  await expect(page.locator('[data-i18n="cta_explore"]')).toContainText(/Переглянути події/i);
+  await expect(heroCta).toContainText(/Переглянути події/i);
 });

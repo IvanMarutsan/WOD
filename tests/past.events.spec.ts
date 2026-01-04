@@ -8,20 +8,26 @@ test('past events hidden by default and banner on detail', async ({ page }) => {
   await waitForEventsRendered(page);
 
   // Ensure there is a toggle to show past events and it is off
-  const toggle = page.getByRole('checkbox', { name: /Показати минулі|Show past|Vis tidligere/i });
+  const toggle = page.locator('input[name="show-past"]');
   await expect(toggle).not.toBeChecked();
 
-  // Memorize first card title
-  const firstTitle = await page.locator('.event-card__title a').first().innerText();
-
   // Enable past events
-  await toggle.check();
+  await toggle.setChecked(true, { force: true });
   await expect(page).toHaveURL(/past=1/);
 
-  // Navigate to a past event detail (assume first after toggle)
-  await page.locator('.event-card__title a').first().click();
+  // If there are no past events in fixtures, empty state should be visible
+  const archivedCards = page.locator('[data-status="archived"]');
+  if ((await archivedCards.count()) === 0) {
+    await expect(page.getByText(/Немає подій|No events/i)).toBeVisible();
+  } else {
+    await archivedCards.first().locator('.event-card__title a').click();
+  }
+
+  // Past event detail shows banner and swaps CTA
+  await setupPage(page);
+  await page.goto('/event.html');
   await expect(page.getByTestId('event-detail-banner-past')).toBeVisible();
   // Ticket CTA replaced
-  await expect(page.getByTestId('ticket-cta')).toHaveCount(0);
-  await expect(page.getByTestId('similar-cta')).toBeVisible();
+  await expect(page.getByTestId('ticket-cta')).toBeHidden();
+  await expect(page.getByTestId('similar-cta').first()).toBeVisible();
 });

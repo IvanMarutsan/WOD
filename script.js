@@ -99,6 +99,7 @@
       organizerEl?.textContent?.trim() ||
       'Organizer';
     const priceEl = document.querySelector('.event-sidebar__price');
+    const ticketCta = document.querySelector('[data-testid="ticket-cta"]');
     const priceMin = priceEl?.dataset.priceMin || '';
     const priceMax = priceEl?.dataset.priceMax || '';
     const priceValue = priceMin || priceMax || '0';
@@ -1906,7 +1907,15 @@
       tagsList.innerHTML = Array.from(pendingTags)
         .map((tag) => {
           const removeLabel = formatMessage('remove_tag_label', { tag });
-          return `\n            <span class=\"tags-input__chip pending\" title=\"${pendingTooltip}\" aria-label=\"${tag} ${pendingLabel}\">\n              ${tag}\n              <span class=\"tags-input__pending\">${pendingLabel}</span>\n              <button type=\"button\" data-tag=\"${tag}\" aria-label=\"${removeLabel}\">×</button>\n            </span>\n          `;\n        })\n        .join('');
+          return `
+            <span class="tags-input__chip pending" title="${pendingTooltip}" aria-label="${tag} ${pendingLabel}">
+              ${tag}
+              <span class="tags-input__pending">${pendingLabel}</span>
+              <button type="button" data-tag="${tag}" aria-label="${removeLabel}">&times;</button>
+            </span>
+          `;
+        })
+        .join('');
       tagsHidden.value = Array.from(pendingTags).join(', ');
     };
 
@@ -2019,7 +2028,7 @@
       });
     }
 
-    multiStepForm.addEventListener('submit', (event) => {
+    multiStepForm.addEventListener('submit', async (event) => {
       const verified = getEffectiveOrganizerStatus() !== 'none';
       if (!verified) {
         event.preventDefault();
