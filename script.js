@@ -1699,7 +1699,7 @@
     }
 
     if (!window.netlifyIdentity) {
-      if (isLoginPage && !document.querySelector('[data-identity-widget]')) {
+      if (!document.querySelector('[data-identity-widget]')) {
         const identityScript = document.createElement('script');
         identityScript.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
         identityScript.async = true;
@@ -1709,15 +1709,9 @@
           setupAdminAuth();
         };
         document.body.appendChild(identityScript);
-        setAuthState('checking');
-        setStatus('admin_access_checking');
-        return;
       }
-      setAuthState('denied');
-      setStatus('admin_access_required');
-      if (isAdminPage) {
-        window.location.href = getAdminLoginRedirect();
-      }
+      setAuthState('checking');
+      setStatus('admin_access_checking');
       return;
     }
 
@@ -2279,18 +2273,38 @@
       }
     };
 
+    const updateAdminSessionFlag = (user) => {
+      try {
+        if (user && hasAdminRole(user)) {
+          localStorage.setItem(ADMIN_SESSION_KEY, '1');
+        } else {
+          localStorage.removeItem(ADMIN_SESSION_KEY);
+        }
+      } catch (error) {
+        return;
+      }
+    };
+
     const initIdentitySession = () => {
-      if (!window.netlifyIdentity) return;
+      if (!window.netlifyIdentity) {
+        window.addEventListener('load', () => {
+          if (window.netlifyIdentity) initIdentitySession();
+        }, { once: true });
+        return;
+      }
       window.netlifyIdentity.on('init', (user) => {
         identityUser = user;
+        updateAdminSessionFlag(user);
         updatePublishState();
       });
       window.netlifyIdentity.on('login', (user) => {
         identityUser = user;
+        updateAdminSessionFlag(user);
         updatePublishState();
       });
       window.netlifyIdentity.on('logout', () => {
         identityUser = null;
+        updateAdminSessionFlag(null);
         updatePublishState();
       });
       window.netlifyIdentity.init();
