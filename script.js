@@ -1612,9 +1612,8 @@
       setSuperAdminVisibility(isSuperAdmin(user));
 
       if (isLoginPage) {
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get('redirect') || './admin.html';
-        window.location.href = redirect;
+        const redirect = searchParams.get('redirect') || './admin.html';
+        window.location.href = hasAuthToken ? './admin.html' : redirect;
       }
 
       if (isAdminPage) {
@@ -1622,14 +1621,21 @@
       }
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const hasRecoveryToken = params.has('recovery_token');
-    const hasInviteToken = params.has('invite_token');
-    const hasConfirmToken = params.has('confirmation_token');
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(
+      window.location.hash && window.location.hash.includes('=')
+        ? window.location.hash.slice(1)
+        : ''
+    );
+    const hasRecoveryToken = searchParams.has('recovery_token') || hashParams.has('recovery_token');
+    const hasInviteToken = searchParams.has('invite_token') || hashParams.has('invite_token');
+    const hasConfirmToken =
+      searchParams.has('confirmation_token') || hashParams.has('confirmation_token');
+    const hasAuthToken = hasRecoveryToken || hasInviteToken || hasConfirmToken;
 
     window.netlifyIdentity.on('init', (user) => {
       handleUser(user);
-      if (isLoginPage && !user && (hasRecoveryToken || hasInviteToken || hasConfirmToken)) {
+      if (isLoginPage && !user && hasAuthToken) {
         const action = hasRecoveryToken ? 'recovery' : 'signup';
         window.netlifyIdentity.open(action);
       }
