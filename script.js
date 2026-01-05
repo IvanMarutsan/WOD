@@ -1582,6 +1582,20 @@
     }
 
     if (!window.netlifyIdentity) {
+      if (isLoginPage && !document.querySelector('[data-identity-widget]')) {
+        const identityScript = document.createElement('script');
+        identityScript.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
+        identityScript.async = true;
+        identityScript.defer = true;
+        identityScript.dataset.identityWidget = 'true';
+        identityScript.onload = () => {
+          setupAdminAuth();
+        };
+        document.body.appendChild(identityScript);
+        setAuthState('checking');
+        setStatus('admin_access_checking');
+        return;
+      }
       setAuthState('denied');
       setStatus('admin_access_required');
       if (isAdminPage) {
