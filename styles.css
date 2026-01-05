@@ -418,14 +418,6 @@ button:disabled,
   align-items: flex-start;
 }
 
-.hero__marker {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--dk-red);
-  margin-top: 6px;
-  flex: 0 0 auto;
-}
 
 .hero-actions {
   display: flex;
@@ -451,28 +443,36 @@ button:disabled,
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: var(--surface);
-  border-radius: 999px;
-  padding: 8px;
-  border: 1px solid var(--line);
 }
 
-.hero__cta-marker {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--dk-red);
-  align-self: center;
-  margin-left: 6px;
+.search {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 0;
+  border: none;
+  overflow: visible;
 }
+
 
 .hero-search input[type="search"] {
   flex: 1;
-  border: none;
+  border: 1px solid var(--line);
   background: transparent;
   color: var(--text);
   font-size: 1rem;
   padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.search input[type="search"]:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.search .btn.primary {
+  border-radius: 10px;
+  border: 1px solid var(--line);
 }
 
 .hero-search input[type="search"]::placeholder {
@@ -966,16 +966,6 @@ button:disabled,
   outline-offset: 4px;
 }
 
-.event-card--paid::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--dk-red);
-}
 
 .event-card__badge {
   position: absolute;
@@ -1956,15 +1946,6 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   position: relative;
 }
 
-.pending::after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin-left: 6px;
-}
 .form-field input,
 .form-field select {
   background: var(--bg);
