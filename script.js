@@ -17,6 +17,23 @@
   let debugPanel = null;
   let debugList = null;
 
+  const redirectIdentityHashToLogin = () => {
+    const hash = window.location.hash || '';
+    if (
+      !hash.includes('recovery_token') &&
+      !hash.includes('invite_token') &&
+      !hash.includes('confirmation_token')
+    ) {
+      return;
+    }
+    const path = window.location.pathname;
+    if (path.includes('admin-login')) return;
+    if (!path.endsWith('/') && !path.endsWith('/index.html')) return;
+    window.location.replace(`./admin-login.html${hash}`);
+  };
+
+  redirectIdentityHashToLogin();
+
   const appendLogEntry = (entry) => {
     logBuffer.push(entry);
     if (!debugList) return;
