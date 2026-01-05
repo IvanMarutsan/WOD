@@ -19,9 +19,9 @@
   --radius: 12px;
   --space: 12px;
   --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
-  --logo-min: 88px;
-  --logo-mid: 12vw;
-  --logo-max: 140px;
+  --logo-min: 40px;
+  --logo-mid: 6vw;
+  --logo-max: 64px;
 
   /* Focus ring (high contrast) */
   --focus-ring: 0 0 0 3px rgba(0, 87, 183, 0.25), 0 0 0 6px rgba(200, 16, 46, 0.25);
@@ -110,6 +110,9 @@ button:disabled,
   background: var(--bg);
   border-bottom: 1px solid var(--line);
   box-shadow: none;
+  --logo-min: 40px;
+  --logo-mid: 6vw;
+  --logo-max: 64px;
 }
 
 .site-header--scrolled {
@@ -141,11 +144,12 @@ button:disabled,
   height: auto;
   max-height: clamp(var(--logo-min), var(--logo-mid), var(--logo-max));
   display: block;
+  border-radius: 50%;
 }
 
 .site-header.is-scrolled .brand__logo {
-  width: clamp(calc(var(--logo-min) - 8px), 10vw, calc(var(--logo-max) - 12px));
-  max-height: clamp(calc(var(--logo-min) - 8px), 10vw, calc(var(--logo-max) - 12px));
+  width: clamp(var(--logo-min), var(--logo-mid), var(--logo-max));
+  max-height: clamp(var(--logo-min), var(--logo-mid), var(--logo-max));
 }
 
 .brand__name {
@@ -190,18 +194,60 @@ button:disabled,
 }
 
 .site-nav a {
-  padding: 4px 8px;
+  padding: 10px 18px;
   border-radius: 999px;
+  border: 1px solid var(--accent-2);
+  color: var(--accent-2);
+  font-weight: 600;
+  background: transparent;
+  line-height: 1;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  background: rgba(0, 87, 183, 0.08);
+  box-shadow: var(--focus-ring);
 }
 
 .site-nav a:focus-visible {
-  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.header-utils {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .lang-switch {
   display: inline-flex;
   gap: 8px;
   align-items: center;
+}
+
+.has-lang-select .lang-switch {
+  display: none;
+}
+
+.lang-select {
+  appearance: none;
+  min-width: 0;
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-align-last: center;
+}
+
+.lang-select:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
 }
 
 .lang-switch__button {
@@ -234,6 +280,22 @@ button:disabled,
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+.theme-toggle--footer {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+.btn--subtle {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.btn--subtle:hover {
+  background: rgba(15, 27, 60, 0.06);
 }
 
 .header__cta {

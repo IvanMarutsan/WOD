@@ -39,13 +39,14 @@
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
-<div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-                    <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UA</button>
-          <button class="lang-switch__button" type="button" data-lang="en" data-testid="lang-en" aria-pressed="false" aria-label="Choose English">EN</button>
-          <button class="lang-switch__button" type="button" data-lang="da" data-testid="lang-da" aria-pressed="false" aria-label="Vælg dansk">DK</button>
+        <div class="header-utils">
+          <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
+          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+            <option value="uk">UA</option>
+            <option value="en">EN</option>
+            <option value="da">DK</option>
+          </select>
         </div>
-        <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
       </div>
     </header>
 
@@ -355,6 +356,16 @@
           <a class="social-link" href="https://t.me/whatsondk" aria-label="Telegram" rel="noopener">
             <span class="social-icon" aria-hidden="true">TG</span>
           </a>
+          <button
+            class="theme-toggle theme-toggle--footer"
+            type="button"
+            data-testid="theme-toggle"
+            aria-pressed="false"
+            aria-label="Перемкнути тему"
+            data-i18n-aria="theme_toggle_aria"
+          >
+            Світла
+          </button>
         </div>
         <a class="footer__help" href="./docs.html" data-i18n="footer_help">Допомога</a>
         <a class="footer__help" href="./legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>

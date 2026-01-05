@@ -11,6 +11,10 @@
   const ticketCtas = document.querySelectorAll('.event-sidebar__cta--ticket');
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const langButtons = document.querySelectorAll('.lang-switch__button');
+  const langSelect = document.querySelector('[data-testid="lang-select"]');
+  if (langSelect) {
+    document.documentElement.classList.add('has-lang-select');
+  }
   const themeToggle = document.querySelector('.theme-toggle');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
   const logBuffer = [];
@@ -1466,6 +1470,9 @@
     langButtons.forEach((button) => {
       button.setAttribute('aria-pressed', String(button.dataset.lang === lang));
     });
+    if (langSelect) {
+      langSelect.value = lang;
+    }
 
     const localeMap = {
       uk: 'uk_UA',
@@ -1930,7 +1937,7 @@
 
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
       const next = current === 'light' ? 'dark' : 'light';
       localStorage.setItem('theme', next);
       applyTheme(next);
@@ -1948,6 +1955,18 @@
         const nextUrl = `${window.location.pathname}?${nextParams.toString()}`;
         window.history.pushState({}, '', nextUrl);
       });
+    });
+  }
+
+  if (langSelect) {
+    langSelect.addEventListener('change', () => {
+      const lang = langSelect.value || 'uk';
+      setStoredLang(lang);
+      applyTranslations(lang);
+      const nextParams = new URLSearchParams(window.location.search);
+      nextParams.set('lang', lang);
+      const nextUrl = `${window.location.pathname}?${nextParams.toString()}`;
+      window.history.pushState({}, '', nextUrl);
     });
   }
 

@@ -17,6 +17,14 @@
 
 - Set the GitHub secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` in the repository settings.
 
+## Preview deploys (Netlify)
+
+- Create a feature branch: `git checkout -b feature/your-change`
+- Commit and push changes: `git push -u origin feature/your-change`
+- Open a PR into `main` → Netlify creates a Preview Deploy automatically.
+- Test the Preview URL from the PR or Netlify Deploys.
+- Merge the PR when ready → Netlify auto-deploys to production.
+
 ## Admin access (Netlify Identity)
 
 - Enable Identity in the Netlify site dashboard.

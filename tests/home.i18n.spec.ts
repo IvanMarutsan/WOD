@@ -12,10 +12,11 @@ test('language switch updates UI', async ({ page }) => {
   await gotoHome(page);
   await waitForEventsRendered(page);
   const heroCta = page.locator('.hero-actions [data-i18n="cta_explore"]');
-  await page.getByTestId('lang-en').click();
+  const langSelect = page.getByTestId('lang-select');
+  await langSelect.selectOption('en');
   await expect(heroCta).toContainText(/Browse events/i);
-  await page.getByTestId('lang-da').click();
+  await langSelect.selectOption('da');
   await expect(heroCta).toContainText(/Se begivenheder/i);
-  await page.getByTestId('lang-uk').click();
+  await langSelect.selectOption('uk');
   await expect(heroCta).toContainText(/Переглянути події/i);
 });
