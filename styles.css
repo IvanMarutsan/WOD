@@ -627,7 +627,7 @@ button:disabled,
 
 .filters {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 20px;
   background: var(--surface);
   border-radius: var(--radius);
@@ -636,47 +636,42 @@ button:disabled,
 }
 
 .filters__group {
-  border: none;
   margin: 0;
-  padding: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  background: var(--bg);
+}
+
+.filters__main {
   display: grid;
   gap: 12px;
 }
 
-.filters__group legend {
-  font-weight: 600;
-  margin-bottom: 4px;
+.filters__row--main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
 }
 
-.filters__toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: none;
+.filters__advanced-toggle {
+  height: 38px;
+  align-self: flex-end;
+}
+
+.filters__advanced {
+  display: grid;
+  gap: 12px;
+}
+
+.filters__label {
+  margin: 0;
+  font-weight: 600;
   color: var(--text);
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0;
-  cursor: pointer;
-}
-
-.filters__toggle-btn::after {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid var(--muted);
-  border-bottom: 2px solid var(--muted);
-  transform: rotate(45deg);
-  transition: transform 0.2s ease;
-}
-
-.filters__toggle-btn[aria-expanded="false"]::after {
-  transform: rotate(-45deg);
-}
-
-.filters__panel[hidden] {
-  display: none;
+  font-size: 0.95rem;
 }
 
 .filters__row {

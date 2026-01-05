@@ -416,6 +416,7 @@
       filters_online: 'Онлайн',
       filters_location: 'Місце та категорія',
       filters_aria: 'Фільтри каталогу',
+      filters_advanced: 'Розширені фільтри',
       filters_city: 'Місто',
       filters_all_cities: 'Усі міста',
       filters_city_copenhagen: 'Копенгаген',
@@ -834,6 +835,7 @@
       filters_online: 'Online',
       filters_location: 'Location & category',
       filters_aria: 'Catalog filters',
+      filters_advanced: 'Advanced filters',
       filters_city: 'City',
       filters_all_cities: 'All cities',
       filters_city_copenhagen: 'Copenhagen',
@@ -1252,6 +1254,7 @@
       filters_online: 'Online',
       filters_location: 'Sted og kategori',
       filters_aria: 'Katalogfiltre',
+      filters_advanced: 'Avancerede filtre',
       filters_city: 'By',
       filters_all_cities: 'Alle byer',
       filters_city_copenhagen: 'København',
@@ -2885,6 +2888,8 @@
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const searchInput = document.querySelector('#event-search');
     const pastHint = document.querySelector('[data-past-hint]');
+    const advancedToggle = document.querySelector('[data-action="filters-advanced"]');
+    const advancedPanel = document.querySelector('#filters-advanced');
     const presetButtons = filtersForm ? Array.from(filtersForm.querySelectorAll('.filters__preset')) : [];
     const presetInputs = filtersForm
       ? {
@@ -2904,6 +2909,19 @@
     const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
     const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
     const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
+    const audienceFields = filtersForm
+      ? ['audience-ua', 'audience-family', 'audience-volunteer'].map((name) => filtersForm.elements[name])
+      : [];
+    const advancedFields = filtersForm
+      ? [
+          filtersForm.elements.category,
+          filtersForm.elements.price,
+          filtersForm.elements.format,
+          dateFromField,
+          dateToField,
+          ...audienceFields
+        ]
+      : [];
 
     const formatPrice = (event) => {
       if (event.priceType === 'free') {
@@ -3382,6 +3400,26 @@
       window.history.pushState({}, '', nextUrl);
     };
 
+    const syncAdvancedPanel = (force) => {
+      if (!advancedToggle || !advancedPanel) return;
+      const hasValue = advancedFields.some((field) => {
+        if (!field) return false;
+        if (field instanceof HTMLInputElement && field.type === 'checkbox') {
+          return field.checked;
+        }
+        return Boolean(field.value);
+      });
+      if (force !== undefined) {
+        advancedPanel.hidden = !force;
+        advancedToggle.setAttribute('aria-expanded', String(force));
+        return;
+      }
+      if (hasValue) {
+        advancedPanel.hidden = false;
+        advancedToggle.setAttribute('aria-expanded', 'true');
+      }
+    };
+
     const loadEvents = async () => {
       try {
         const response = await fetch('./data/events.json');
@@ -3392,12 +3430,20 @@
         setErrorState(false);
         readQueryParams();
         applyFilters();
+        syncAdvancedPanel();
       } catch (error) {
         setErrorState(true);
       }
     };
 
     if (filtersForm) {
+      if (advancedToggle && advancedPanel) {
+        advancedToggle.addEventListener('click', () => {
+          const isOpen = !advancedPanel.hidden;
+          advancedPanel.hidden = isOpen;
+          advancedToggle.setAttribute('aria-expanded', String(!isOpen));
+        });
+      }
       presetButtons.forEach((button) => {
         button.addEventListener('click', () => {
           const key = button.dataset.quick;
@@ -3466,6 +3512,7 @@
         }
         updateQueryParams();
         applyFilters();
+        syncAdvancedPanel();
       });
       filtersForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -3481,6 +3528,7 @@
           syncPresetButtons();
           updateQueryParams();
           applyFilters();
+          syncAdvancedPanel(false);
         }, 0);
       });
     }

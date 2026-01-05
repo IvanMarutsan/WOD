@@ -157,47 +157,8 @@
             </p>
           </header>
           <form class="filters" aria-label="Фільтри каталогу" data-i18n-aria="filters_aria">
-            <fieldset class="filters__group">
-              <legend>
-                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-date">
-                  <span data-i18n="filters_date">Дата</span>
-                </button>
-              </legend>
-              <div class="filters__panel" id="filters-date">
-                <div class="filters__row">
-                <label class="filters__field">
-                  <span data-i18n="filters_from">Від</span>
-                  <input type="date" name="date-from" />
-                </label>
-                <label class="filters__field">
-                  <span data-i18n="filters_to">До</span>
-                  <input type="date" name="date-to" />
-                </label>
-                </div>
-                <div class="filters__row filters__row--presets">
-                <input class="filters__preset-input" type="checkbox" name="quick-today" aria-hidden="true" tabindex="-1" />
-                <input class="filters__preset-input" type="checkbox" name="quick-tomorrow" aria-hidden="true" tabindex="-1" />
-                <input class="filters__preset-input" type="checkbox" name="quick-weekend" aria-hidden="true" tabindex="-1" />
-                <input class="filters__preset-input" type="checkbox" name="quick-online" aria-hidden="true" tabindex="-1" />
-                <div class="filters__preset-group" role="group" aria-label="Швидкі пресети">
-                  <button class="filters__toggle filters__preset" type="button" data-quick="today" data-preset="today" aria-pressed="false" data-i18n="presets">Сьогодні</button>
-                  <button class="filters__toggle filters__preset" type="button" data-quick="tomorrow" data-preset="tomorrow" aria-pressed="false" data-i18n="presets">Завтра</button>
-                  <button class="filters__toggle filters__preset" type="button" data-quick="weekend" data-preset="weekend" aria-pressed="false" data-i18n="presets" data-testid="filters-weekend">Вихідні</button>
-                  <button class="filters__toggle filters__preset" type="button" data-quick="online" data-preset="online" aria-pressed="false" data-i18n="presets">Онлайн</button>
-                </div>
-                <button class="filters__reset-inline" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset class="filters__group">
-              <legend>
-                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-location">
-                  <span data-i18n="filters_location">Місце та категорія</span>
-                </button>
-              </legend>
-              <div class="filters__panel" id="filters-location">
-                <div class="filters__row">
+            <div class="filters__main">
+              <div class="filters__row filters__row--main">
                 <label class="filters__field">
                   <span data-i18n="filters_city">Місто</span>
                   <select name="city">
@@ -209,29 +170,57 @@
                     <option value="esbjerg" data-i18n="filters_city_esbjerg">Есб'єрг</option>
                   </select>
                 </label>
-                <label class="filters__field">
-                  <span data-i18n="filters_category">Категорія</span>
-                  <select name="category">
-                    <option value="" data-i18n="filters_all_categories">Усі категорії</option>
-                    <option value="music" data-i18n="category_music">Музика</option>
-                    <option value="networking" data-i18n="category_networking">Networking</option>
-                    <option value="cinema" data-i18n="category_cinema">Кіно</option>
-                    <option value="education" data-i18n="category_education">Освіта</option>
-                    <option value="kids" data-i18n="category_kids">Для дітей</option>
-                    <option value="community" data-i18n="category_community">Спільнота</option>
-                  </select>
-                </label>
+                <button class="btn ghost filters__advanced-toggle" type="button" data-action="filters-advanced" aria-expanded="false" aria-controls="filters-advanced" data-i18n="filters_advanced">
+                  Розширені фільтри
+                </button>
+              </div>
+              <div class="filters__row filters__row--presets">
+                <input class="filters__preset-input" type="checkbox" name="quick-today" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-tomorrow" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-weekend" aria-hidden="true" tabindex="-1" />
+                <input class="filters__preset-input" type="checkbox" name="quick-online" aria-hidden="true" tabindex="-1" />
+                <div class="filters__preset-group" role="group" aria-label="Швидкі пресети">
+                  <button class="filters__toggle filters__preset" type="button" data-quick="today" data-preset="today" aria-pressed="false" data-i18n="presets">Сьогодні</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="tomorrow" data-preset="tomorrow" aria-pressed="false" data-i18n="presets">Завтра</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="weekend" data-preset="weekend" aria-pressed="false" data-i18n="presets" data-testid="filters-weekend">Вихідні</button>
+                  <button class="filters__toggle filters__preset" type="button" data-quick="online" data-preset="online" aria-pressed="false" data-i18n="presets">Онлайн</button>
                 </div>
               </div>
-            </fieldset>
+            </div>
 
-            <fieldset class="filters__group">
-              <legend>
-                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-preferences">
-                  <span data-i18n="filters_preferences">Параметри</span>
-                </button>
-              </legend>
-              <div class="filters__panel" id="filters-preferences">
+            <div class="filters__advanced" id="filters-advanced" hidden>
+              <div class="filters__group">
+                <p class="filters__label" data-i18n="filters_date">Дата</p>
+                <div class="filters__row">
+                  <label class="filters__field">
+                    <span data-i18n="filters_from">Від</span>
+                    <input type="date" name="date-from" />
+                  </label>
+                  <label class="filters__field">
+                    <span data-i18n="filters_to">До</span>
+                    <input type="date" name="date-to" />
+                  </label>
+                </div>
+              </div>
+              <div class="filters__group">
+                <p class="filters__label" data-i18n="filters_category">Категорія</p>
+                <div class="filters__row">
+                  <label class="filters__field">
+                    <span data-i18n="filters_category">Категорія</span>
+                    <select name="category">
+                      <option value="" data-i18n="filters_all_categories">Усі категорії</option>
+                      <option value="music" data-i18n="category_music">Музика</option>
+                      <option value="networking" data-i18n="category_networking">Networking</option>
+                      <option value="cinema" data-i18n="category_cinema">Кіно</option>
+                      <option value="education" data-i18n="category_education">Освіта</option>
+                      <option value="kids" data-i18n="category_kids">Для дітей</option>
+                      <option value="community" data-i18n="category_community">Спільнота</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <div class="filters__group">
+                <p class="filters__label" data-i18n="filters_preferences">Параметри</p>
                 <div class="filters__row">
                   <label class="filters__field">
                     <span data-i18n="filters_price">Ціна</span>
@@ -251,15 +240,8 @@
                   </label>
                 </div>
               </div>
-            </fieldset>
-
-            <fieldset class="filters__group">
-              <legend>
-                <button class="filters__toggle-btn" type="button" aria-expanded="true" aria-controls="filters-audience">
-                  <span data-i18n="filters_audience">Аудиторія</span>
-                </button>
-              </legend>
-              <div class="filters__panel" id="filters-audience">
+              <div class="filters__group">
+                <p class="filters__label" data-i18n="filters_audience">Аудиторія</p>
                 <div class="filters__row">
                   <label class="filters__toggle">
                     <input type="checkbox" name="audience-ua" />
@@ -275,7 +257,7 @@
                   </label>
                 </div>
               </div>
-            </fieldset>
+            </div>
 
             <div class="filters__actions">
               <label class="filters__toggle">
@@ -286,7 +268,7 @@
                 Показати минулі події має пріоритет над датами, діапазон очищено.
               </p>
               <p class="filters__count" aria-live="polite" role="status" data-i18n="found_count">N знайдено</p>
-              <button class="btn ghost" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
+              <button class="btn ghost" type="reset" data-testid="filters-reset" data-i18n="reset_filters">Скинути фільтри</button>
             </div>
           </form>
           <div class="catalog-grid" aria-live="polite">
