@@ -292,6 +292,9 @@
             </button>
           </div>
           <div class="catalog-nav" aria-label="Навігація списку подій">
+            <button class="btn ghost" type="button" data-action="events-reset" data-i18n="events_reset" hidden>
+              Повернутися до актуальних подій
+            </button>
             <button class="btn ghost" type="button" data-action="events-next" data-i18n="events_next">
               Показати наступні події
             </button>
@@ -324,32 +327,73 @@
 
     <footer class="site-footer">
       <div class="container">
-        <p data-i18n="footer_rights">© 2024 Evently. All rights reserved.</p>
-        <div class="footer__socials" data-i18n-aria="footer_socials">
-          <span class="footer__socials-label" data-i18n="footer_socials">Соцмережі</span>
-          <a class="social-link" href="https://instagram.com/whatsondk" aria-label="Instagram" rel="noopener">
-            <span class="social-icon" aria-hidden="true">IG</span>
-          </a>
-          <a class="social-link" href="https://facebook.com/whatsondk" aria-label="Facebook" rel="noopener">
-            <span class="social-icon" aria-hidden="true">FB</span>
-          </a>
-          <a class="social-link" href="https://t.me/whatsondk" aria-label="Telegram" rel="noopener">
-            <span class="social-icon" aria-hidden="true">TG</span>
-          </a>
-          <button
-            class="theme-toggle theme-toggle--footer"
-            type="button"
-            data-testid="theme-toggle"
-            aria-pressed="false"
-            aria-label="Перемкнути тему"
-            data-i18n-aria="theme_toggle_aria"
-          >
-            Світла
-          </button>
+        <div class="footer__row">
+          <p data-i18n="footer_rights">© 2024 Evently. All rights reserved.</p>
+          <div class="footer__socials" data-i18n-aria="footer_socials">
+            <a class="social-link" href="https://instagram.com/whatsondk" aria-label="Instagram" rel="noopener">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
+                <circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="2" />
+                <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" />
+              </svg>
+            </a>
+            <a class="social-link" href="https://facebook.com/whatsondk" aria-label="Facebook" rel="noopener">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v2H7v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z"
+                  fill="currentColor"
+                />
+              </svg>
+            </a>
+            <a class="social-link" href="https://wa.me/4500000000" aria-label="WhatsApp" rel="noopener">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 5.2a6.8 6.8 0 0 0-5.9 10.1L5 20l4.8-1.1A6.8 6.8 0 1 0 12 5.2z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M9.3 9.2c.2-.4.5-.4.8-.3l.7.3c.2.1.3.2.4.4l.2.5c.1.2 0 .4-.1.6l-.2.3c-.1.2-.1.3 0 .5.3.6 1 1.3 1.6 1.6.2.1.3.1.5 0l.3-.2c.2-.1.4-.2.6-.1l.5.2c.2.1.3.2.4.4l.3.7c.1.3 0 .6-.3.8-.3.3-.7.4-1.1.4-1.2 0-2.8-.8-3.9-1.9-1.1-1.1-1.9-2.7-1.9-3.9 0-.4.1-.8.4-1.1z"
+                  fill="currentColor"
+                />
+              </svg>
+            </a>
+            <a class="social-link" href="https://www.threads.net/@whatsondk" aria-label="Threads" rel="noopener">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M7.5 6.8c1.4-1.6 3.5-2.6 5.8-2.6 3.3 0 6.1 2 6.9 4.9"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M8.4 12.2c1.2-.7 2.6-1 4-1 2.6 0 4.7 1.1 4.7 3.1 0 2.2-2.1 4.2-5.6 4.2-3.7 0-6.3-2.3-6.3-5.7 0-2.2 1-3.8 2.6-4.9"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </a>
+            <button
+              class="theme-toggle theme-toggle--footer"
+              type="button"
+              data-testid="theme-toggle"
+              aria-pressed="false"
+              aria-label="Перемкнути тему"
+              data-i18n-aria="theme_toggle_aria"
+            >
+              Світла
+            </button>
+          </div>
         </div>
-        <a class="footer__help" href="./docs.html" data-i18n="footer_help">Допомога</a>
-        <a class="footer__help" href="./legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
-        <a class="footer__help" href="./legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+        <div class="footer__links">
+          <a class="footer__help" href="./docs.html" data-i18n="footer_help">Допомога</a>
+          <a class="footer__help" href="./legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+          <a class="footer__help" href="./legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+        </div>
       </div>
     </footer>
 

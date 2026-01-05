@@ -425,6 +425,7 @@
       filters_city_aalborg: 'Ольборг',
       filters_city_esbjerg: "Есб'єрг",
       events_next: 'Показати наступні події',
+      events_reset: 'Повернутися до актуальних подій',
       filters_category: 'Категорія',
       filters_all_categories: 'Усі категорії',
       category_music: 'Музика',
@@ -844,6 +845,7 @@
       filters_city_aalborg: 'Aalborg',
       filters_city_esbjerg: 'Esbjerg',
       events_next: 'Show next events',
+      events_reset: 'Back to upcoming events',
       filters_category: 'Category',
       filters_all_categories: 'All categories',
       category_music: 'Music',
@@ -1263,6 +1265,7 @@
       filters_city_aalborg: 'Aalborg',
       filters_city_esbjerg: 'Esbjerg',
       events_next: 'Vis næste events',
+      events_reset: 'Tilbage til aktuelle events',
       filters_category: 'Kategori',
       filters_all_categories: 'Alle kategorier',
       category_music: 'Musik',
@@ -2886,6 +2889,7 @@
     const emptyState = document.querySelector('.catalog-empty');
     const errorState = document.querySelector('.catalog-error');
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
+    const resetEventsButton = document.querySelector('[data-action="events-reset"]');
     const searchInput = document.querySelector('#event-search');
     const pastHint = document.querySelector('[data-past-hint]');
     const advancedToggle = document.querySelector('[data-action="filters-advanced"]');
@@ -2950,10 +2954,7 @@
       const cardClass = `event-card ${isFree ? 'event-card--free' : 'event-card--paid'}${
         pastEvent ? ' event-card--archived' : ''
       }`;
-      const freeLabel = formatMessage('price_free', {});
-      const badgeMarkup = isFree
-        ? `<span class="event-card__badge">${freeLabel}</span>`
-        : '';
+      const badgeMarkup = '';
       const archivedLabel = formatMessage('archived_label', {});
       const archivedMarkup = pastEvent
         ? `<span class="event-card__status" aria-label="${archivedLabel}">${archivedLabel}</span>`
@@ -2987,7 +2988,7 @@
       const ticketLabel = formatMessage(ticketKey, {});
       const ticketUrl = event.ticketUrl ? event.ticketUrl : 'event.html';
       const location = `${event.city} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${badgeMarkup}\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n          </div>\n        </article>\n      `;
+      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n          </div>\n        </article>\n      `;
     };
 
     const updateCount = (count) => {
@@ -3013,9 +3014,14 @@
     };
 
     const updateWindowButtons = (baseList, range) => {
-      if (!nextEventsButton) return;
+      if (!nextEventsButton && !resetEventsButton) return;
       const hasNext = baseList.some((event) => new Date(event.start) >= range.end);
-      nextEventsButton.disabled = !hasNext;
+      if (nextEventsButton) {
+        nextEventsButton.disabled = !hasNext;
+      }
+      if (resetEventsButton) {
+        resetEventsButton.hidden = windowOffset === 0;
+      }
     };
 
     const syncPastFilterState = (shouldClear) => {
@@ -3230,6 +3236,8 @@
       renderEvents(filteredEvents.slice(0, visibleCount));
       if (range) {
         updateWindowButtons(baseList, range);
+      } else if (resetEventsButton) {
+        resetEventsButton.hidden = true;
       }
     };
 
@@ -3552,6 +3560,17 @@
     if (nextEventsButton) {
       nextEventsButton.addEventListener('click', () => {
         stepWindow(1);
+      });
+    }
+
+    if (resetEventsButton) {
+      resetEventsButton.addEventListener('click', () => {
+        windowOffset = 0;
+        applyFilters();
+        const catalogSection = document.querySelector('#events');
+        if (catalogSection) {
+          catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     }
 
