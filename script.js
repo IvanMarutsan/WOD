@@ -246,6 +246,7 @@
       admin_audit_summary: 'Останні рішення по модерації.',
       admin_audit_empty: 'Журнал поки порожній.',
       admin_access_checking: 'Перевіряємо доступ...',
+      admin_access_granted: 'Доступ підтверджено.',
       admin_access_required: 'Потрібен вхід адміністратора.',
       admin_access_denied: 'У вас немає доступу до адмінки.',
       admin_access_login: 'Увійти',
@@ -648,6 +649,7 @@
       admin_audit_summary: 'Latest moderation decisions.',
       admin_audit_empty: 'No audit entries yet.',
       admin_access_checking: 'Checking access...',
+      admin_access_granted: 'Access confirmed.',
       admin_access_required: 'Admin login required.',
       admin_access_denied: 'You do not have access to the admin panel.',
       admin_access_login: 'Sign in',
@@ -1050,6 +1052,7 @@
       admin_audit_summary: 'Seneste moderationsbeslutninger.',
       admin_audit_empty: 'Ingen logposter endnu.',
       admin_access_checking: 'Kontrollerer adgang...',
+      admin_access_granted: 'Adgang bekræftet.',
       admin_access_required: 'Admin-login er påkrævet.',
       admin_access_denied: 'Du har ikke adgang til adminpanelet.',
       admin_access_login: 'Log ind',
@@ -1616,6 +1619,7 @@
       if (!user) {
         setAuthState('denied');
         setStatus('admin_access_required');
+        if (loginButton) loginButton.hidden = false;
         if (logoutButton) logoutButton.hidden = true;
         updateMeta(null);
         setSuperAdminVisibility(false);
@@ -1628,6 +1632,7 @@
       if (!hasAdminRole(user)) {
         setAuthState('denied');
         setStatus('admin_access_denied');
+        if (loginButton) loginButton.hidden = true;
         if (logoutButton) logoutButton.hidden = false;
         updateMeta(user);
         setSuperAdminVisibility(false);
@@ -1638,6 +1643,8 @@
       }
 
       setAuthState('granted');
+      setStatus('admin_access_granted');
+      if (loginButton) loginButton.hidden = true;
       if (logoutButton) logoutButton.hidden = false;
       updateMeta(user);
       setSuperAdminVisibility(isSuperAdmin(user));
