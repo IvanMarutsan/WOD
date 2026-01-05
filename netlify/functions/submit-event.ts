@@ -36,6 +36,9 @@ const isNonEmptyString = (value: unknown) =>
 const isValidEmail = (value: unknown) =>
   typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+const isValidPhone = (value: unknown) =>
+  typeof value === 'string' && /^\+?\d[\d\s()-]{5,}$/.test(value);
+
 const isValidDate = (value: unknown) => {
   if (!isNonEmptyString(value)) return false;
   const date = new Date(String(value));
@@ -76,7 +79,12 @@ export const handler = async (event: HandlerEvent) => {
     if (!isNonEmptyString(payload.address)) errors.push('address');
     if (!['free', 'paid'].includes(String(payload['ticket-type'] || ''))) errors.push('ticket-type');
     if (!isNonEmptyString(payload['contact-name'])) errors.push('contact-name');
-    if (!isValidEmail(payload['contact-email'])) errors.push('contact-email');
+    if (payload['contact-email'] && !isValidEmail(payload['contact-email'])) {
+      errors.push('contact-email');
+    }
+    if (payload['contact-phone'] && !isValidPhone(payload['contact-phone'])) {
+      errors.push('contact-phone');
+    }
     const tags = parseTags(payload.tags);
     if (tags.length === 0) errors.push('tags');
 
@@ -94,13 +102,14 @@ export const handler = async (event: HandlerEvent) => {
     const events = Array.isArray(existing) ? existing : [];
     const title = payload.title || payload.name || payload.eventTitle || 'Untitled event';
     const createdAt = new Date().toISOString();
+    const status = payload.status === 'approved' ? 'approved' : 'pending';
     const eventRecord = {
       id,
       title,
       city: payload.city || payload.eventCity || '',
       start: payload.start || payload.eventStart || '',
       end: payload.end || payload.eventEnd || '',
-      status: 'pending',
+      status,
       createdAt,
       updatedAt: createdAt,
       payload

@@ -53,6 +53,9 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const store = getStore('wod-admin');
     const events = (await store.get('events', { type: 'json' })) as any[] | null;
     const audit = (await store.get('audit', { type: 'json' })) as any[] | null;
+    const verificationRequests = (await store.get('verificationRequests', { type: 'json' })) as
+      | any[]
+      | null;
     const list = Array.isArray(events) ? events : [];
     const prunedEvents = pruneEvents(list);
     const prunedAudit = pruneAudit(Array.isArray(audit) ? audit : []);
@@ -87,14 +90,15 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
             history: Array.isArray(event.reasonHistory) ? event.reasonHistory : []
           }))
       : [];
-    const auditLog = roles.includes('super_admin')
-      ? prunedAudit.slice(0, 50)
+    const auditLog = roles.includes('super_admin') ? prunedAudit.slice(0, 50) : [];
+    const verifications = Array.isArray(verificationRequests)
+      ? verificationRequests.filter((item) => item.status === 'pending')
       : [];
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: true, pending, rejected, audit: auditLog })
+      body: JSON.stringify({ ok: true, pending, rejected, audit: auditLog, verifications })
     };
   } catch (error) {
     console.log('admin-events error', error);

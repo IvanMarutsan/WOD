@@ -83,6 +83,16 @@
             </div>
           </section>
 
+          <section class="moderation moderation--verification" aria-labelledby="verification-title">
+            <header class="section-header">
+              <h2 id="verification-title" data-i18n="admin_verification_title">Запити на верифікацію</h2>
+              <p class="section-summary" data-i18n="admin_verification_summary">Перевірте посилання та підтвердіть організаторів.</p>
+            </header>
+            <div class="moderation-list" data-admin-verifications>
+              <p class="moderation__state" data-admin-verifications-empty data-i18n="admin_verification_empty" hidden>Наразі немає запитів на верифікацію.</p>
+            </div>
+          </section>
+
         <section class="moderation moderation--rejected" aria-labelledby="rejected-title" data-super-admin-only hidden>
           <header class="section-header">
             <h2 id="rejected-title" data-i18n="admin_rejected_title">Відхилені події</h2>
@@ -123,6 +133,19 @@
         <div class="moderation-card__actions" data-admin-actions>
           <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
           <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="verification-card-template">
+      <article class="moderation-card moderation-card--verification" data-admin-verification-row>
+        <div class="moderation-card__meta">
+          <h3 data-admin-verification-name></h3>
+          <p data-admin-verification-meta></p>
+          <a class="moderation-card__link" data-admin-verification-link href="#" target="_blank" rel="noopener">Link</a>
+        </div>
+        <div class="moderation-card__actions">
+          <button class="btn primary" type="button" data-action="approve-verification" data-i18n="admin_verification_approve">Підтвердити</button>
         </div>
       </article>
     </template>

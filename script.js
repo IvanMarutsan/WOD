@@ -16,6 +16,7 @@
   const logBuffer = [];
   let debugPanel = null;
   let debugList = null;
+  let identityUser = null;
 
   const redirectIdentityHashToLogin = () => {
     const hash = window.location.hash || '';
@@ -235,6 +236,10 @@
       admin_modal_cancel: 'Скасувати',
       admin_modal_reject: 'Відхилити',
       admin_pending_empty: 'Наразі немає подій на модерації.',
+      admin_verification_title: 'Запити на верифікацію',
+      admin_verification_summary: 'Перевірте посилання та підтвердіть організаторів.',
+      admin_verification_empty: 'Наразі немає запитів на верифікацію.',
+      admin_verification_approve: 'Підтвердити',
       admin_rejected_title: 'Відхилені події',
       admin_rejected_summary: 'Доступно лише для супер-адміністратора.',
       admin_rejected_empty: 'Немає відхилених подій.',
@@ -454,6 +459,7 @@
       footer_help: 'Допомога',
       footer_privacy: 'Політика конфіденційності',
       footer_terms: 'Умови користування',
+      footer_socials: 'Соцмережі',
       not_found_title: 'Сторінку не знайдено',
       not_found_summary: 'Перевірте адресу або скористайтеся пошуком — можливо, потрібна подія вже тут.',
       not_found_search_label: 'Пошук подій',
@@ -541,13 +547,23 @@
       contacts_faq_a3: 'Копенгаген, Орхус, Оденсе, Ольборг, Есб\'єрг та онлайн.',
       form_end_label: 'Завершення',
       form_optional_hint: '(необов\'язково)',
-      form_contact_legend: 'Контактна особа',
-      form_contact_name: 'Імʼя',
-      form_contact_name_help: 'Вкажіть імʼя контактної особи.',
+      form_contact_legend: 'Організатор / Контакт',
+      form_contact_name: 'Організація або контакт',
+      form_contact_name_help: 'Наприклад: NGO “HelpHub” або Olena K.',
       form_contact_email: 'Email',
-      form_contact_email_help: 'Наприклад: name@example.com.',
+      form_contact_email_help: 'Необов’язково. Наприклад: name@example.com.',
       form_contact_phone: 'Телефон',
-      form_contact_phone_help: 'Формат: +45 12 34 56 78.',
+      form_contact_phone_help: 'Необов’язково. Формат: +45 12 34 56 78.',
+      form_contact_website: 'Вебсайт',
+      form_contact_website_help: 'Необов’язково.',
+      form_contact_website_placeholder: 'https://',
+      form_contact_instagram: 'Instagram',
+      form_contact_instagram_placeholder: 'https://instagram.com/',
+      form_contact_facebook: 'Facebook',
+      form_contact_facebook_placeholder: 'https://facebook.com/',
+      form_contact_telegram: 'Telegram',
+      form_contact_telegram_placeholder: 'https://t.me/',
+      form_contact_social_help: 'Необов’язково.',
       event_contact_title: 'Контакти',
       event_contact_name: 'Імʼя',
       event_contact_email_label: 'Email',
@@ -638,6 +654,10 @@
       admin_modal_cancel: 'Cancel',
       admin_modal_reject: 'Reject',
       admin_pending_empty: 'No events are awaiting moderation.',
+      admin_verification_title: 'Verification requests',
+      admin_verification_summary: 'Review links and verify organizers.',
+      admin_verification_empty: 'No verification requests yet.',
+      admin_verification_approve: 'Approve',
       admin_rejected_title: 'Rejected events',
       admin_rejected_summary: 'Visible to super admins only.',
       admin_rejected_empty: 'No rejected events.',
@@ -857,6 +877,7 @@
       footer_help: 'Help',
       footer_privacy: 'Privacy Policy',
       footer_terms: 'Terms of Use',
+      footer_socials: 'Socials',
       not_found_title: 'Page not found',
       not_found_summary: 'Check the address or try search — the event might already be here.',
       not_found_search_label: 'Search events',
@@ -944,13 +965,23 @@
       contacts_faq_a3: 'Copenhagen, Aarhus, Odense, Aalborg, Esbjerg, and online.',
       form_end_label: 'End time',
       form_optional_hint: '(optional)',
-      form_contact_legend: 'Contact person',
-      form_contact_name: 'Name',
-      form_contact_name_help: 'Add a contact name.',
+      form_contact_legend: 'Organizer / contact',
+      form_contact_name: 'Organization or contact',
+      form_contact_name_help: 'For example: NGO “HelpHub” or Olena K.',
       form_contact_email: 'Email',
-      form_contact_email_help: 'For example: name@example.com.',
+      form_contact_email_help: 'Optional. For example: name@example.com.',
       form_contact_phone: 'Phone',
-      form_contact_phone_help: 'Format: +45 12 34 56 78.',
+      form_contact_phone_help: 'Optional. Format: +45 12 34 56 78.',
+      form_contact_website: 'Website',
+      form_contact_website_help: 'Optional.',
+      form_contact_website_placeholder: 'https://',
+      form_contact_instagram: 'Instagram',
+      form_contact_instagram_placeholder: 'https://instagram.com/',
+      form_contact_facebook: 'Facebook',
+      form_contact_facebook_placeholder: 'https://facebook.com/',
+      form_contact_telegram: 'Telegram',
+      form_contact_telegram_placeholder: 'https://t.me/',
+      form_contact_social_help: 'Optional.',
       event_contact_title: 'Contacts',
       event_contact_name: 'Name',
       event_contact_email_label: 'Email',
@@ -1044,6 +1075,10 @@
       admin_rejected_title: 'Afviste events',
       admin_rejected_summary: 'Kun synligt for superadmins.',
       admin_rejected_empty: 'Ingen afviste events.',
+      admin_verification_title: 'Bekræftelsesanmodninger',
+      admin_verification_summary: 'Gennemgå links og bekræft arrangører.',
+      admin_verification_empty: 'Ingen bekræftelsesanmodninger endnu.',
+      admin_verification_approve: 'Bekræft',
       admin_loading: 'Indlæser...',
       admin_reason_label: 'Begrundelse',
       admin_history_title: 'Beslutningshistorik',
@@ -1260,6 +1295,7 @@
       footer_help: 'Hjælp',
       footer_privacy: 'Privatlivspolitik',
       footer_terms: 'Vilkår',
+      footer_socials: 'Sociale medier',
       not_found_title: 'Siden blev ikke fundet',
       not_found_summary: 'Tjek adressen eller brug søgning — måske er eventet allerede her.',
       not_found_search_label: 'Søg events',
@@ -1347,13 +1383,23 @@
       contacts_faq_a3: 'København, Aarhus, Odense, Aalborg, Esbjerg og online.',
       form_end_label: 'Sluttidspunkt',
       form_optional_hint: '(valgfrit)',
-      form_contact_legend: 'Kontaktperson',
-      form_contact_name: 'Navn',
-      form_contact_name_help: 'Angiv kontaktpersonens navn.',
+      form_contact_legend: 'Arrangør / kontakt',
+      form_contact_name: 'Organisation eller kontakt',
+      form_contact_name_help: 'For eksempel: NGO “HelpHub” eller Olena K.',
       form_contact_email: 'Email',
-      form_contact_email_help: 'For eksempel: name@example.com.',
+      form_contact_email_help: 'Valgfrit. For eksempel: name@example.com.',
       form_contact_phone: 'Telefon',
-      form_contact_phone_help: 'Format: +45 12 34 56 78.',
+      form_contact_phone_help: 'Valgfrit. Format: +45 12 34 56 78.',
+      form_contact_website: 'Website',
+      form_contact_website_help: 'Valgfrit.',
+      form_contact_website_placeholder: 'https://',
+      form_contact_instagram: 'Instagram',
+      form_contact_instagram_placeholder: 'https://instagram.com/',
+      form_contact_facebook: 'Facebook',
+      form_contact_facebook_placeholder: 'https://facebook.com/',
+      form_contact_telegram: 'Telegram',
+      form_contact_telegram_placeholder: 'https://t.me/',
+      form_contact_social_help: 'Valgfrit.',
       event_contact_title: 'Kontakt',
       event_contact_name: 'Navn',
       event_contact_email_label: 'Email',
@@ -1714,16 +1760,18 @@
   };
 
   const VERIFICATION_KEY = 'organizerVerification';
+  const VERIFICATION_EMAIL_KEY = 'organizerVerificationEmail';
 
   const getVerificationState = () => {
     try {
       const stored = JSON.parse(localStorage.getItem(VERIFICATION_KEY) || '{}');
       return {
         emailVerified: Boolean(stored.emailVerified),
-        websitePending: Boolean(stored.websitePending)
+        websitePending: Boolean(stored.websitePending),
+        websiteApproved: Boolean(stored.websiteApproved)
       };
     } catch (error) {
-      return { emailVerified: false, websitePending: false };
+      return { emailVerified: false, websitePending: false, websiteApproved: false };
     }
   };
 
@@ -1735,7 +1783,23 @@
     }
   };
 
-  const isOrganizerVerified = (state) => state.emailVerified && state.websitePending;
+  const getStoredVerificationEmail = () => {
+    try {
+      return localStorage.getItem(VERIFICATION_EMAIL_KEY) || '';
+    } catch (error) {
+      return '';
+    }
+  };
+
+  const setStoredVerificationEmail = (email) => {
+    try {
+      localStorage.setItem(VERIFICATION_EMAIL_KEY, email);
+    } catch (error) {
+      return;
+    }
+  };
+
+  const isOrganizerVerified = (state) => state.emailVerified && state.websiteApproved;
 
   const formatDateTime = (value) => {
     const date = new Date(value);
@@ -1931,7 +1995,30 @@
       badge.hidden = !isOrganizerVerified(state);
     });
     if (verificationPending) {
-      verificationPending.hidden = !state.websitePending;
+      verificationPending.hidden = !(state.websitePending && !state.websiteApproved);
+    }
+  };
+
+  const syncVerificationWithServer = async () => {
+    const email = getStoredVerificationEmail();
+    if (!email) return;
+    try {
+      const response = await fetch(
+        `/.netlify/functions/organizer-verification?email=${encodeURIComponent(email)}`
+      );
+      if (!response.ok) return;
+      const result = await response.json();
+      if (!result || !result.ok) return;
+      const current = getVerificationState();
+      const nextState = {
+        ...current,
+        websiteApproved: Boolean(result.verified),
+        websitePending: Boolean(result.pending)
+      };
+      saveVerificationState(nextState);
+      applyVerificationState(nextState);
+    } catch (error) {
+      return;
     }
   };
 
@@ -1947,6 +2034,7 @@
   if (verificationSection) {
     const state = getVerificationState();
     applyVerificationState(state);
+    syncVerificationWithServer();
     if (sendCodeButton && emailInput) {
       sendCodeButton.addEventListener('click', async () => {
         try {
@@ -1954,6 +2042,7 @@
             emailInput.reportValidity();
             return;
           }
+          setStoredVerificationEmail(emailInput.value.trim());
           if (verificationHoneypot && verificationHoneypot.value.trim()) {
             setVerificationStatus('verification_spam', true);
             return;
@@ -2011,13 +2100,27 @@
     }
 
     if (linkSubmitButton && linkInput) {
-      linkSubmitButton.addEventListener('click', () => {
+      linkSubmitButton.addEventListener('click', async () => {
         try {
           if (!linkInput.checkValidity()) {
             linkInput.reportValidity();
             return;
           }
-          const nextState = { ...getVerificationState(), websitePending: true };
+          const email = getStoredVerificationEmail();
+          if (!email) {
+            setVerificationStatus('verification_error', true);
+            return;
+          }
+          await fetch('/.netlify/functions/organizer-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              link: linkInput.value.trim(),
+              name: email
+            })
+          });
+          const nextState = { ...getVerificationState(), websitePending: true, websiteApproved: false };
           saveVerificationState(nextState);
           applyVerificationState(nextState);
           setVerificationStatus('verification_pending', false);
@@ -2144,6 +2247,24 @@
     const submitStatus = multiStepForm.querySelector('[data-submit-status]');
     const organizerId = multiStepForm.dataset.organizerId || 'org-001';
     let organizerStatus = 'none';
+    const isAdminBypass = () => identityUser && hasAdminRole(identityUser);
+
+    const initIdentitySession = () => {
+      if (!window.netlifyIdentity) return;
+      window.netlifyIdentity.on('init', (user) => {
+        identityUser = user;
+        updatePublishState();
+      });
+      window.netlifyIdentity.on('login', (user) => {
+        identityUser = user;
+        updatePublishState();
+      });
+      window.netlifyIdentity.on('logout', () => {
+        identityUser = null;
+        updatePublishState();
+      });
+      window.netlifyIdentity.init();
+    };
 
     const setStep = (index) => {
       steps.forEach((step, stepIndex) => {
@@ -2293,7 +2414,9 @@
 
     const getEffectiveOrganizerStatus = () => {
       const verification = getVerificationState();
+      if (isAdminBypass()) return 'admin';
       if (organizerStatus && organizerStatus !== 'none') return organizerStatus;
+      if (verification.emailVerified && verification.websiteApproved) return 'verified';
       if (verification.emailVerified && verification.websitePending) return 'pending_manual';
       return 'none';
     };
@@ -2330,6 +2453,7 @@
       }
     };
     updatePublishState();
+    initIdentitySession();
     loadOrganizerStatus();
 
     if (verificationBannerButton) {
@@ -2370,7 +2494,7 @@
         return;
       }
       if (statusField) {
-        statusField.value = 'pending';
+        statusField.value = isAdminBypass() ? 'approved' : 'pending';
       }
       if (!validateStep()) {
         return;
@@ -2409,12 +2533,15 @@
     moderationList.dataset.ready = 'true';
 
     const pendingContainer = document.querySelector('[data-admin-pending]');
+    const verificationContainer = document.querySelector('[data-admin-verifications]');
     const rejectedContainer = document.querySelector('[data-admin-rejected]');
     const auditContainer = document.querySelector('[data-admin-audit]');
     const template = document.querySelector('#moderation-card-template');
+    const verificationTemplate = document.querySelector('#verification-card-template');
     const auditTemplate = document.querySelector('#audit-row-template');
     const loadingEl = pendingContainer?.querySelector('[data-admin-loading]');
     const emptyEl = pendingContainer?.querySelector('[data-admin-empty]');
+    const verificationEmptyEl = verificationContainer?.querySelector('[data-admin-verifications-empty]');
     const rejectedEmptyEl = rejectedContainer?.querySelector('[data-admin-rejected-empty]');
     const auditEmptyEl = auditContainer?.querySelector('[data-admin-audit-empty]');
     const modalDialog = modal.querySelector('.modal__dialog');
@@ -2509,6 +2636,33 @@
       });
     };
 
+    const renderVerifications = (items) => {
+      if (!verificationContainer || !verificationTemplate) return;
+      verificationContainer
+        .querySelectorAll('[data-admin-verification-row]')
+        .forEach((card) => card.remove());
+      items.forEach((item) => {
+        const row = verificationTemplate.content.firstElementChild.cloneNode(true);
+        const nameEl = row.querySelector('[data-admin-verification-name]');
+        const metaEl = row.querySelector('[data-admin-verification-meta]');
+        const linkEl = row.querySelector('[data-admin-verification-link]');
+        const email = item.email || '—';
+        const createdAt = item.createdAt
+          ? new Date(item.createdAt).toLocaleString(getUiLocale())
+          : '—';
+        row.dataset.email = email;
+        row.dataset.link = item.link || '';
+        row.dataset.name = item.name || email;
+        if (nameEl) nameEl.textContent = item.name || email;
+        if (metaEl) metaEl.textContent = `${email} · ${createdAt}`;
+        if (linkEl) {
+          linkEl.href = item.link || '#';
+          linkEl.textContent = item.link || '—';
+        }
+        verificationContainer.appendChild(row);
+      });
+    };
+
     const renderAudit = (items) => {
       if (!auditContainer || !auditTemplate) return;
       auditContainer.querySelectorAll('[data-admin-audit-row]').forEach((row) => row.remove());
@@ -2562,6 +2716,7 @@
     const loadModerationQueue = async () => {
       if (loadingEl) loadingEl.hidden = false;
       if (emptyEl) emptyEl.hidden = true;
+      if (verificationEmptyEl) verificationEmptyEl.hidden = true;
       if (rejectedEmptyEl) rejectedEmptyEl.hidden = true;
       if (auditEmptyEl) auditEmptyEl.hidden = true;
       try {
@@ -2576,15 +2731,19 @@
         const pending = Array.isArray(result?.pending) ? result.pending : [];
         const rejected = Array.isArray(result?.rejected) ? result.rejected : [];
         const audit = Array.isArray(result?.audit) ? result.audit : [];
+        const verifications = Array.isArray(result?.verifications) ? result.verifications : [];
         renderCards(pendingContainer, pending, true);
         renderCards(rejectedContainer, rejected, false);
+        renderVerifications(verifications);
         setEmptyState(emptyEl, pending.length === 0);
+        setEmptyState(verificationEmptyEl, verifications.length === 0);
         setEmptyState(rejectedEmptyEl, rejected.length === 0);
         if (superAdmin) {
           renderAudit(audit);
         }
       } catch (error) {
         setEmptyState(emptyEl, true);
+        setEmptyState(verificationEmptyEl, true);
         setEmptyState(rejectedEmptyEl, true);
         if (auditEmptyEl) auditEmptyEl.hidden = false;
       } finally {
@@ -2598,6 +2757,18 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({ id: eventId, action, reason })
+        });
+      } catch (error) {
+        // Ignore network errors for optimistic UI.
+      }
+    };
+
+    const sendVerificationAction = async ({ email, link, name, action }) => {
+      try {
+        await fetch('/.netlify/functions/admin-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ email, link, name, action })
         });
       } catch (error) {
         // Ignore network errors for optimistic UI.
@@ -2618,6 +2789,24 @@
         if (target.dataset.action === 'reject') {
           openModal(target, card);
         }
+      });
+    }
+
+    if (verificationContainer) {
+      verificationContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (target.dataset.action !== 'approve-verification') return;
+        const card = target.closest('[data-admin-verification-row]');
+        if (!card) return;
+        const email = card.dataset.email || '';
+        const link = card.dataset.link || '';
+        const name = card.dataset.name || '';
+        sendVerificationAction({ email, link, name, action: 'approve' });
+        card.remove();
+        const remaining =
+          verificationContainer.querySelectorAll('[data-admin-verification-row]').length === 0;
+        setEmptyState(verificationEmptyEl, remaining);
       });
     }
 

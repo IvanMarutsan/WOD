@@ -198,26 +198,23 @@
               </label>
             </div>
             <fieldset class="form-fieldset">
-              <legend data-i18n="form_contact_legend">Контактна особа</legend>
+              <legend data-i18n="form_contact_legend">Організатор / Контакт</legend>
               <label class="form-field">
-                <span data-i18n="form_contact_name">Імʼя</span>
+                <span data-i18n="form_contact_name">Організація або контакт</span>
                 <span class="required" aria-hidden="true">*</span>
                 <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
                 <input type="text" name="contact-name" required aria-describedby="contact-name-help" />
-                <small id="contact-name-help" data-i18n="form_contact_name_help">Вкажіть імʼя контактної особи.</small>
+                <small id="contact-name-help" data-i18n="form_contact_name_help">Наприклад: NGO “HelpHub” або Olena K.</small>
               </label>
               <label class="form-field">
                 <span data-i18n="form_contact_email">Email</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
                 <input
                   type="email"
                   name="contact-email"
-                  required
                   aria-describedby="contact-email-help"
-                  pattern="^[^@\s]+@[^\s@]+\.[^\s@]+$"
+                  pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
                 />
-                <small id="contact-email-help" data-i18n="form_contact_email_help">Наприклад: name@example.com.</small>
+                <small id="contact-email-help" data-i18n="form_contact_email_help">Необов’язково. Наприклад: name@example.com.</small>
               </label>
               <label class="form-field">
                 <span data-i18n="form_contact_phone">Телефон</span>
@@ -227,7 +224,27 @@
                   aria-describedby="contact-phone-help"
                   pattern="^\+45\s?[0-9]{2}(\s?[0-9]{2}){3}$"
                 />
-                <small id="contact-phone-help" data-i18n="form_contact_phone_help">Формат: +45 12 34 56 78.</small>
+                <small id="contact-phone-help" data-i18n="form_contact_phone_help">Необов’язково. Формат: +45 12 34 56 78.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_website">Вебсайт</span>
+                <input type="url" name="contact-website" placeholder="https://" data-i18n-placeholder="form_contact_website_placeholder" />
+                <small data-i18n="form_contact_website_help">Необов’язково.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_instagram">Instagram</span>
+                <input type="url" name="contact-instagram" placeholder="https://instagram.com/" data-i18n-placeholder="form_contact_instagram_placeholder" />
+                <small data-i18n="form_contact_social_help">Необов’язково.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_facebook">Facebook</span>
+                <input type="url" name="contact-facebook" placeholder="https://facebook.com/" data-i18n-placeholder="form_contact_facebook_placeholder" />
+                <small data-i18n="form_contact_social_help">Необов’язково.</small>
+              </label>
+              <label class="form-field">
+                <span data-i18n="form_contact_telegram">Telegram</span>
+                <input type="url" name="contact-telegram" placeholder="https://t.me/" data-i18n-placeholder="form_contact_telegram_placeholder" />
+                <small data-i18n="form_contact_social_help">Необов’язково.</small>
               </label>
             </fieldset>
           </section>
@@ -293,6 +310,19 @@
     <footer class="site-footer">
       <div class="container">
         <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <div class="footer__socials" data-i18n-aria="footer_socials">
+          <span class="footer__socials-label" data-i18n="footer_socials">Соцмережі</span>
+          <a class="social-link" href="https://instagram.com/whatsondk" aria-label="Instagram" rel="noopener">
+            <span class="social-icon" aria-hidden="true">IG</span>
+          </a>
+          <a class="social-link" href="https://facebook.com/whatsondk" aria-label="Facebook" rel="noopener">
+            <span class="social-icon" aria-hidden="true">FB</span>
+          </a>
+          <a class="social-link" href="https://t.me/whatsondk" aria-label="Telegram" rel="noopener">
+            <span class="social-icon" aria-hidden="true">TG</span>
+          </a>
+        </div>
+
         <a class="footer__help" href="./docs.html" data-i18n="footer_help">Допомога</a>
         <a class="footer__help" href="./legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
         <a class="footer__help" href="./legal-terms.html" data-i18n="footer_terms">Умови користування</a>
@@ -300,6 +330,7 @@
     </footer>
 
 
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="./script.js" defer></script>
   </body>
 </html>
