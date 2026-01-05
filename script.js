@@ -1622,7 +1622,18 @@
       }
     };
 
-    window.netlifyIdentity.on('init', handleUser);
+    const params = new URLSearchParams(window.location.search);
+    const hasRecoveryToken = params.has('recovery_token');
+    const hasInviteToken = params.has('invite_token');
+    const hasConfirmToken = params.has('confirmation_token');
+
+    window.netlifyIdentity.on('init', (user) => {
+      handleUser(user);
+      if (isLoginPage && !user && (hasRecoveryToken || hasInviteToken || hasConfirmToken)) {
+        const action = hasRecoveryToken ? 'recovery' : 'signup';
+        window.netlifyIdentity.open(action);
+      }
+    });
     window.netlifyIdentity.on('login', (user) => {
       handleUser(user);
       window.netlifyIdentity.close();
