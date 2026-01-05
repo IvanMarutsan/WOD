@@ -8,6 +8,7 @@
   const moderationList = document.querySelector('.moderation-list');
   const modal = document.querySelector('.modal');
   const catalogGrid = document.querySelector('.catalog-grid');
+  const highlightsTrack = document.querySelector('.highlights__track');
   const ticketCtas = document.querySelectorAll('.event-sidebar__cta--ticket');
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const langButtons = document.querySelectorAll('.lang-switch__button');
@@ -1830,6 +1831,18 @@
     return `${map.day}.${map.month}.${map.year} · ${map.hour}:${map.minute}`;
   };
 
+  const formatShortDate = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const parts = new Intl.DateTimeFormat('da-DK', {
+      timeZone: 'Europe/Copenhagen',
+      day: '2-digit',
+      month: '2-digit'
+    }).formatToParts(date);
+    const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${map.day}.${map.month}`;
+  };
+
   const formatTime = (value) => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
@@ -1912,9 +1925,13 @@
   };
 
   const params = new URLSearchParams(window.location.search);
-  const urlLang = params.get('lang');
-  const initialLang = urlLang || getStoredLang() || 'uk';
-  applyTranslations(initialLang);
+  if (params.has('lang')) {
+    params.delete('lang');
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
+    window.history.replaceState({}, '', nextUrl);
+  }
+  applyTranslations('uk');
   injectEventJsonLd();
 
   const getPreferredTheme = () => {
@@ -1950,30 +1967,8 @@
     });
   }
 
-  if (langButtons.length) {
-    langButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const lang = button.dataset.lang || 'uk';
-        setStoredLang(lang);
-        applyTranslations(lang);
-        const nextParams = new URLSearchParams(window.location.search);
-        nextParams.set('lang', lang);
-        const nextUrl = `${window.location.pathname}?${nextParams.toString()}`;
-        window.history.pushState({}, '', nextUrl);
-      });
-    });
-  }
-
-  if (langSelect) {
-    langSelect.addEventListener('change', () => {
-      const lang = langSelect.value || 'uk';
-      setStoredLang(lang);
-      applyTranslations(lang);
-      const nextParams = new URLSearchParams(window.location.search);
-      nextParams.set('lang', lang);
-      const nextUrl = `${window.location.pathname}?${nextParams.toString()}`;
-      window.history.pushState({}, '', nextUrl);
-    });
+  if (langButtons.length || langSelect) {
+    setStoredLang('uk');
   }
 
   const verificationSection = document.querySelector('[data-verification]');
@@ -2938,6 +2933,229 @@
     };
 
     const normalize = (value) => String(value || '').toLowerCase();
+    const getTokens = (value) =>
+      normalize(value)
+        .split(/[\s,]+/)
+        .map((token) => token.trim())
+        .filter(Boolean);
+
+    const EVENT_TITLES = {
+      'evt-001': {
+        uk: 'Тиждень дизайну в Копенгагені: Open Studio',
+        en: 'Copenhagen Design Week: Open Studio',
+        da: 'Copenhagen Design Week: Open Studio'
+      },
+      'evt-002': {
+        uk: 'Зимовий фестиваль їжі в Орхусі',
+        en: 'Aarhus Winter Food Fest',
+        da: 'Aarhus Vinter Madfestival'
+      },
+      'evt-003': {
+        uk: 'Нічний забіг в Оденсе біля річки',
+        en: 'Odense Night Run by the River',
+        da: 'Odense Natløb ved åen'
+      },
+      'evt-004': {
+        uk: 'Творчий coding jam в Ольборзі',
+        en: 'Aalborg Creative Coding Jam',
+        da: 'Aalborg Kreativ Coding Jam'
+      },
+      'evt-005': {
+        uk: "Сімейний кіновечір в Есб'єрзі",
+        en: 'Esbjerg Family Film Night',
+        da: 'Esbjerg Familie Film Aften'
+      },
+      'evt-006': {
+        uk: 'Спільний сніданок для новоприбулих',
+        en: 'Community Breakfast for Newcomers',
+        da: 'Fællesskabsmorgenmad for nytilkomne'
+      },
+      'evt-007': {
+        uk: 'Концертний вечір у Копенгагені',
+        en: 'Copenhagen Concert Night',
+        da: 'København Koncertaften'
+      },
+      'evt-008': {
+        uk: 'Показ українського фільму',
+        en: 'Ukrainian Film Screening',
+        da: 'Ukrainsk filmvisning'
+      },
+      'evt-009': {
+        uk: 'Клуб данської мови',
+        en: 'Danish Language Club',
+        da: 'Dansk Sprogklub'
+      },
+      'evt-010': {
+        uk: 'Нетворкінг-ланч для стартапів',
+        en: 'Startup Networking Lunch',
+        da: 'Startup Netværksfrokost'
+      },
+      'evt-011': {
+        uk: 'Маркет ремесел та мейкерів у Колдингу',
+        en: 'Kolding Craft & Makers Market',
+        da: 'Kolding Håndværk & Makers Marked'
+      },
+      'evt-012': {
+        uk: 'Історична прогулянка в Роскілле',
+        en: 'Roskilde History Walk',
+        da: 'Roskilde Historievandring'
+      },
+      'evt-013': {
+        uk: 'День каякінгу на озері в Сількеборзі',
+        en: 'Silkeborg Lake Kayak Day',
+        da: 'Silkeborg Sø Kajakdag'
+      },
+      'evt-014': {
+        uk: 'Сімейний день науки у Вайле',
+        en: 'Vejle Family Science Day',
+        da: 'Vejle Familievidenskabsdag'
+      },
+      'evt-015': {
+        uk: 'День волонтера: прибирання міста',
+        en: 'Volunteer Day: City Clean-Up',
+        da: 'Frivillighedsdag: Byoprydning'
+      },
+      'evt-016': {
+        uk: 'Сімейний день у музеї Копенгагена',
+        en: 'Copenhagen Museum Family Day',
+        da: 'Københavns Museum Familiedag'
+      },
+      'evt-017': {
+        uk: "Кар'єрна консультація для новоприбулих",
+        en: 'Job Clinic for Newcomers',
+        da: 'Jobklinik for nytilkomne'
+      },
+      'evt-018': {
+        uk: 'Вечір арт-терапії',
+        en: 'Art Therapy Evening',
+        da: 'Aften med kunstterapi'
+      },
+      'evt-019': {
+        uk: 'День спадщини в Хельсінгёрі',
+        en: 'Helsingør Heritage Day',
+        da: 'Helsingør Kulturarvsdag'
+      },
+      'evt-020': {
+        uk: 'Форум української спільноти',
+        en: 'Ukrainian Community Forum',
+        da: 'Ukrainsk Fællesskabsforum'
+      }
+    };
+
+    const CITY_TRANSLATIONS = {
+      copenhagen: { uk: 'Копенгаген', en: 'Copenhagen', da: 'København' },
+      aarhus: { uk: 'Орхус', en: 'Aarhus', da: 'Aarhus' },
+      odense: { uk: 'Оденсе', en: 'Odense', da: 'Odense' },
+      aalborg: { uk: 'Ольборг', en: 'Aalborg', da: 'Aalborg' },
+      esbjerg: { uk: "Есб'єрг", en: 'Esbjerg', da: 'Esbjerg' },
+      kolding: { uk: 'Колдинг', en: 'Kolding', da: 'Kolding' },
+      roskilde: { uk: 'Роскілле', en: 'Roskilde', da: 'Roskilde' },
+      silkeborg: { uk: 'Сількеборг', en: 'Silkeborg', da: 'Silkeborg' },
+      vejle: { uk: 'Вайле', en: 'Vejle', da: 'Vejle' },
+      fredericia: { uk: 'Фредерісія', en: 'Fredericia', da: 'Fredericia' },
+      helsingør: { uk: 'Хельсінгёр', en: 'Helsingør', da: 'Helsingør' },
+      helsingor: { uk: 'Хельсінгёр', en: 'Helsingør', da: 'Helsingør' }
+    };
+
+    const CATEGORY_TRANSLATIONS = {
+      art: { uk: 'Мистецтво', en: 'Art', da: 'Kunst' },
+      food: { uk: 'Їжа', en: 'Food', da: 'Mad' },
+      sports: { uk: 'Спорт', en: 'Sports', da: 'Sport' },
+      business: { uk: 'Бізнес', en: 'Business', da: 'Business' },
+      market: { uk: 'Маркет', en: 'Market', da: 'Marked' },
+      outdoors: { uk: 'На природі', en: 'Outdoors', da: 'Udendørs' },
+      science: { uk: 'Наука', en: 'Science', da: 'Videnskab' },
+      volunteer: { uk: 'Волонтерство', en: 'Volunteer', da: 'Frivilligt' },
+      culture: { uk: 'Культура', en: 'Culture', da: 'Kultur' },
+      career: { uk: "Кар'єра", en: 'Career', da: 'Karriere' },
+      wellbeing: { uk: 'Добробут', en: 'Wellbeing', da: 'Trivsel' },
+      history: { uk: 'Історія', en: 'History', da: 'Historie' },
+      education: { uk: 'Освіта', en: 'Education', da: 'Uddannelse' },
+      music: { uk: 'Музика', en: 'Music', da: 'Musik' },
+      networking: { uk: 'Нетворкінг', en: 'Networking', da: 'Networking' },
+      cinema: { uk: 'Кіно', en: 'Cinema', da: 'Film' },
+      kids: { uk: 'Для дітей', en: 'For kids', da: 'For børn' },
+      community: { uk: 'Спільнота', en: 'Community', da: 'Fællesskab' }
+    };
+
+    const TAG_TRANSLATIONS = {
+      adventure: { uk: 'пригоди', en: 'adventure', da: 'eventyr' },
+      art: { uk: 'мистецтво', en: 'art', da: 'kunst' },
+      career: { uk: "кар'єра", en: 'career', da: 'karriere' },
+      castle: { uk: 'замок', en: 'castle', da: 'slot' },
+      cinema: { uk: 'кіно', en: 'cinema', da: 'film' },
+      coding: { uk: 'кодинг', en: 'coding', da: 'kodning' },
+      community: { uk: 'спільнота', en: 'community', da: 'fællesskab' },
+      craft: { uk: 'ремесла', en: 'craft', da: 'håndværk' },
+      creative: { uk: 'креатив', en: 'creative', da: 'kreativ' },
+      culture: { uk: 'культура', en: 'culture', da: 'kultur' },
+      danish: { uk: 'данська', en: 'danish', da: 'dansk' },
+      design: { uk: 'дизайн', en: 'design', da: 'design' },
+      discussion: { uk: 'обговорення', en: 'discussion', da: 'diskussion' },
+      family: { uk: 'родина', en: 'family', da: 'familie' },
+      festival: { uk: 'фестиваль', en: 'festival', da: 'festival' },
+      food: { uk: 'їжа', en: 'food', da: 'mad' },
+      heritage: { uk: 'спадщина', en: 'heritage', da: 'kulturarv' },
+      history: { uk: 'історія', en: 'history', da: 'historie' },
+      indie: { uk: 'інді', en: 'indie', da: 'indie' },
+      kayak: { uk: 'каяк', en: 'kayak', da: 'kajak' },
+      kids: { uk: 'діти', en: 'kids', da: 'børn' },
+      language: { uk: 'мова', en: 'language', da: 'sprog' },
+      live: { uk: 'лайв', en: 'live', da: 'live' },
+      lunch: { uk: 'обід', en: 'lunch', da: 'frokost' },
+      market: { uk: 'маркет', en: 'market', da: 'marked' },
+      museum: { uk: 'музей', en: 'museum', da: 'museum' },
+      music: { uk: 'музика', en: 'music', da: 'musik' },
+      networking: { uk: 'нетворкінг', en: 'networking', da: 'netværk' },
+      night: { uk: 'ніч', en: 'night', da: 'nat' },
+      outdoors: { uk: 'на природі', en: 'outdoors', da: 'udendørs' },
+      science: { uk: 'наука', en: 'science', da: 'videnskab' },
+      sports: { uk: 'спорт', en: 'sports', da: 'sport' },
+      startup: { uk: 'стартап', en: 'startup', da: 'startup' },
+      studio: { uk: 'студія', en: 'studio', da: 'studie' },
+      support: { uk: 'підтримка', en: 'support', da: 'støtte' },
+      talk: { uk: 'розмова', en: 'talk', da: 'samtale' },
+      ua: { uk: 'UA', en: 'UA', da: 'UA' },
+      volunteer: { uk: 'волонтерство', en: 'volunteer', da: 'frivilligt' },
+      volunteers: { uk: 'волонтери', en: 'volunteers', da: 'frivillige' },
+      walking: { uk: 'пішохідна', en: 'walking', da: 'vandring' },
+      welcome: { uk: 'вітання', en: 'welcome', da: 'velkomst' },
+      wellbeing: { uk: 'добробут', en: 'wellbeing', da: 'trivsel' },
+      workshop: { uk: 'воркшоп', en: 'workshop', da: 'workshop' }
+    };
+
+    const getLocalizedEventTitle = (event, lang) =>
+      EVENT_TITLES[event.id]?.[lang] || EVENT_TITLES[event.id]?.en || event.title;
+
+    const localizeByMap = (value, map, lang) => {
+      const key = normalize(value);
+      const record = map[key];
+      if (!record) return value;
+      return record[lang] || record.en || value;
+    };
+
+    const getLocalizedCity = (value, lang) => {
+      if (!value) return value;
+      const normalized = normalize(value);
+      const keyMap = {
+        copenhagen: 'filters_city_copenhagen',
+        aarhus: 'filters_city_aarhus',
+        odense: 'filters_city_odense',
+        aalborg: 'filters_city_aalborg',
+        esbjerg: 'filters_city_esbjerg'
+      };
+      const key = keyMap[normalized];
+      if (key) {
+        const translated = formatMessage(key, {});
+        return translated || value;
+      }
+      return localizeByMap(value, CITY_TRANSLATIONS, lang);
+    };
+
+    const getLocalizedCategory = (value, lang) =>
+      localizeByMap(value, CATEGORY_TRANSLATIONS, lang);
+
+    const getLocalizedTag = (value, lang) => localizeByMap(value, TAG_TRANSLATIONS, lang);
 
     const getTagLabel = (tag) => (typeof tag === 'string' ? tag : tag?.label || '');
     const getTagStatus = (tag) => (typeof tag === 'string' ? 'approved' : tag?.status || 'approved');
@@ -2946,11 +3164,101 @@
         .map((tag) => ({ label: getTagLabel(tag), status: getTagStatus(tag) }))
         .filter((tag) => tag.label);
 
+    const truncateText = (value, maxLength) => {
+      const clean = String(value || '').replace(/\s+/g, ' ').trim();
+      if (!clean) return '';
+      if (clean.length <= maxLength) return clean;
+      return `${clean.slice(0, maxLength - 3).trimEnd()}...`;
+    };
+
+    const shuffleList = (list) => {
+      const copy = [...list];
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    const buildHighlightCard = (event) => {
+      const lang = document.documentElement.lang || 'uk';
+      const title = getLocalizedEventTitle(event, lang);
+      const city = getLocalizedCity(event.city, lang);
+      const dateLabel = formatShortDate(event.start);
+      const detailUrl = `event.html?id=${encodeURIComponent(event.id)}`;
+      const image = event.images && event.images.length ? event.images[0] : '';
+      const imageMarkup = image
+        ? `<img class="highlights__image" src="${image}" alt="${title}" loading="lazy" width="360" height="220" />`
+        : '<div class="highlights__image highlights__image--placeholder"></div>';
+      return `\n        <a class=\"highlights__card\" href=\"${detailUrl}\">\n          <div class=\"highlights__media\">\n            ${imageMarkup}\n            <div class=\"highlights__overlay\">\n              <span class=\"highlights__date\">${dateLabel}</span>\n              <h3>${title}</h3>\n              <span class=\"highlights__city\">${city}</span>\n            </div>\n          </div>\n        </a>\n      `;
+    };
+
+    const selectHighlights = (list, limit) => {
+      const byCity = new Map();
+      list.forEach((event) => {
+        if (!event.city) return;
+        const key = normalize(event.city);
+        if (!byCity.has(key)) {
+          byCity.set(key, []);
+        }
+        byCity.get(key).push(event);
+      });
+
+      const selected = [];
+      const selectedIds = new Set();
+      const cityKeys = shuffleList([...byCity.keys()]);
+      cityKeys.forEach((city) => {
+        if (selected.length >= limit) return;
+        const pool = byCity.get(city);
+        if (!pool || pool.length === 0) return;
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        if (pick && !selectedIds.has(pick.id)) {
+          selected.push(pick);
+          selectedIds.add(pick.id);
+        }
+      });
+
+      if (selected.length < limit) {
+        const remaining = shuffleList(list.filter((event) => !selectedIds.has(event.id)));
+        remaining.slice(0, limit - selected.length).forEach((event) => selected.push(event));
+      }
+      return selected;
+    };
+
+    const renderHighlights = (list) => {
+      if (!highlightsTrack) return;
+      const now = new Date();
+      const weekEnd = new Date(now);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+      const upcomingWeek = list.filter((event) => {
+        if (event.status !== 'published') return false;
+        if (isPast(event)) return false;
+        const startDate = new Date(event.start);
+        if (Number.isNaN(startDate.getTime())) return false;
+        return startDate >= now && startDate <= weekEnd;
+      });
+
+      if (!upcomingWeek.length) {
+        highlightsTrack.innerHTML = `
+          <div class="highlights__empty">
+            <p class="highlights__empty-title">Немає подій на найближчий тиждень.</p>
+            <p class="highlights__empty-text">Перевірте каталог або поверніться пізніше — ми додаємо нові події регулярно.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const selection = selectHighlights(upcomingWeek, 6);
+      highlightsTrack.innerHTML = selection.map(buildHighlightCard).join('');
+    };
+
     const buildCard = (event) => {
+      const lang = document.documentElement.lang || 'uk';
       const image = event.images && event.images.length ? event.images[0] : '';
       const priceInfo = formatPrice(event);
       const isFree = event.priceType === 'free';
       const pastEvent = isPast(event);
+      const title = getLocalizedEventTitle(event, lang);
       const cardClass = `event-card ${isFree ? 'event-card--free' : 'event-card--paid'}${
         pastEvent ? ' event-card--archived' : ''
       }`;
@@ -2964,6 +3272,10 @@
       const buildTag = (tag, type = 'tag') => {
         const isPending = tag.status === 'pending';
         const pendingClass = isPending ? ' event-card__tag--pending' : '';
+        const localizedLabel =
+          type === 'category'
+            ? getLocalizedCategory(tag.label, lang)
+            : getLocalizedTag(tag.label, lang);
         const ariaKey =
           type === 'category'
             ? isPending
@@ -2972,9 +3284,9 @@
             : isPending
               ? 'tag_pending_aria'
               : 'tag_aria';
-        const ariaLabel = formatMessage(ariaKey, { label: tag.label });
+        const ariaLabel = formatMessage(ariaKey, { label: localizedLabel });
         const pendingAttrs = isPending ? ` title="${pendingTooltip}"` : '';
-        return `<span class="event-card__tag${pendingClass}" aria-label="${ariaLabel}" data-tag-label="${tag.label}" data-tag-type="${type}"${pendingAttrs}>${tag.label}</span>`;
+        return `<span class="event-card__tag${pendingClass}" aria-label="${ariaLabel}" data-tag-label="${localizedLabel}" data-tag-type="${type}"${pendingAttrs}>${localizedLabel}</span>`;
       };
       const baseTags = getTagList(event.tags);
       const categoryTag = event.category?.label
@@ -2986,9 +3298,11 @@
       ].join('');
       const ticketKey = event.priceType === 'free' ? 'register_cta' : 'ticket_cta';
       const ticketLabel = formatMessage(ticketKey, {});
-      const ticketUrl = event.ticketUrl ? event.ticketUrl : 'event.html';
-      const location = `${event.city} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${event.title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"event.html\">${event.title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n          </div>\n        </article>\n      `;
+      const ticketUrl = event.ticketUrl || '#';
+      const detailUrl = `event.html?id=${encodeURIComponent(event.id)}`;
+      const cityLabel = getLocalizedCity(event.city, lang);
+      const location = `${cityLabel} · ${event.venue}`;
+      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"${detailUrl}\">${title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <div class=\"event-card__actions\">\n              <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n              <a class=\"event-card__cta event-card__cta--details\" href=\"${detailUrl}\" data-i18n=\"cta_details\">${formatMessage('cta_details', {})}</a>\n            </div>\n          </div>\n        </article>\n      `;
     };
 
     const updateCount = (count) => {
@@ -3050,7 +3364,8 @@
     };
 
     updateCatalogI18n = () => {
-      updateCount(filteredEvents.length);
+      renderEvents(filteredEvents.slice(0, visibleCount));
+      renderHighlights(events);
     };
 
     const seenCards = new Set();
@@ -3099,6 +3414,18 @@
       observeCards();
     };
 
+    if (catalogGrid) {
+      catalogGrid.addEventListener('click', (event) => {
+        const card = event.target.closest('.event-card');
+        if (!card) return;
+        if (event.target.closest('a, button, input, select, textarea')) return;
+        const eventId = card.dataset.eventId;
+        if (eventId) {
+          window.location.href = `event.html?id=${encodeURIComponent(eventId)}`;
+        }
+      });
+    }
+
     const setErrorState = (hasError) => {
       if (errorState) {
         errorState.hidden = !hasError;
@@ -3121,6 +3448,7 @@
     const matchesFilters = (event, formData) => {
       if (event.status !== 'published') return false;
       if (!filtersForm || !formData) return true;
+      const lang = document.documentElement.lang || 'uk';
       const dateFrom = formData.get('date-from');
       const dateTo = formData.get('date-to');
       const city = normalize(formData.get('city'));
@@ -3192,15 +3520,17 @@
       if (price && normalize(event.priceType) !== price) return false;
       if (format && normalize(event.format) !== format) return false;
       if (searchValue) {
+        const localizedTitle = getLocalizedEventTitle(event, lang);
+        const localizedCity = getLocalizedCity(event.city, lang);
+        const localizedCategory = getLocalizedCategory(event.category?.label || '', lang);
+        const localizedTags = getTagList(event.tags).map((tag) => getLocalizedTag(tag.label, lang));
         const haystack = [
-          event.title,
+          localizedTitle,
           event.description,
-          event.city,
+          localizedCity,
           event.venue,
-          getTagList(event.tags)
-            .map((tag) => tag.label)
-            .join(' '),
-          event.category?.label || ''
+          localizedTags.join(' '),
+          localizedCategory
         ]
           .map(normalize)
           .join(' ');
@@ -3298,6 +3628,84 @@
         sunday.setDate(saturday.getDate() + 1);
         setDateRange(saturday, sunday);
       }
+    };
+
+    const setSelectFromTokens = (select, tokens) => {
+      if (!select || !tokens.length) return false;
+      for (const option of Array.from(select.options)) {
+        const value = normalize(option.value);
+        const label = normalize(option.textContent);
+        if (!value) continue;
+        if (tokens.includes(value) || tokens.includes(label)) {
+          if (select.value !== option.value) {
+            select.value = option.value;
+            return true;
+          }
+          return false;
+        }
+      }
+      return false;
+    };
+
+    const setCheckboxFromTokens = (input, labelEl, tokens) => {
+      if (!input || !labelEl || !tokens.length) return false;
+      const label = normalize(labelEl.textContent);
+      if (!label || !tokens.includes(label)) return false;
+      if (!input.checked) {
+        input.checked = true;
+        return true;
+      }
+      return false;
+    };
+
+    const applySearchFilters = (query) => {
+      if (!filtersForm) return false;
+      const tokens = getTokens(query);
+      if (!tokens.length) return false;
+      let changed = false;
+
+      changed = setSelectFromTokens(filtersForm.elements.city, tokens) || changed;
+      changed = setSelectFromTokens(filtersForm.elements.category, tokens) || changed;
+      changed = setSelectFromTokens(filtersForm.elements.price, tokens) || changed;
+      changed = setSelectFromTokens(filtersForm.elements.format, tokens) || changed;
+
+      const audienceMap = [
+        { input: filtersForm.elements['audience-ua'], key: 'audience-ua' },
+        { input: filtersForm.elements['audience-family'], key: 'audience-family' },
+        { input: filtersForm.elements['audience-volunteer'], key: 'audience-volunteer' }
+      ];
+      audienceMap.forEach(({ input }) => {
+        const labelEl = input?.closest('label')?.querySelector('span');
+        changed = setCheckboxFromTokens(input, labelEl, tokens) || changed;
+      });
+
+      ['today', 'tomorrow', 'weekend', 'online'].forEach((key) => {
+        const input = presetInputs[key];
+        const button = presetButtons.find((btn) => btn.dataset.quick === key);
+        if (!input || !button) return;
+        const label = normalize(button.textContent);
+        if (!tokens.includes(label) && !tokens.includes(key)) return;
+        if (!input.checked) {
+          input.checked = true;
+          changed = true;
+        }
+        if (['today', 'tomorrow', 'weekend'].includes(key)) {
+          clearOtherDatePresets(key);
+          applyDatePreset(key);
+        }
+        if (key === 'online') {
+          const formatField = filtersForm.elements.format;
+          if (formatField && formatField.value !== 'online') {
+            formatField.value = 'online';
+            changed = true;
+          }
+        }
+      });
+
+      if (changed) {
+        syncPresetButtons();
+      }
+      return changed;
     };
 
     const readQueryParams = () => {
@@ -3438,6 +3846,7 @@
         setErrorState(false);
         readQueryParams();
         applyFilters();
+        renderHighlights(events);
         syncAdvancedPanel();
       } catch (error) {
         setErrorState(true);
@@ -3550,9 +3959,16 @@
       if (searchForm) {
         searchForm.addEventListener('submit', (event) => {
           event.preventDefault();
+          if (applySearchFilters(searchInput.value)) {
+            syncAdvancedPanel();
+          }
           updateQueryParams();
           applyFilters();
           searchInput.focus({ preventScroll: true });
+          const catalogSection = document.querySelector('#events');
+          if (catalogSection) {
+            catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         });
       }
     }
@@ -3598,8 +4014,17 @@
   const eventPrice = document.querySelector('.event-sidebar__price[data-price-type]');
   const pastBanner = document.querySelector('[data-past-banner]');
   const ticketNote = document.querySelector('.event-sidebar__note');
+  const eventTitleEl = document.querySelector('[data-event-title]');
+  const eventCategoryEl = document.querySelector('[data-event-category]');
+  const eventDescriptionEl = document.querySelector('[data-event-description]');
+  const eventLocationEl = document.querySelector('[data-event-location]');
+  const eventTagsEl = document.querySelector('[data-event-tags]');
+  const contactNameEl = document.querySelector('[data-event-contact-name]');
+  const contactEmailEl = document.querySelector('[data-event-contact-email]');
+  const contactPhoneEl = document.querySelector('[data-event-contact-phone]');
 
-  if (eventMeta) {
+  const updateEventMeta = () => {
+    if (!eventMeta) return;
     const start = eventMeta.dataset.eventStart;
     const end = eventMeta.dataset.eventEnd;
     const city = eventMeta.dataset.eventCity;
@@ -3627,15 +4052,100 @@
         ticketNote.textContent = formatMessage('similar_cta', {});
       }
     }
-  }
+  };
 
-  if (eventPrice) {
+  const updateEventPrice = () => {
+    if (!eventPrice) return;
     const type = eventPrice.dataset.priceType;
     const min = Number(eventPrice.dataset.priceMin);
     const max = Number(eventPrice.dataset.priceMax);
     const minValue = Number.isNaN(min) ? null : min;
     const maxValue = Number.isNaN(max) ? null : max;
     eventPrice.textContent = formatPriceLabel(type, minValue, maxValue);
+  };
+
+  const renderEventDetail = (eventData) => {
+    if (!eventData) return;
+    if (eventTitleEl) eventTitleEl.textContent = eventData.title;
+    if (eventCategoryEl && eventData.category?.label) {
+      eventCategoryEl.textContent = eventData.category.label;
+    }
+    if (eventDescriptionEl && eventData.description) {
+      eventDescriptionEl.textContent = eventData.description;
+    }
+    if (eventLocationEl) {
+      const location = `${eventData.city} · ${eventData.venue}`;
+      eventLocationEl.textContent = location;
+    }
+    if (eventMeta) {
+      eventMeta.dataset.eventStart = eventData.start || '';
+      eventMeta.dataset.eventEnd = eventData.end || '';
+      eventMeta.dataset.eventCity = eventData.city || '';
+    }
+    if (eventTagsEl) {
+      const tags = [
+        ...(eventData.category?.label
+          ? [{ label: eventData.category.label, status: eventData.category.status || 'approved', type: 'category' }]
+          : []),
+        ...(eventData.tags || []).map((tag) => ({ label: tag.label, status: tag.status || 'approved', type: 'tag' }))
+      ];
+      eventTagsEl.innerHTML = tags
+        .map((tag) => {
+          const isPending = tag.status === 'pending';
+          const pendingClass = isPending ? ' event-tag--pending' : '';
+          const pendingAttrs = isPending ? ` data-i18n-title="pending_tooltip"` : '';
+          const typeAttr = tag.type === 'category' ? ' data-tag-type="category"' : '';
+          return `<span class="event-tag${pendingClass}" data-tag-label="${tag.label}"${typeAttr}${pendingAttrs}>${tag.label}</span>`;
+        })
+        .join('');
+      updateStaticTagAria();
+    }
+    if (eventPrice) {
+      eventPrice.dataset.priceType = eventData.priceType || 'paid';
+      eventPrice.dataset.priceMin = eventData.priceMin ?? '';
+      eventPrice.dataset.priceMax = eventData.priceMax ?? '';
+    }
+    if (ticketCtas.length) {
+      ticketCtas.forEach((cta) => {
+        cta.href = eventData.ticketUrl || '#';
+        cta.dataset.eventId = eventData.id || '';
+      });
+    }
+    if (contactNameEl && eventData.contactPerson?.name) {
+      contactNameEl.textContent = eventData.contactPerson.name;
+    }
+    if (contactEmailEl && eventData.contactPerson?.email) {
+      contactEmailEl.textContent = eventData.contactPerson.email;
+      contactEmailEl.setAttribute('href', `mailto:${eventData.contactPerson.email}`);
+    }
+    if (contactPhoneEl && eventData.contactPerson?.phone) {
+      contactPhoneEl.textContent = eventData.contactPerson.phone;
+      contactPhoneEl.setAttribute('href', `tel:${eventData.contactPerson.phone}`);
+    }
+    updateEventPrice();
+    updateEventMeta();
+  };
+
+  if (document.body.classList.contains('event-page')) {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('id');
+    if (eventId) {
+      fetch('./data/events.json')
+        .then((response) => (response.ok ? response.json() : Promise.reject(new Error('events'))))
+        .then((data) => {
+          const eventData = data.find((item) => item.id === eventId);
+          if (eventData) {
+            renderEventDetail(eventData);
+          }
+        })
+        .catch(() => {
+          updateEventMeta();
+          updateEventPrice();
+        });
+    } else {
+      updateEventMeta();
+      updateEventPrice();
+    }
   }
 
   document.addEventListener('click', async (event) => {
@@ -3657,7 +4167,6 @@
     }
   });
 
-  const highlightsTrack = document.querySelector('.highlights__track');
   if (highlightsTrack) {
     const prevButton = document.querySelector('.highlights__button[data-action="prev"]');
     const nextButton = document.querySelector('.highlights__button[data-action="next"]');

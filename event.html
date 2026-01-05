@@ -41,12 +41,7 @@
         </nav>
         <div class="header-utils">
           <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-            <option value="uk">UA</option>
-            <option value="en">EN</option>
-            <option value="da">DK</option>
-          </select>
-        </div>
+</div>
       </div>
     </header>
 
@@ -56,8 +51,8 @@
         <div class="event-layout">
           <article class="event-article">
             <header class="event-article__header">
-              <p class="eyebrow" data-i18n="event_eyebrow">Дизайн і продукт</p>
-              <h1>Design Systems Meetup</h1>
+              <p class="eyebrow" data-i18n="event_eyebrow" data-event-category>Дизайн і продукт</p>
+              <h1 data-event-title>Design Systems Meetup</h1>
               <p
                 class="event-article__meta"
                 data-event-start="2024-11-12T19:00:00+01:00"
@@ -71,9 +66,9 @@
               <p data-i18n="event_past_banner">Ця подія вже минула</p>
             </div>
 
-            <section class="event-article__section">
+      <section class="event-article__section">
               <h2 data-i18n="event_description_title">Опис</h2>
-              <p data-i18n="event_description_body">
+              <p data-i18n="event_description_body" data-event-description>
                 Зустріч спільноти про масштабовані дизайн-системи. Обговоримо кейси, проведемо
                 воркшоп і познайомимося ближче.
               </p>
@@ -81,7 +76,7 @@
 
             <section class="event-article__section">
               <h2 data-i18n="event_where_title">Де</h2>
-              <p class="event-article__location">Copenhagen · Design Hub</p>
+              <p class="event-article__location" data-event-location>Copenhagen · Design Hub</p>
               <div class="event-map" aria-label="Мапа події (плейсхолдер)">
                 <p data-i18n="event_map_placeholder">Плейсхолдер мапи</p>
               </div>
@@ -96,21 +91,21 @@
               <h2 id="event-contact-title" data-i18n="event_contact_title">Контакти</h2>
               <p>
                 <span data-i18n="event_contact_name">Імʼя</span>:
-                <span>Olena K.</span>
+                <span data-event-contact-name>Olena K.</span>
               </p>
               <p>
                 <a href="mailto:hello@whatsondk.test" data-i18n="event_contact_email_label">Email</a>:
-                <a href="mailto:hello@whatsondk.test">hello@whatsondk.test</a>
+                <a href="mailto:hello@whatsondk.test" data-event-contact-email>hello@whatsondk.test</a>
               </p>
               <p>
                 <a href="tel:+4512345678" data-i18n="event_contact_phone_label">Телефон</a>:
-                <a href="tel:+4512345678">+45 12 34 56 78</a>
+                <a href="tel:+4512345678" data-event-contact-phone>+45 12 34 56 78</a>
               </p>
             </section>
 
             <section class="event-article__section">
               <h2 data-i18n="event_tags_title">Теги</h2>
-              <div class="event-tags">
+              <div class="event-tags" data-event-tags>
                 <span class="event-tag" data-tag-label="Education" data-tag-type="category">Education</span>
                 <span class="event-tag" data-tag-label="Design">Design</span>
                 <span class="event-tag" data-tag-label="Community">Community</span>

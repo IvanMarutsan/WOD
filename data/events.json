@@ -22,11 +22,11 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-12T17:30:00+01:00",
-    "end": "2026-01-12T20:00:00+01:00",
+    "start": "2026-01-04T12:00:00",
+    "end": "2026-01-04T14:00:00",
     "format": "offline",
-    "venue": "K\u00f8dbyen Creative Hub",
-    "address": "Fl\u00e6sketorvet 10, 1711 K\u00f8benhavn",
+    "venue": "Kødbyen Creative Hub",
+    "address": "Flæsketorvet 10, 1711 København",
     "city": "Copenhagen",
     "geo": {
       "lat": 55.6674,
@@ -74,8 +74,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-18T12:00:00+01:00",
-    "end": "2026-01-18T18:30:00+01:00",
+    "start": "2026-01-05T13:00:00",
+    "end": "2026-01-05T15:00:00",
     "format": "offline",
     "venue": "Latin Quarter Square",
     "address": "Klostertorvet 4, 8000 Aarhus",
@@ -87,7 +87,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/aarhus-winter-food-fest",
     "organizerId": "org-002",
     "images": [
       "https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=900&auto=format&fit=crop"
@@ -126,8 +126,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-02-02T19:00:00+01:00",
-    "end": "2026-02-02T21:00:00+01:00",
+    "start": "2026-01-06T14:00:00",
+    "end": "2026-01-06T16:00:00",
     "format": "offline",
     "venue": "Odense Harbor",
     "address": "Havnegade 7, 5000 Odense",
@@ -178,11 +178,11 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-22T18:30:00+01:00",
-    "end": "2026-01-22T21:15:00+01:00",
+    "start": "2026-01-07T15:00:00",
+    "end": "2026-01-07T17:00:00",
     "format": "offline",
     "venue": "Nordkraft",
-    "address": "Teglg\u00e5rds Plads 1, 9000 Aalborg",
+    "address": "Teglgårds Plads 1, 9000 Aalborg",
     "city": "Aalborg",
     "geo": {
       "lat": 57.048,
@@ -234,7 +234,7 @@
     "end": null,
     "format": "offline",
     "venue": "Esbjerg Library",
-    "address": "N\u00f8rregade 19, 6700 Esbjerg",
+    "address": "Nørregade 19, 6700 Esbjerg",
     "city": "Esbjerg",
     "geo": {
       "lat": 55.4763,
@@ -243,7 +243,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/esbjerg-family-film-night",
     "organizerId": "org-002",
     "images": [
       "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?w=900&auto=format&fit=crop"
@@ -286,7 +286,7 @@
     "end": "2026-01-15T11:00:00+01:00",
     "format": "offline",
     "venue": "Union Kitchen",
-    "address": "\u00c5boulevarden 18, 8000 Aarhus",
+    "address": "Åboulevarden 18, 8000 Aarhus",
     "city": "Aarhus",
     "geo": {
       "lat": 56.1532,
@@ -295,7 +295,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/aarhus-community-breakfast",
     "organizerId": "org-003",
     "images": [
       "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=900&auto=format&fit=crop"
@@ -338,7 +338,7 @@
     "end": "2026-02-08T23:00:00+01:00",
     "format": "offline",
     "venue": "Vega",
-    "address": "Enghavevej 40, 1674 K\u00f8benhavn",
+    "address": "Enghavevej 40, 1674 København",
     "city": "Copenhagen",
     "geo": {
       "lat": 55.6647,
@@ -390,7 +390,7 @@
     "end": "2026-01-30T22:00:00+01:00",
     "format": "offline",
     "venue": "Cinemateket",
-    "address": "Gothersgade 55, 1123 K\u00f8benhavn",
+    "address": "Gothersgade 55, 1123 København",
     "city": "Copenhagen",
     "geo": {
       "lat": 55.6812,
@@ -442,7 +442,7 @@
     "end": null,
     "format": "offline",
     "venue": "Culture House",
-    "address": "\u00d8sterbro 12, 9000 Aalborg",
+    "address": "Østerbro 12, 9000 Aalborg",
     "city": "Aalborg",
     "geo": {
       "lat": 57.0466,
@@ -451,7 +451,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/aalborg-danish-language-club",
     "organizerId": "org-003",
     "images": [
       "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&auto=format&fit=crop"
@@ -649,8 +649,8 @@
     "start": "2026-03-07T09:30:00+01:00",
     "end": "2026-03-07T13:00:00+01:00",
     "format": "offline",
-    "venue": "Silkeborg Langs\u00f8",
-    "address": "S\u00f8vej 2, 8600 Silkeborg",
+    "venue": "Silkeborg Langsø",
+    "address": "Søvej 2, 8600 Silkeborg",
     "city": "Silkeborg",
     "geo": {
       "lat": 56.1669,
@@ -701,8 +701,8 @@
     "start": "2026-02-21T11:00:00+01:00",
     "end": "2026-02-21T15:00:00+01:00",
     "format": "offline",
-    "venue": "\u00d8kolariet",
-    "address": "D\u00e6mningen 11, 7100 Vejle",
+    "venue": "Økolariet",
+    "address": "Dæmningen 11, 7100 Vejle",
     "city": "Vejle",
     "geo": {
       "lat": 55.7093,
@@ -711,7 +711,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/vejle-family-science-day",
     "organizerId": "org-004",
     "images": [
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop"
@@ -763,7 +763,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/aalborg-volunteer-day",
     "organizerId": "org-003",
     "images": [
       "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&auto=format&fit=crop"
@@ -806,7 +806,7 @@
     "end": "2026-02-15T14:30:00+01:00",
     "format": "offline",
     "venue": "National Museum",
-    "address": "Ny Vestergade 10, 1471 K\u00f8benhavn",
+    "address": "Ny Vestergade 10, 1471 København",
     "city": "Copenhagen",
     "geo": {
       "lat": 55.6734,
@@ -867,7 +867,7 @@
     "priceType": "free",
     "priceMin": 0,
     "priceMax": 0,
-    "ticketUrl": "",
+    "ticketUrl": "https://example.com/register/fredericia-job-clinic",
     "organizerId": "org-004",
     "images": [
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
@@ -938,7 +938,7 @@
   {
     "id": "evt-019",
     "slug": "helsingor-heritage-day",
-    "title": "Helsing\u00f8r Heritage Day",
+    "title": "Helsingør Heritage Day",
     "description": "Castle tours and heritage talks in English and Danish.",
     "category": {
       "label": "history",
@@ -962,8 +962,8 @@
     "end": "2026-03-01T16:00:00+01:00",
     "format": "offline",
     "venue": "Kronborg Castle",
-    "address": "Kronborg 2, 3000 Helsing\u00f8r",
-    "city": "Helsing\u00f8r",
+    "address": "Kronborg 2, 3000 Helsingør",
+    "city": "Helsingør",
     "geo": {
       "lat": 56.0383,
       "lng": 12.621
@@ -1014,7 +1014,7 @@
     "end": "2026-02-25T19:00:00+01:00",
     "format": "offline",
     "venue": "Union Hall",
-    "address": "N\u00f8rre Voldgade 12, 1358 K\u00f8benhavn",
+    "address": "Nørre Voldgade 12, 1358 København",
     "city": "Copenhagen",
     "geo": {
       "lat": 55.6818,
