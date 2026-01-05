@@ -278,6 +278,9 @@
       step_preview: '5. Прев’ю',
       form_title_label: 'Назва події',
       form_title_help: 'Мінімум 3 символи.',
+      form_description_label: 'Опис події',
+      form_description_placeholder: 'Коротко опишіть подію',
+      form_description_help: 'До 400 символів, без спаму.',
       form_category_placeholder: 'Оберіть категорію',
       form_category_music: 'Музика',
       form_category_food: 'Їжа',
@@ -305,6 +308,8 @@
       form_image_alt_placeholder: 'Опис зображення',
       form_image_alt_help: 'Наприклад: сцена з освітленням.',
       preview_title: 'Назва',
+      preview_organizer: 'Організатор',
+      preview_description: 'Опис',
       preview_category: 'Категорія',
       preview_tags: 'Теги',
       preview_time: 'Час',
@@ -319,6 +324,8 @@
       event_description_title: 'Опис',
       event_description_body:
         'Зустріч спільноти про масштабовані дизайн-системи. Обговоримо кейси, проведемо воркшоп і познайомимося ближче.',
+      event_description_more: 'Показати більше',
+      event_description_less: 'Згорнути опис',
       event_where_title: 'Де',
       event_map_placeholder: 'Плейсхолдер мапи',
       event_language_title: 'Мова події',
@@ -698,6 +705,9 @@
       step_preview: '5. Preview',
       form_title_label: 'Event title',
       form_title_help: 'Minimum 3 characters.',
+      form_description_label: 'Event description',
+      form_description_placeholder: 'Briefly describe the event',
+      form_description_help: 'Up to 400 characters, no spam.',
       form_category_placeholder: 'Select a category',
       form_category_music: 'Music',
       form_category_food: 'Food',
@@ -725,6 +735,8 @@
       form_image_alt_placeholder: 'Image description',
       form_image_alt_help: 'For example: a stage with lighting.',
       preview_title: 'Title',
+      preview_organizer: 'Organizer',
+      preview_description: 'Description',
       preview_category: 'Category',
       preview_tags: 'Tags',
       preview_time: 'Time',
@@ -739,6 +751,8 @@
       event_description_title: 'Description',
       event_description_body:
         'A community meetup focused on scalable design systems. Hear case studies, join a workshop, and connect with peers.',
+      event_description_more: 'Show more',
+      event_description_less: 'Show less',
       event_where_title: 'Where',
       event_map_placeholder: 'Map placeholder',
       event_language_title: 'Event language',
@@ -1118,6 +1132,9 @@
       step_preview: '5. Forhåndsvisning',
       form_title_label: 'Eventtitel',
       form_title_help: 'Minimum 3 tegn.',
+      form_description_label: 'Eventbeskrivelse',
+      form_description_placeholder: 'Beskriv eventet kort',
+      form_description_help: 'Op til 400 tegn, ingen spam.',
       form_category_placeholder: 'Vælg kategori',
       form_category_music: 'Musik',
       form_category_food: 'Mad',
@@ -1145,6 +1162,8 @@
       form_image_alt_placeholder: 'Billedbeskrivelse',
       form_image_alt_help: 'For eksempel: en scene med lys.',
       preview_title: 'Titel',
+      preview_organizer: 'Arrangør',
+      preview_description: 'Beskrivelse',
       preview_category: 'Kategori',
       preview_tags: 'Tags',
       preview_time: 'Tid',
@@ -1159,6 +1178,8 @@
       event_description_title: 'Beskrivelse',
       event_description_body:
         'Et community-møde om skalerbare design systemer. Vi gennemgår cases, holder workshop og mødes med andre.',
+      event_description_more: 'Vis mere',
+      event_description_less: 'Vis mindre',
       event_where_title: 'Hvor',
       event_map_placeholder: 'Kort-placering',
       event_language_title: 'Event-sprog',
@@ -1815,9 +1836,25 @@
 
   const isOrganizerVerified = (state) => state.emailVerified && state.websiteApproved;
 
+  const parseDateTime = (value) => {
+    if (!value) return null;
+    const direct = new Date(value);
+    if (!Number.isNaN(direct.getTime())) return direct;
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+    if (!match) return null;
+    const [, year, month, day, hour, minute] = match;
+    return new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute)
+    );
+  };
+
   const formatDateTime = (value) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
+    const date = parseDateTime(value);
+    if (!date) return value;
     const parts = new Intl.DateTimeFormat('da-DK', {
       timeZone: 'Europe/Copenhagen',
       day: '2-digit',
@@ -1844,8 +1881,8 @@
   };
 
   const formatTime = (value) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
+    const date = parseDateTime(value);
+    if (!date) return value;
     const parts = new Intl.DateTimeFormat('da-DK', {
       timeZone: 'Europe/Copenhagen',
       hour: '2-digit',
@@ -2245,13 +2282,20 @@
     const nextButton = multiStepForm.querySelector('[data-action="next"]');
     const backButton = multiStepForm.querySelector('[data-action="back"]');
     const previewTitle = document.querySelector('#preview-title');
+    const previewOrganizer = document.querySelector('#preview-organizer');
+    const previewDescription = document.querySelector('#preview-description');
     const previewCategory = document.querySelector('#preview-category');
     const previewTags = document.querySelector('#preview-tags');
     const previewTime = document.querySelector('#preview-time');
     const previewLocation = document.querySelector('#preview-location');
     const previewTickets = document.querySelector('#preview-tickets');
     const previewFormat = document.querySelector('#preview-format');
+    const previewImage = document.querySelector('#preview-image');
     const categorySelect = multiStepForm.querySelector('select[name="category"]');
+    const formatSelect = multiStepForm.querySelector('select[name="format"]');
+    const imageInput = multiStepForm.querySelector('input[name="image"]');
+    const imageAltInput = multiStepForm.querySelector('input[name="image-alt"]');
+    const contactNameField = multiStepForm.querySelector('input[name="contact-name"]');
     const tagsInput = multiStepForm.querySelector('.tags-input__field');
     const tagsList = multiStepForm.querySelector('.tags-input__list');
     const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
@@ -2267,6 +2311,7 @@
     const submitStatus = multiStepForm.querySelector('[data-submit-status]');
     const organizerId = multiStepForm.dataset.organizerId || 'org-001';
     let organizerStatus = 'none';
+    let previewImageUrl = null;
     const isAdminBypass = () => identityUser && hasAdminRole(identityUser);
 
     const initIdentitySession = () => {
@@ -2305,9 +2350,7 @@
       if (nextButton) {
         nextButton.hidden = index === steps.length - 1;
       }
-      if (index === steps.length - 1) {
-        updatePreview();
-      }
+      updatePreview();
     };
 
     const getFieldValue = (name) => {
@@ -2319,17 +2362,49 @@
       return field.value;
     };
 
+    const getSelectLabel = (select, fallback) => {
+      if (!select) return fallback;
+      const option = Array.from(select.options).find((item) => item.value === fallback);
+      return option?.textContent?.trim() || fallback;
+    };
+
+    const updatePreviewImage = () => {
+      if (!previewImage || !imageInput) return;
+      const file = imageInput.files?.[0];
+      if (!file) {
+        previewImage.hidden = true;
+        previewImage.removeAttribute('src');
+        return;
+      }
+      if (previewImageUrl) {
+        URL.revokeObjectURL(previewImageUrl);
+      }
+      previewImageUrl = URL.createObjectURL(file);
+      previewImage.src = previewImageUrl;
+      previewImage.alt = imageAltInput?.value?.trim()
+        || formatMessage('form_image_alt_placeholder', {});
+      previewImage.hidden = false;
+    };
+
     const updatePreview = () => {
       const pendingLabel = formatMessage('pending_label', {});
       const pendingTooltip = formatMessage('pending_tooltip', {});
       if (previewTitle) {
         previewTitle.textContent = getFieldValue('title') || '—';
       }
+      if (previewOrganizer) {
+        const contactName = contactNameField?.value || getFieldValue('contact-name');
+        previewOrganizer.textContent = contactName || '—';
+      }
+      if (previewDescription) {
+        previewDescription.textContent = getFieldValue('description') || '—';
+      }
       if (previewCategory) {
         const value = getFieldValue('category');
         const isPending = pendingCategories.has(value);
+        const label = value ? getSelectLabel(categorySelect, value) : '';
         previewCategory.textContent = value
-          ? `${value}${isPending ? ` ${pendingLabel}` : ''}`
+          ? `${label}${isPending ? ` ${pendingLabel}` : ''}`
           : '—';
         if (previewCategory && isPending) {
           previewCategory.setAttribute('title', pendingTooltip);
@@ -2338,10 +2413,16 @@
         }
       }
       if (previewTags) {
-        const tags = Array.from(pendingTags);
-        previewTags.textContent = tags.length ? `${tags.join(', ')} ${pendingLabel}` : '—';
+        const tags = tagsHidden?.value
+          ? tagsHidden.value.split(',').map((tag) => tag.trim()).filter(Boolean)
+          : [];
+        previewTags.textContent = tags.length ? tags.join(', ') : '—';
         if (tags.length) {
-          previewTags.setAttribute('title', pendingTooltip);
+          if (pendingTags.size) {
+            previewTags.setAttribute('title', pendingTooltip);
+          } else {
+            previewTags.removeAttribute('title');
+          }
         } else {
           previewTags.removeAttribute('title');
         }
@@ -2349,7 +2430,7 @@
       if (previewTime) {
         const start = getFieldValue('start');
         const end = getFieldValue('end');
-        previewTime.textContent = start ? (end ? `${start} → ${end}` : start) : '—';
+        previewTime.textContent = start ? (formatDateRange(start, end) || start) : '—';
       }
       if (previewLocation) {
         previewLocation.textContent = getFieldValue('address') || '—';
@@ -2359,12 +2440,28 @@
         const minPrice = getFieldValue('price-min');
         const maxPrice = getFieldValue('price-max');
         const priceLabel = minPrice || maxPrice ? `${minPrice || '0'}–${maxPrice || '∞'}` : '—';
-        previewTickets.textContent = `${ticketType}${ticketType !== '—' ? ` · ${priceLabel}` : ''}`;
+        if (ticketType === 'free') {
+          previewTickets.textContent = formatMessage('form_ticket_free', {});
+        } else if (ticketType === 'paid') {
+          previewTickets.textContent = `${formatMessage('form_ticket_paid', {})} · ${priceLabel}`;
+        } else {
+          previewTickets.textContent = '—';
+        }
       }
       if (previewFormat) {
-        previewFormat.textContent = getFieldValue('format') || '—';
+        const value = getFieldValue('format');
+        previewFormat.textContent = value ? getSelectLabel(formatSelect, value) : '—';
       }
+      updatePreviewImage();
     };
+
+    multiStepForm.addEventListener('input', () => {
+      updatePreview();
+    });
+
+    multiStepForm.addEventListener('change', () => {
+      updatePreview();
+    });
 
     const renderTagChips = () => {
       if (!tagsList || !tagsHidden) return;
@@ -2415,6 +2512,18 @@
           }
         });
         renderTagChips();
+        updatePreview();
+      });
+    }
+
+    if (imageInput) {
+      imageInput.addEventListener('change', () => {
+        updatePreview();
+      });
+    }
+
+    if (imageAltInput) {
+      imageAltInput.addEventListener('input', () => {
         updatePreview();
       });
     }
@@ -4017,11 +4126,39 @@
   const eventTitleEl = document.querySelector('[data-event-title]');
   const eventCategoryEl = document.querySelector('[data-event-category]');
   const eventDescriptionEl = document.querySelector('[data-event-description]');
+  const eventDescriptionToggle = document.querySelector('[data-event-description-toggle]');
   const eventLocationEl = document.querySelector('[data-event-location]');
   const eventTagsEl = document.querySelector('[data-event-tags]');
   const contactNameEl = document.querySelector('[data-event-contact-name]');
   const contactEmailEl = document.querySelector('[data-event-contact-email]');
   const contactPhoneEl = document.querySelector('[data-event-contact-phone]');
+
+  const updateDescriptionToggle = (text) => {
+    if (!eventDescriptionEl || !eventDescriptionToggle) return;
+    if (text) {
+      eventDescriptionEl.dataset.fullText = text;
+    }
+    const fullText =
+      text || eventDescriptionEl.dataset.fullText || eventDescriptionEl.textContent?.trim() || '';
+    if (!fullText || fullText.length <= 400) {
+      eventDescriptionEl.textContent = fullText;
+      eventDescriptionToggle.hidden = true;
+      eventDescriptionToggle.removeAttribute('aria-expanded');
+      return;
+    }
+    const isExpanded = eventDescriptionToggle.getAttribute('aria-expanded') === 'true';
+    if (isExpanded) {
+      eventDescriptionEl.textContent = fullText;
+    } else {
+      const shortText = `${fullText.slice(0, 400).trim()}…`;
+      eventDescriptionEl.textContent = shortText;
+    }
+    eventDescriptionToggle.hidden = false;
+    eventDescriptionToggle.textContent = formatMessage(
+      isExpanded ? 'event_description_less' : 'event_description_more',
+      {}
+    );
+  };
 
   const updateEventMeta = () => {
     if (!eventMeta) return;
@@ -4072,6 +4209,10 @@
     }
     if (eventDescriptionEl && eventData.description) {
       eventDescriptionEl.textContent = eventData.description;
+      if (eventDescriptionToggle) {
+        eventDescriptionToggle.setAttribute('aria-expanded', 'false');
+      }
+      updateDescriptionToggle(eventData.description);
     }
     if (eventLocationEl) {
       const location = `${eventData.city} · ${eventData.venue}`;
@@ -4127,6 +4268,13 @@
   };
 
   if (document.body.classList.contains('event-page')) {
+    if (eventDescriptionToggle) {
+      eventDescriptionToggle.addEventListener('click', () => {
+        const expanded = eventDescriptionToggle.getAttribute('aria-expanded') === 'true';
+        eventDescriptionToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        updateDescriptionToggle();
+      });
+    }
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('id');
     if (eventId) {
@@ -4141,10 +4289,12 @@
         .catch(() => {
           updateEventMeta();
           updateEventPrice();
+          updateDescriptionToggle();
         });
     } else {
       updateEventMeta();
       updateEventPrice();
+      updateDescriptionToggle();
     }
   }
 

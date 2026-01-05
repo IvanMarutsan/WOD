@@ -67,18 +67,38 @@
           <section class="form-step is-active" data-step="1" aria-labelledby="step-title-1">
             <h2 id="step-title-1" data-i18n="step_basic">Основне</h2>
             <div class="form-grid">
-              <label class="form-field">
-                <span data-i18n="form_title_label">Назва події</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+              <label class="form-field form-field--full">
+                <span class="form-field__label">
+                  <span data-i18n="form_title_label">Назва події</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <input type="text" name="title" required minlength="3" aria-describedby="title-help" />
                 <small id="title-help" data-i18n="form_title_help">Мінімум 3 символи.</small>
               </label>
-              <div class="form-field">
-                <div class="form-field__header">
-                  <span data-i18n="form_category_label">Категорія</span>
+              <label class="form-field form-field--full">
+                <span class="form-field__label">
+                  <span data-i18n="form_description_label">Опис події</span>
                   <span class="required" aria-hidden="true">*</span>
                   <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
+                <textarea
+                  name="description"
+                  required
+                  rows="4"
+                  aria-describedby="description-help"
+                  placeholder="Коротко опишіть подію"
+                  data-i18n-placeholder="form_description_placeholder"
+                ></textarea>
+                <small id="description-help" data-i18n="form_description_help">До 400 символів, без спаму.</small>
+              </label>
+              <div class="form-field">
+                <div class="form-field__header">
+                  <span class="form-field__label">
+                    <span data-i18n="form_category_label">Категорія</span>
+                    <span class="required" aria-hidden="true">*</span>
+                    <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                  </span>
                 </div>
                 <label class="sr-only" for="event-category" data-i18n="form_category_label">Категорія</label>
                 <select id="event-category" name="category" required>
@@ -89,10 +109,12 @@
                   <option value="tech" data-i18n="form_category_tech">Tech</option>
                 </select>
               </div>
-              <div class="form-field">
-                <span data-i18n="form_tags_label">Теги</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+              <div class="form-field form-field--full">
+                <span class="form-field__label">
+                  <span data-i18n="form_tags_label">Теги</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <div class="tags-input" aria-describedby="tags-help">
                   <div class="tags-input__list" role="list"></div>
                   <input
@@ -115,9 +137,11 @@
             <h2 id="step-title-2" data-i18n="step_time">Час та місце</h2>
             <div class="form-grid">
               <label class="form-field">
-                <span data-i18n="form_start_label">Початок</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <span class="form-field__label">
+                  <span data-i18n="form_start_label">Початок</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <input type="datetime-local" name="start" required aria-describedby="start-help" />
                 <small id="start-help" data-i18n="form_start_help">Вкажіть локальний час.</small>
               </label>
@@ -127,19 +151,23 @@
                 <small data-i18n="form_optional_hint">(необов'язково)</small>
               </label>
               <label class="form-field">
-                <span data-i18n="form_format_label">Формат</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                <span class="form-field__label">
+                  <span data-i18n="form_format_label">Формат</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <select name="format" required>
                   <option value="" data-i18n="form_format_placeholder">Оберіть формат</option>
                   <option value="offline" data-i18n="form_format_offline">Офлайн</option>
                   <option value="online" data-i18n="form_format_online">Онлайн</option>
                 </select>
               </label>
-              <label class="form-field">
-                <span data-i18n="form_address_label">Адреса</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+              <label class="form-field form-field--full">
+                <span class="form-field__label">
+                  <span data-i18n="form_address_label">Адреса</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <input type="text" name="address" required aria-describedby="address-help" placeholder="Копенгаген, Main St 10" data-i18n-placeholder="form_address_placeholder" />
                 <small id="address-help" data-i18n="form_address_help">Для онлайн-подій вкажіть платформу.</small>
               </label>
@@ -149,11 +177,13 @@
           <section class="form-step" data-step="3" aria-labelledby="step-title-3" hidden>
             <h2 id="step-title-3" data-i18n="step_tickets">Квитки</h2>
             <div class="form-grid">
-              <fieldset class="form-fieldset">
+              <fieldset class="form-fieldset form-field--full">
                 <legend>
-                  <span data-i18n="form_ticket_type_label">Тип події</span>
-                  <span class="required" aria-hidden="true">*</span>
-                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                  <span class="form-field__label">
+                    <span data-i18n="form_ticket_type_label">Тип події</span>
+                    <span class="required" aria-hidden="true">*</span>
+                    <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                  </span>
                 </legend>
                 <label class="form-choice">
                   <input type="radio" name="ticket-type" value="free" required />
@@ -172,7 +202,7 @@
                 <span data-i18n="form_price_max">Максимальна ціна</span>
                 <input type="number" name="price-max" min="0" step="1" />
               </label>
-              <label class="form-field">
+              <label class="form-field form-field--full">
                 <span data-i18n="form_ticket_url">Зовнішній лінк на квитки</span>
                 <input type="url" name="ticket-url" aria-describedby="ticket-help" placeholder="https://" />
                 <small id="ticket-help" data-i18n="form_ticket_help">Необов’язково.</small>
@@ -183,11 +213,15 @@
           <section class="form-step" data-step="4" aria-labelledby="step-title-4" hidden>
             <h2 id="step-title-4" data-i18n="step_media">Медіа</h2>
             <div class="form-grid">
-              <label class="form-field">
-                <span data-i18n="form_image_label">Зображення події</span>
-                <input type="file" name="image" accept="image/*" />
+              <label class="form-field form-field--full">
+                <span class="form-field__label">
+                  <span data-i18n="form_image_label">Зображення події</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
+                <input type="file" name="image" accept="image/*" required />
               </label>
-              <label class="form-field">
+              <label class="form-field form-field--full">
                 <span data-i18n="form_image_alt_label">Alt текст</span>
                 <input type="text" name="image-alt" aria-describedby="alt-help" placeholder="Опис зображення" data-i18n-placeholder="form_image_alt_placeholder" />
                 <small id="alt-help" data-i18n="form_image_alt_help">Наприклад: сцена з освітленням.</small>
@@ -195,63 +229,76 @@
             </div>
             <fieldset class="form-fieldset">
               <legend data-i18n="form_contact_legend">Організатор / Контакт</legend>
-              <label class="form-field">
-                <span data-i18n="form_contact_name">Організація або контакт</span>
-                <span class="required" aria-hidden="true">*</span>
-                <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
-                <input type="text" name="contact-name" required aria-describedby="contact-name-help" />
-                <small id="contact-name-help" data-i18n="form_contact_name_help">Наприклад: NGO “HelpHub” або Olena K.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_email">Email</span>
-                <input
-                  type="email"
-                  name="contact-email"
-                  aria-describedby="contact-email-help"
-                  pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
-                />
-                <small id="contact-email-help" data-i18n="form_contact_email_help">Необов’язково. Наприклад: name@example.com.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_phone">Телефон</span>
-                <input
-                  type="tel"
-                  name="contact-phone"
-                  aria-describedby="contact-phone-help"
-                  pattern="^\+45\s?[0-9]{2}(\s?[0-9]{2}){3}$"
-                />
-                <small id="contact-phone-help" data-i18n="form_contact_phone_help">Необов’язково. Формат: +45 12 34 56 78.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_website">Вебсайт</span>
-                <input type="url" name="contact-website" placeholder="https://" data-i18n-placeholder="form_contact_website_placeholder" />
-                <small data-i18n="form_contact_website_help">Необов’язково.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_instagram">Instagram</span>
-                <input type="url" name="contact-instagram" placeholder="https://instagram.com/" data-i18n-placeholder="form_contact_instagram_placeholder" />
-                <small data-i18n="form_contact_social_help">Необов’язково.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_facebook">Facebook</span>
-                <input type="url" name="contact-facebook" placeholder="https://facebook.com/" data-i18n-placeholder="form_contact_facebook_placeholder" />
-                <small data-i18n="form_contact_social_help">Необов’язково.</small>
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_contact_telegram">Telegram</span>
-                <input type="url" name="contact-telegram" placeholder="https://t.me/" data-i18n-placeholder="form_contact_telegram_placeholder" />
-                <small data-i18n="form_contact_social_help">Необов’язково.</small>
-              </label>
+              <div class="form-grid">
+                <label class="form-field form-field--full">
+                  <span class="form-field__label">
+                    <span data-i18n="form_contact_name">Організація або контакт</span>
+                    <span class="required" aria-hidden="true">*</span>
+                    <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                  </span>
+                  <input type="text" name="contact-name" required aria-describedby="contact-name-help" />
+                  <small id="contact-name-help" data-i18n="form_contact_name_help">Наприклад: NGO “HelpHub” або Olena K.</small>
+                </label>
+                <label class="form-field">
+                  <span data-i18n="form_contact_email">Email</span>
+                  <input
+                    type="email"
+                    name="contact-email"
+                    aria-describedby="contact-email-help"
+                    pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                  />
+                  <small id="contact-email-help" data-i18n="form_contact_email_help">Необов’язково. Наприклад: name@example.com.</small>
+                </label>
+                <label class="form-field">
+                  <span data-i18n="form_contact_phone">Телефон</span>
+                  <input
+                    type="tel"
+                    name="contact-phone"
+                    aria-describedby="contact-phone-help"
+                    pattern="^\+45\s?[0-9]{2}(\s?[0-9]{2}){3}$"
+                  />
+                  <small id="contact-phone-help" data-i18n="form_contact_phone_help">Необов’язково. Формат: +45 12 34 56 78.</small>
+                </label>
+                <label class="form-field form-field--full">
+                  <span data-i18n="form_contact_website">Вебсайт</span>
+                  <input type="url" name="contact-website" placeholder="https://" data-i18n-placeholder="form_contact_website_placeholder" />
+                  <small data-i18n="form_contact_website_help">Необов’язково.</small>
+                </label>
+                <label class="form-field">
+                  <span data-i18n="form_contact_instagram">Instagram</span>
+                  <input type="url" name="contact-instagram" placeholder="https://instagram.com/" data-i18n-placeholder="form_contact_instagram_placeholder" />
+                  <small data-i18n="form_contact_social_help">Необов’язково.</small>
+                </label>
+                <label class="form-field">
+                  <span data-i18n="form_contact_facebook">Facebook</span>
+                  <input type="url" name="contact-facebook" placeholder="https://facebook.com/" data-i18n-placeholder="form_contact_facebook_placeholder" />
+                  <small data-i18n="form_contact_social_help">Необов’язково.</small>
+                </label>
+                <label class="form-field">
+                  <span data-i18n="form_contact_telegram">Telegram</span>
+                  <input type="url" name="contact-telegram" placeholder="https://t.me/" data-i18n-placeholder="form_contact_telegram_placeholder" />
+                  <small data-i18n="form_contact_social_help">Необов’язково.</small>
+                </label>
+              </div>
             </fieldset>
           </section>
 
           <section class="form-step" data-step="5" aria-labelledby="step-title-5" hidden>
             <h2 id="step-title-5" data-i18n="step_preview">Прев’ю</h2>
             <div class="preview" data-testid="preview">
+              <img class="preview__image" id="preview-image" alt="" hidden />
               <dl class="preview__list">
                 <div>
                   <dt data-i18n="preview_title">Назва</dt>
                   <dd id="preview-title">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_organizer">Організатор</dt>
+                  <dd id="preview-organizer">—</dd>
+                </div>
+                <div>
+                  <dt data-i18n="preview_description">Опис</dt>
+                  <dd id="preview-description">—</dd>
                 </div>
                 <div>
                   <dt data-i18n="preview_category">Категорія</dt>

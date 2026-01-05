@@ -1368,6 +1368,22 @@ button:disabled,
   font-size: 1.1rem;
 }
 
+.event-description__toggle {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.event-description__toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
 .event-map {
   background: var(--surface);
   border-radius: var(--radius);
@@ -2010,6 +2026,16 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   font-size: 0.95rem;
 }
 
+.form-field__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
 .form-field__header {
   display: flex;
   align-items: center;
@@ -2084,6 +2110,8 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 }
 
 .form-field small {
+  display: block;
+  min-height: 1.2em;
   color: var(--muted);
 }
 
@@ -2125,6 +2153,16 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   padding: 16px;
   border: 1px dashed var(--line);
   margin-bottom: 16px;
+}
+
+.preview__image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  display: block;
+  margin-bottom: 12px;
 }
 
 .preview__list {
