@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Вхід адміністратора — What's on DK?</title>
+    <meta name="description" content="Вхід для адміністраторів і модераторів What's on DK?." />
+    <meta property="og:title" content="Вхід адміністратора — What's on DK?" />
+    <meta property="og:description" content="Вхід для адміністраторів і модераторів What's on DK?." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="static/og-placeholder-white.png" />
+    <meta property="og:url" content="https://whatsondk.netlify.app/admin-login.html" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Вхід адміністратора — What's on DK?" />
+    <meta name="twitter:description" content="Вхід для адміністраторів і модераторів What's on DK?." />
+    <meta name="twitter:image" content="static/og-placeholder-white.png" />
+    <link rel="alternate" hreflang="uk" href="./admin-login.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="./admin-login.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="./admin-login.html?lang=da" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="admin-login-page">
+    <a class="skip-link" href="./admin-login.html#content" data-i18n="skip_link">Перейти до вмісту</a>
+
+    <header class="site-header" role="banner">
+      <div class="container header__inner">
+        <a class="brand" href="./" aria-label="Домівка" data-i18n-aria="home_link">
+          <img class="brand__logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="1024" height="1024" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </a>
+        <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UA</button>
+          <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="da" aria-pressed="false" aria-label="Vælg dansk">DK</button>
+        </div>
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
+      </div>
+    </header>
+
+    <main id="content" class="admin-login">
+      <div class="container">
+        <section class="admin-login__card">
+          <h1 data-i18n="admin_login_title">Вхід для адміністраторів</h1>
+          <p class="admin-login__summary" data-i18n="admin_login_summary">Доступ лише для команди модерації.</p>
+          <div class="admin-login__actions">
+            <button class="btn primary" type="button" data-admin-login data-i18n="admin_login_button">Увійти</button>
+            <button class="btn ghost" type="button" data-admin-logout data-i18n="admin_access_logout" hidden>Вийти</button>
+          </div>
+          <p class="admin-login__status" data-admin-status></p>
+          <a class="admin-login__back" href="./" data-i18n="admin_login_back">Повернутись на головну</a>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footer_rights">© 2024 What’s on DK?. Всі права захищено.</p>
+        <a class="footer__help" href="./docs.html" data-i18n="footer_help">Допомога</a>
+        <a class="footer__help" href="./legal-privacy.html" data-i18n="footer_privacy">Політика конфіденційності</a>
+        <a class="footer__help" href="./legal-terms.html" data-i18n="footer_terms">Умови користування</a>
+      </div>
+    </footer>
+
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script src="./script.js" defer></script>
+  </body>
+</html>

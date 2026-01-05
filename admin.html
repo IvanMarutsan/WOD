@@ -3,24 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Moderation Queue — What's on DK?</title>
-    <meta name="description" content="Moderation queue for pending events." />
-    <meta property="og:title" content="Moderation Queue - Evently" />
-    <meta property="og:description" content="Approve or reject pending event submissions." />
+    <title>Модерація — What's on DK?</title>
+    <meta name="description" content="Модерація подій: схвалення, відхилення та причини рішень." />
+    <meta property="og:title" content="Модерація — What's on DK?" />
+    <meta property="og:description" content="Модерація подій: схвалення, відхилення та причини рішень." />
     <meta property="og:type" content="website" />
     <!-- TODO: Replace OG image URL -->
     <meta property="og:image" content="static/og-placeholder-white.png" />
-    <meta property="og:url" content="" />
+    <meta property="og:url" content="https://whatsondk.netlify.app/admin.html" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Moderation Queue - Evently" />
-    <meta name="twitter:description" content="Approve or reject pending event submissions." />
+    <meta name="twitter:title" content="Модерація — What's on DK?" />
+    <meta name="twitter:description" content="Модерація подій: схвалення, відхилення та причини рішень." />
     <meta name="twitter:image" content="static/og-placeholder-white.png" />
     <link rel="alternate" hreflang="uk" href="./admin.html?lang=uk" />
     <link rel="alternate" hreflang="en" href="./admin.html?lang=en" />
     <link rel="alternate" hreflang="da" href="./admin.html?lang=da" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body class="dashboard-page">
+  <body class="dashboard-page admin-page" data-admin-auth="checking">
     <a class="skip-link" href="./admin.html#content" data-i18n="skip_link">Перейти до вмісту</a>
 
     <header class="site-header" role="banner">
@@ -39,79 +39,106 @@
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+          <button class="lang-switch__button" type="button" data-lang="uk" aria-pressed="true" aria-label="Обрати українську">UA</button>
           <button class="lang-switch__button" type="button" data-lang="en" aria-pressed="false" aria-label="Choose English">EN</button>
+          <button class="lang-switch__button" type="button" data-lang="da" aria-pressed="false" aria-label="Vælg dansk">DK</button>
         </div>
         <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
         <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
       </div>
     </header>
 
-    <main id="content" class="dashboard">
+    <main id="content" class="dashboard" data-admin-content>
       <div class="container">
-        <header class="dashboard__header">
-          <div>
-            <p class="eyebrow" data-i18n="admin_eyebrow">Робочий простір адміністратора</p>
-            <h1 data-i18n="admin_title">Черга модерації</h1>
+        <section class="admin-auth" data-admin-auth>
+          <p class="admin-auth__status" data-admin-status data-i18n="admin_access_checking">Перевіряємо доступ...</p>
+          <div class="admin-auth__meta" hidden>
+            <span data-admin-user></span>
+            <span data-admin-role></span>
           </div>
-          <a class="btn ghost" href="./dashboard.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
-        </header>
-
-        <section class="moderation" aria-labelledby="moderation-title">
-          <header class="section-header">
-            <h2 id="moderation-title" data-i18n="admin_pending_title">Події на розгляді</h2>
-            <p class="section-summary" data-i18n="admin_pending_summary">Перевіряйте нові заявки та публікуйте їх.</p>
-          </header>
-
-          <div class="moderation-list">
-            <article class="moderation-card" data-event="design-systems">
-              <div class="moderation-card__meta">
-                <h3>Design Systems Meetup</h3>
-                <p>Kyiv · 12 Nov · 19:00</p>
-              </div>
-              <div class="moderation-card__status">
-                <span class="status-pill status-pill--pending" data-i18n="admin_status_pending">На розгляді</span>
-                <p class="moderation-card__reason" hidden></p>
-              </div>
-              <div class="moderation-card__actions">
-                <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
-                <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
-              </div>
-            </article>
-
-            <article class="moderation-card" data-event="food-fest">
-              <div class="moderation-card__meta">
-                <h3>Local Food Fest</h3>
-                <p>Lviv · 20 Oct · 14:00</p>
-              </div>
-              <div class="moderation-card__status">
-                <span class="status-pill status-pill--pending" data-i18n="admin_status_pending">На розгляді</span>
-                <p class="moderation-card__reason" hidden></p>
-              </div>
-              <div class="moderation-card__actions">
-                <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
-                <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
-              </div>
-            </article>
-
-            <article class="moderation-card" data-event="music-night">
-              <div class="moderation-card__meta">
-                <h3>Indie Music Night</h3>
-                <p>Odesa · 1 Nov · 20:00</p>
-              </div>
-              <div class="moderation-card__status">
-                <span class="status-pill status-pill--pending" data-i18n="admin_status_pending">На розгляді</span>
-                <p class="moderation-card__reason" hidden></p>
-              </div>
-              <div class="moderation-card__actions">
-                <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
-                <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
-              </div>
-            </article>
+          <div class="admin-auth__actions">
+            <button class="btn primary" type="button" data-admin-login data-i18n="admin_access_login">Увійти</button>
+            <button class="btn ghost" type="button" data-admin-logout data-i18n="admin_access_logout" hidden>Вийти</button>
           </div>
         </section>
+
+        <div data-admin-protected>
+          <header class="dashboard__header">
+            <div>
+              <p class="eyebrow" data-i18n="admin_eyebrow">Робочий простір адміністратора</p>
+              <h1 data-i18n="admin_title">Черга модерації</h1>
+            </div>
+            <a class="btn ghost" href="./dashboard.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
+          </header>
+
+          <section class="moderation" aria-labelledby="moderation-title">
+            <header class="section-header">
+              <h2 id="moderation-title" data-i18n="admin_pending_title">Події на розгляді</h2>
+              <p class="section-summary" data-i18n="admin_pending_summary">Перевіряйте нові заявки та публікуйте їх.</p>
+            </header>
+
+            <div class="moderation-list" data-admin-pending>
+              <p class="moderation__state" data-admin-loading data-i18n="admin_loading">Завантаження...</p>
+              <p class="moderation__state" data-admin-empty data-i18n="admin_pending_empty" hidden>Наразі немає подій на модерації.</p>
+            </div>
+          </section>
+
+        <section class="moderation moderation--rejected" aria-labelledby="rejected-title" data-super-admin-only hidden>
+          <header class="section-header">
+            <h2 id="rejected-title" data-i18n="admin_rejected_title">Відхилені події</h2>
+            <p class="section-summary" data-i18n="admin_rejected_summary">Доступно лише для супер-адміністратора.</p>
+          </header>
+          <div class="moderation-list" data-admin-rejected>
+            <p class="moderation__state" data-admin-rejected-empty data-i18n="admin_rejected_empty" hidden>Немає відхилених подій.</p>
+          </div>
+        </section>
+
+        <section class="moderation moderation--audit" aria-labelledby="audit-title" data-super-admin-only hidden>
+          <header class="section-header">
+            <h2 id="audit-title" data-i18n="admin_audit_title">Журнал рішень</h2>
+            <p class="section-summary" data-i18n="admin_audit_summary">Останні рішення по модерації.</p>
+          </header>
+          <div class="moderation-list moderation-list--compact" data-admin-audit>
+            <p class="moderation__state" data-admin-audit-empty data-i18n="admin_audit_empty" hidden>Журнал поки порожній.</p>
+          </div>
+        </section>
+        </div>
       </div>
     </main>
+
+    <template id="moderation-card-template">
+      <article class="moderation-card" data-admin-card>
+        <div class="moderation-card__meta">
+          <h3 data-admin-title></h3>
+          <p data-admin-meta></p>
+        </div>
+        <div class="moderation-card__status">
+          <span class="status-pill status-pill--pending" data-admin-status data-i18n="admin_status_pending">На розгляді</span>
+          <p class="moderation-card__reason" data-admin-reason hidden></p>
+          <details class="moderation-card__history" data-admin-history hidden>
+            <summary data-i18n="admin_history_title">Історія рішень</summary>
+            <ul class="moderation-card__history-list" data-admin-history-list></ul>
+          </details>
+        </div>
+        <div class="moderation-card__actions" data-admin-actions>
+          <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
+          <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="audit-row-template">
+      <article class="moderation-card moderation-card--audit" data-admin-audit-row>
+        <div class="moderation-card__meta">
+          <h3 data-admin-audit-title></h3>
+          <p data-admin-audit-meta></p>
+        </div>
+        <div class="moderation-card__status">
+          <span class="status-pill status-pill--pending" data-admin-audit-status></span>
+          <p class="moderation-card__reason" data-admin-audit-reason hidden></p>
+        </div>
+      </article>
+    </template>
 
     <div class="modal" hidden>
       <div class="modal__overlay" data-modal-close></div>
@@ -140,6 +167,7 @@
       </div>
     </footer>
 
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="./script.js" defer></script>
   </body>
 </html>

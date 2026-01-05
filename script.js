@@ -208,6 +208,8 @@
       admin_pending_title: 'Події на розгляді',
       admin_pending_summary: 'Перевіряйте нові заявки та публікуйте їх.',
       admin_status_pending: 'На розгляді',
+      admin_status_approved: 'Схвалено',
+      admin_status_rejected: 'Відхилено',
       admin_action_approve: 'Схвалити',
       admin_action_reject: 'Відхилити',
       admin_modal_title: 'Відхилити подію',
@@ -215,6 +217,30 @@
       admin_modal_reason_label: 'Причина',
       admin_modal_cancel: 'Скасувати',
       admin_modal_reject: 'Відхилити',
+      admin_pending_empty: 'Наразі немає подій на модерації.',
+      admin_rejected_title: 'Відхилені події',
+      admin_rejected_summary: 'Доступно лише для супер-адміністратора.',
+      admin_rejected_empty: 'Немає відхилених подій.',
+      admin_loading: 'Завантаження...',
+      admin_reason_label: 'Причина',
+      admin_history_title: 'Історія рішень',
+      admin_history_entry: '{action} · {actor} · {ts}',
+      admin_audit_title: 'Журнал рішень',
+      admin_audit_summary: 'Останні рішення по модерації.',
+      admin_audit_empty: 'Журнал поки порожній.',
+      admin_access_checking: 'Перевіряємо доступ...',
+      admin_access_required: 'Потрібен вхід адміністратора.',
+      admin_access_denied: 'У вас немає доступу до адмінки.',
+      admin_access_login: 'Увійти',
+      admin_access_logout: 'Вийти',
+      admin_access_user: 'Увійшли як',
+      admin_access_role_admin: 'Роль: адміністратор',
+      admin_access_role_super: 'Роль: супер-адмін',
+      admin_login_title: 'Вхід для адміністраторів',
+      admin_login_summary: 'Доступ лише для команди модерації.',
+      admin_login_button: 'Увійти',
+      admin_login_back: 'Повернутись на головну',
+      admin_login_error: 'Потрібна роль адміністратора.',
       create_event_eyebrow: 'Створення події',
       stepper_aria: 'Кроки створення події',
       step_basic: '1. Основне',
@@ -307,7 +333,7 @@
       docs_past_body_2: 'За потреби увімкніть фільтр “Показати минулі”, щоб переглянути архів.',
       docs_verification_title: 'Верифікація організаторів',
       docs_verification_body_1:
-        'Верифікація потрібна для публікації подій. Ви можете підтвердити email або надати сайт/соцмережі.',
+        'Верифікація потрібна для публікації подій. Потрібно підтвердити email і додати сайт або соцмережі.',
       docs_verification_body_2: 'Після перевірки статус організатора змінюється на “Верифіковано”.',
       privacy_title: 'Політика конфіденційності',
       privacy_summary: 'Ми збираємо мінімум даних, потрібних для роботи платформи, і не використовуємо сторонні трекери.',
@@ -365,6 +391,13 @@
       filters_aria: 'Фільтри каталогу',
       filters_city: 'Місто',
       filters_all_cities: 'Усі міста',
+      filters_city_copenhagen: 'Копенгаген',
+      filters_city_aarhus: 'Орхус',
+      filters_city_odense: 'Оденсе',
+      filters_city_aalborg: 'Ольборг',
+      filters_city_esbjerg: "Есб'єрг",
+      events_prev: 'Показати попередні події',
+      events_next: 'Показати наступні події',
       filters_category: 'Категорія',
       filters_all_categories: 'Усі категорії',
       category_music: 'Музика',
@@ -387,6 +420,7 @@
       filters_family: 'Сім\'ям',
       filters_volunteer: 'Волонтерам',
       filters_past: 'Показати минулі',
+      filters_past_hint: 'Показати минулі події має пріоритет над датами, діапазон очищено.',
       reset_filters: 'Скинути фільтри',
       empty_state: 'Немає подій за цим запитом.',
       similar_cta: 'Схожі події',
@@ -433,6 +467,8 @@
       meta_dashboard_new_desc: 'Покрокова форма створення події.',
       meta_admin_title: 'Модерація — What’s on DK?',
       meta_admin_desc: 'Перевірка нових заявок на події.',
+      meta_admin_login_title: 'Вхід адміністратора — What’s on DK?',
+      meta_admin_login_desc: 'Вхід для доступу до панелі модерації.',
       meta_not_found_title: '404 — What’s on DK?',
       meta_not_found_desc: 'Сторінку не знайдено. Перейдіть на головну або скористайтеся пошуком.',
       organizer_location: 'Організатор у Данії',
@@ -451,11 +487,11 @@
       verification_pending: 'Очікує підтвердження',
       verification_note: 'Для публікації подій потрібна верифікація організатора.',
       verification_code_sent: 'Код надіслано. Перевірте пошту.',
-      verification_success: 'Організатора верифіковано.',
+      verification_success: 'Email підтверджено. Додайте сайт або соцмережу для завершення.',
       verification_invalid_code: 'Невірний код. Спробуйте ще раз.',
       verification_error: 'Не вдалося виконати дію. Спробуйте пізніше.',
-      verification_blocked: 'Щоб опублікувати подію, підтвердьте верифікацію організатора.',
-      verification_banner_text: 'Щоб опублікувати подію, потрібна верифікація організатора.',
+      verification_blocked: 'Щоб опублікувати подію, підтвердьте email і додайте сайт або соцмережу.',
+      verification_banner_text: 'Потрібні email та сайт/соцмережа для верифікації організатора.',
       verification_banner_action: 'Перейти до верифікації',
       submit_success: 'Подію надіслано на модерацію.',
       submit_error: 'Не вдалося надіслати подію. Спробуйте ще раз.',
@@ -575,6 +611,8 @@
       admin_pending_title: 'Pending events',
       admin_pending_summary: 'Review new submissions and publish them.',
       admin_status_pending: 'Pending',
+      admin_status_approved: 'Approved',
+      admin_status_rejected: 'Rejected',
       admin_action_approve: 'Approve',
       admin_action_reject: 'Reject',
       admin_modal_title: 'Reject event',
@@ -582,6 +620,30 @@
       admin_modal_reason_label: 'Reason',
       admin_modal_cancel: 'Cancel',
       admin_modal_reject: 'Reject',
+      admin_pending_empty: 'No events are awaiting moderation.',
+      admin_rejected_title: 'Rejected events',
+      admin_rejected_summary: 'Visible to super admins only.',
+      admin_rejected_empty: 'No rejected events.',
+      admin_loading: 'Loading...',
+      admin_reason_label: 'Reason',
+      admin_history_title: 'Decision history',
+      admin_history_entry: '{action} · {actor} · {ts}',
+      admin_audit_title: 'Decision log',
+      admin_audit_summary: 'Latest moderation decisions.',
+      admin_audit_empty: 'No audit entries yet.',
+      admin_access_checking: 'Checking access...',
+      admin_access_required: 'Admin login required.',
+      admin_access_denied: 'You do not have access to the admin panel.',
+      admin_access_login: 'Sign in',
+      admin_access_logout: 'Sign out',
+      admin_access_user: 'Signed in as',
+      admin_access_role_admin: 'Role: admin',
+      admin_access_role_super: 'Role: super admin',
+      admin_login_title: 'Admin login',
+      admin_login_summary: 'Access is limited to the moderation team.',
+      admin_login_button: 'Sign in',
+      admin_login_back: 'Back to home',
+      admin_login_error: 'Admin role required.',
       create_event_eyebrow: 'Create new event',
       stepper_aria: 'Event creation steps',
       step_basic: '1. Basics',
@@ -674,7 +736,7 @@
       docs_past_body_2: 'Use the “Show past” filter to browse the archive.',
       docs_verification_title: 'Organizer verification',
       docs_verification_body_1:
-        'Verification is required to publish events. You can verify by email or submit a website/social link.',
+        'Verification is required to publish events. Confirm your email and add a website or social link.',
       docs_verification_body_2: 'After review, the organizer status updates to “Verified”.',
       privacy_title: 'Privacy Policy',
       privacy_summary: 'We collect the minimum data needed to run the platform and do not use third-party trackers.',
@@ -732,6 +794,13 @@
       filters_aria: 'Catalog filters',
       filters_city: 'City',
       filters_all_cities: 'All cities',
+      filters_city_copenhagen: 'Copenhagen',
+      filters_city_aarhus: 'Aarhus',
+      filters_city_odense: 'Odense',
+      filters_city_aalborg: 'Aalborg',
+      filters_city_esbjerg: 'Esbjerg',
+      events_prev: 'Show previous events',
+      events_next: 'Show next events',
       filters_category: 'Category',
       filters_all_categories: 'All categories',
       category_music: 'Music',
@@ -754,6 +823,7 @@
       filters_family: 'For families',
       filters_volunteer: 'For volunteers',
       filters_past: 'Show past',
+      filters_past_hint: 'Past events override the date range. The dates were cleared.',
       reset_filters: 'Reset filters',
       empty_state: 'No events match your search.',
       similar_cta: 'Similar events',
@@ -800,6 +870,8 @@
       meta_dashboard_new_desc: 'Step-by-step event creation form.',
       meta_admin_title: 'Moderation — What’s on DK?',
       meta_admin_desc: 'Review new event submissions.',
+      meta_admin_login_title: 'Admin login — What’s on DK?',
+      meta_admin_login_desc: 'Sign in to access moderation tools.',
       meta_not_found_title: '404 — What’s on DK?',
       meta_not_found_desc: 'Page not found. Return home or try search.',
       organizer_location: 'Organizer in Denmark',
@@ -816,13 +888,13 @@
       verification_link_help: 'We will review it manually.',
       verification_link_submit: 'Submit for review',
       verification_pending: 'Pending review',
-      verification_note: 'Verification is required to publish events.',
+      verification_note: 'Verification requires email and a website/social link.',
       verification_code_sent: 'Code sent. Check your inbox.',
-      verification_success: 'Organizer verified.',
+      verification_success: 'Email verified. Add a website or social link to finish.',
       verification_invalid_code: 'Invalid code. Try again.',
       verification_error: 'Action failed. Please try again.',
-      verification_blocked: 'Verify the organizer before publishing the event.',
-      verification_banner_text: 'Organizer verification is required to publish the event.',
+      verification_blocked: 'Confirm email and add a website/social link before publishing.',
+      verification_banner_text: 'Email plus website/social link is required for verification.',
       verification_banner_action: 'Open verification',
       submit_success: 'Event submitted for moderation.',
       submit_error: 'Failed to submit the event. Please try again.',
@@ -942,6 +1014,8 @@
       admin_pending_title: 'Afventende events',
       admin_pending_summary: 'Gennemgå nye indsendelser og udgiv dem.',
       admin_status_pending: 'Afventer',
+      admin_status_approved: 'Godkendt',
+      admin_status_rejected: 'Afvist',
       admin_action_approve: 'Godkend',
       admin_action_reject: 'Afvis',
       admin_modal_title: 'Afvis event',
@@ -949,6 +1023,30 @@
       admin_modal_reason_label: 'Begrundelse',
       admin_modal_cancel: 'Annuller',
       admin_modal_reject: 'Afvis',
+      admin_pending_empty: 'Der er ingen events til moderation lige nu.',
+      admin_rejected_title: 'Afviste events',
+      admin_rejected_summary: 'Kun synligt for superadmins.',
+      admin_rejected_empty: 'Ingen afviste events.',
+      admin_loading: 'Indlæser...',
+      admin_reason_label: 'Begrundelse',
+      admin_history_title: 'Beslutningshistorik',
+      admin_history_entry: '{action} · {actor} · {ts}',
+      admin_audit_title: 'Beslutningslog',
+      admin_audit_summary: 'Seneste moderationsbeslutninger.',
+      admin_audit_empty: 'Ingen logposter endnu.',
+      admin_access_checking: 'Kontrollerer adgang...',
+      admin_access_required: 'Admin-login er påkrævet.',
+      admin_access_denied: 'Du har ikke adgang til adminpanelet.',
+      admin_access_login: 'Log ind',
+      admin_access_logout: 'Log ud',
+      admin_access_user: 'Logget ind som',
+      admin_access_role_admin: 'Rolle: admin',
+      admin_access_role_super: 'Rolle: superadmin',
+      admin_login_title: 'Admin-login',
+      admin_login_summary: 'Adgang er begrænset til moderationsholdet.',
+      admin_login_button: 'Log ind',
+      admin_login_back: 'Tilbage til forsiden',
+      admin_login_error: 'Adminrolle kræves.',
       create_event_eyebrow: 'Opret nyt event',
       stepper_aria: 'Trin til eventoprettelse',
       step_basic: '1. Grundlæggende',
@@ -1041,7 +1139,7 @@
       docs_past_body_2: 'Brug filteret “Vis tidligere” for at se arkivet.',
       docs_verification_title: 'Arrangørbekræftelse',
       docs_verification_body_1:
-        'Bekræftelse kræves for at udgive events. Du kan bekræfte via email eller indsende en hjemmeside/socialt link.',
+        'Bekræftelse kræves for at udgive events. Bekræft din email og tilføj en hjemmeside eller et socialt link.',
       docs_verification_body_2: 'Efter gennemgang opdateres status til “Bekræftet”.',
       privacy_title: 'Privatlivspolitik',
       privacy_summary: 'Vi indsamler kun de data, der er nødvendige for platformen, og bruger ingen tredjeparts-trackere.',
@@ -1099,6 +1197,13 @@
       filters_aria: 'Katalogfiltre',
       filters_city: 'By',
       filters_all_cities: 'Alle byer',
+      filters_city_copenhagen: 'København',
+      filters_city_aarhus: 'Aarhus',
+      filters_city_odense: 'Odense',
+      filters_city_aalborg: 'Aalborg',
+      filters_city_esbjerg: 'Esbjerg',
+      events_prev: 'Vis tidligere events',
+      events_next: 'Vis næste events',
       filters_category: 'Kategori',
       filters_all_categories: 'Alle kategorier',
       category_music: 'Musik',
@@ -1121,6 +1226,7 @@
       filters_family: 'For familier',
       filters_volunteer: 'For frivillige',
       filters_past: 'Vis tidligere',
+      filters_past_hint: 'Tidligere events har prioritet over datoer. Datointervallet blev ryddet.',
       reset_filters: 'Nulstil filtre',
       empty_state: 'Ingen begivenheder matcher din søgning.',
       similar_cta: 'Lignende begivenheder',
@@ -1167,6 +1273,8 @@
       meta_dashboard_new_desc: 'Trinvis oprettelse af event.',
       meta_admin_title: 'Moderation — What’s on DK?',
       meta_admin_desc: 'Gennemgå nye eventindsendelser.',
+      meta_admin_login_title: 'Admin-login — What’s on DK?',
+      meta_admin_login_desc: 'Log ind for at få adgang til moderation.',
       meta_not_found_title: '404 — What’s on DK?',
       meta_not_found_desc: 'Siden blev ikke fundet. Gå til forsiden eller søg.',
       organizer_location: 'Arrangør i Danmark',
@@ -1183,13 +1291,13 @@
       verification_link_help: 'Vi gennemgår den manuelt.',
       verification_link_submit: 'Send til gennemgang',
       verification_pending: 'Afventer godkendelse',
-      verification_note: 'Bekræftelse kræves for at udgive events.',
+      verification_note: 'Bekræftelse kræver email og et website/socialt link.',
       verification_code_sent: 'Koden er sendt. Tjek din indbakke.',
-      verification_success: 'Arrangøren er bekræftet.',
+      verification_success: 'Email bekræftet. Tilføj et website eller socialt link for at færdiggøre.',
       verification_invalid_code: 'Ugyldig kode. Prøv igen.',
       verification_error: 'Handling mislykkedes. Prøv igen senere.',
-      verification_blocked: 'Bekræft arrangøren før du udgiver eventet.',
-      verification_banner_text: 'Arrangørbekræftelse kræves for at udgive eventet.',
+      verification_blocked: 'Bekræft email og tilføj website/socialt link før udgivelse.',
+      verification_banner_text: 'Email + website/socialt link kræves for bekræftelse.',
       verification_banner_action: 'Åbn bekræftelse',
       submit_success: 'Eventet er sendt til moderation.',
       submit_error: 'Kunne ikke sende eventet. Prøv igen.',
@@ -1323,9 +1431,11 @@
                       ? 'dashboard_new'
                       : path.includes('dashboard')
                         ? 'dashboard'
-                        : path.includes('admin')
-                          ? 'admin'
-                          : 'index';
+                        : path.includes('admin-login')
+                          ? 'admin_login'
+                          : path.includes('admin')
+                            ? 'admin'
+                            : 'index';
     const titleKey = `meta_${page}_title`;
     const descKey = `meta_${page}_desc`;
     const titleText = dictionary[titleKey] || translations.uk[titleKey];
@@ -1369,6 +1479,169 @@
     }, template);
   };
 
+  const ADMIN_ROLES = ['admin', 'super_admin'];
+  const UI_LOCALE_MAP = { uk: 'uk-UA', en: 'en-US', da: 'da-DK' };
+
+  const getUserRoles = (user) => {
+    const roles = user?.app_metadata?.roles;
+    return Array.isArray(roles) ? roles : [];
+  };
+
+  const hasAdminRole = (user) => {
+    const roles = getUserRoles(user);
+    return roles.some((role) => ADMIN_ROLES.includes(role));
+  };
+
+  const isSuperAdmin = (user) => getUserRoles(user).includes('super_admin');
+
+  const getAdminLoginRedirect = () => {
+    const redirect = encodeURIComponent(
+      `${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
+    return `./admin-login.html?redirect=${redirect}`;
+  };
+
+  const getUiLocale = () => {
+    const lang = document.documentElement.lang || 'uk';
+    return UI_LOCALE_MAP[lang] || 'uk-UA';
+  };
+
+  const setupAdminAuth = () => {
+    const path = window.location.pathname;
+    const isAdminPage = path.includes('admin.html');
+    const isLoginPage = path.includes('admin-login');
+    if (!isAdminPage && !isLoginPage) return;
+
+    const statusEl = document.querySelector('[data-admin-status]');
+    const loginButton = document.querySelector('[data-admin-login]');
+    const logoutButton = document.querySelector('[data-admin-logout]');
+    const userMeta = document.querySelector('[data-admin-user]');
+    const roleMeta = document.querySelector('[data-admin-role]');
+    const metaContainer = document.querySelector('.admin-auth__meta');
+    const superAdminSections = document.querySelectorAll('[data-super-admin-only]');
+
+    const setStatus = (key) => {
+      if (statusEl) statusEl.textContent = formatMessage(key, {});
+    };
+
+    const setAuthState = (state) => {
+      document.body.dataset.adminAuth = state;
+    };
+
+    const updateMeta = (user) => {
+      if (!userMeta || !roleMeta || !metaContainer) return;
+      if (!user) {
+        metaContainer.hidden = true;
+        return;
+      }
+      const roles = getUserRoles(user);
+      const roleLabel = roles.includes('super_admin')
+        ? formatMessage('admin_access_role_super', {})
+        : formatMessage('admin_access_role_admin', {});
+      userMeta.textContent = `${formatMessage('admin_access_user', {})}: ${user.email || '—'}`;
+      roleMeta.textContent = roleLabel;
+      metaContainer.hidden = false;
+    };
+
+    const setSuperAdminVisibility = (allowed) => {
+      superAdminSections.forEach((section) => {
+        section.hidden = !allowed;
+      });
+    };
+
+    const openLogin = () => {
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.open('login');
+      }
+    };
+
+    if (loginButton) {
+      loginButton.addEventListener('click', openLogin);
+    }
+
+    if (logoutButton) {
+      logoutButton.addEventListener('click', () => {
+        if (window.netlifyIdentity) {
+          window.netlifyIdentity.logout();
+        }
+      });
+    }
+
+    if (!window.netlifyIdentity) {
+      setAuthState('denied');
+      setStatus('admin_access_required');
+      if (isAdminPage) {
+        window.location.href = getAdminLoginRedirect();
+      }
+      return;
+    }
+
+    setAuthState('checking');
+
+    let initTimer = null;
+
+    const handleUser = (user) => {
+      if (initTimer) {
+        clearTimeout(initTimer);
+        initTimer = null;
+      }
+      if (!user) {
+        setAuthState('denied');
+        setStatus('admin_access_required');
+        if (logoutButton) logoutButton.hidden = true;
+        updateMeta(null);
+        setSuperAdminVisibility(false);
+        if (isAdminPage) {
+          window.location.href = getAdminLoginRedirect();
+        }
+        return;
+      }
+
+      if (!hasAdminRole(user)) {
+        setAuthState('denied');
+        setStatus('admin_access_denied');
+        if (logoutButton) logoutButton.hidden = false;
+        updateMeta(user);
+        setSuperAdminVisibility(false);
+        if (isLoginPage) {
+          setStatus('admin_login_error');
+        }
+        return;
+      }
+
+      setAuthState('granted');
+      if (logoutButton) logoutButton.hidden = false;
+      updateMeta(user);
+      setSuperAdminVisibility(isSuperAdmin(user));
+
+      if (isLoginPage) {
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect') || './admin.html';
+        window.location.href = redirect;
+      }
+
+      if (isAdminPage) {
+        initModerationPanel(user, isSuperAdmin(user));
+      }
+    };
+
+    window.netlifyIdentity.on('init', handleUser);
+    window.netlifyIdentity.on('login', (user) => {
+      handleUser(user);
+      window.netlifyIdentity.close();
+    });
+    window.netlifyIdentity.on('logout', () => {
+      handleUser(null);
+    });
+    initTimer = window.setTimeout(() => {
+      if (document.body.dataset.adminAuth === 'checking') {
+        handleUser(null);
+      }
+    }, 500);
+
+    window.netlifyIdentity.init();
+  };
+
   updateStaticTagAria = () => {
     const tagElements = document.querySelectorAll('[data-tag-label]');
     tagElements.forEach((tag) => {
@@ -1410,7 +1683,7 @@
     }
   };
 
-  const isOrganizerVerified = (state) => state.emailVerified || state.websitePending;
+  const isOrganizerVerified = (state) => state.emailVerified && state.websitePending;
 
   const formatDateTime = (value) => {
     const date = new Date(value);
@@ -1968,9 +2241,9 @@
 
     const getEffectiveOrganizerStatus = () => {
       const verification = getVerificationState();
-      if (verification.emailVerified) return 'email_verified';
-      if (verification.websitePending) return 'pending_manual';
-      return organizerStatus;
+      if (organizerStatus && organizerStatus !== 'none') return organizerStatus;
+      if (verification.emailVerified && verification.websitePending) return 'pending_manual';
+      return 'none';
     };
 
     const loadOrganizerStatus = async () => {
@@ -2079,7 +2352,19 @@
     });
   }
 
-  if (moderationList && modal) {
+  const initModerationPanel = (user, superAdmin) => {
+    if (!moderationList || !modal || moderationList.dataset.ready) return;
+    moderationList.dataset.ready = 'true';
+
+    const pendingContainer = document.querySelector('[data-admin-pending]');
+    const rejectedContainer = document.querySelector('[data-admin-rejected]');
+    const auditContainer = document.querySelector('[data-admin-audit]');
+    const template = document.querySelector('#moderation-card-template');
+    const auditTemplate = document.querySelector('#audit-row-template');
+    const loadingEl = pendingContainer?.querySelector('[data-admin-loading]');
+    const emptyEl = pendingContainer?.querySelector('[data-admin-empty]');
+    const rejectedEmptyEl = rejectedContainer?.querySelector('[data-admin-rejected-empty]');
+    const auditEmptyEl = auditContainer?.querySelector('[data-admin-audit-empty]');
     const modalDialog = modal.querySelector('.modal__dialog');
     const modalTextarea = modal.querySelector('textarea[name="reject-reason"]');
     const modalCloseButtons = modal.querySelectorAll('[data-modal-close]');
@@ -2108,38 +2393,181 @@
       }
     };
 
-    const updateStatus = (card, status, reason) => {
+    const updateStatus = (card, statusKey, reason) => {
       const statusPill = card.querySelector('.status-pill');
-      const reasonText = card.querySelector('.moderation-card__reason');
+      const reasonText = card.querySelector('[data-admin-reason]');
       if (!statusPill) return;
-      statusPill.textContent = status;
+      statusPill.textContent = formatMessage(statusKey, {});
       statusPill.classList.remove('status-pill--pending', 'status-pill--published', 'status-pill--draft');
-      if (status === 'Approved') {
+      if (statusKey === 'admin_status_approved') {
         statusPill.classList.add('status-pill--published');
         if (reasonText) {
           reasonText.hidden = true;
         }
-      } else if (status === 'Rejected') {
+      } else if (statusKey === 'admin_status_rejected') {
         statusPill.classList.add('status-pill--draft');
         if (reasonText) {
           reasonText.hidden = false;
-          reasonText.textContent = reason ? `Reason: ${reason}` : 'Reason: —';
+          const label = formatMessage('admin_reason_label', {});
+          reasonText.textContent = reason ? `${label}: ${reason}` : `${label}: —`;
         }
       }
     };
 
-    moderationList.addEventListener('click', (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const card = target.closest('.moderation-card');
-      if (!card) return;
-      if (target.dataset.action === 'approve') {
-        updateStatus(card, 'Approved');
+    const renderHistory = (card, history) => {
+      const historyEl = card.querySelector('[data-admin-history]');
+      const historyList = card.querySelector('[data-admin-history-list]');
+      if (!historyEl || !historyList) return;
+      historyList.innerHTML = '';
+      if (!history || history.length === 0) {
+        historyEl.hidden = true;
+        return;
       }
-      if (target.dataset.action === 'reject') {
-        openModal(target, card);
+      history.forEach((entry) => {
+        const li = document.createElement('li');
+        const actionKey =
+          entry.action === 'approve' ? 'admin_status_approved' : 'admin_status_rejected';
+        const actionLabel = formatMessage(actionKey, {});
+        const actor = entry.actorEmail || '—';
+        const ts = entry.ts ? new Date(entry.ts).toLocaleString() : '—';
+        const tsText = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
+        li.textContent = formatMessage('admin_history_entry', { action: actionLabel, actor, ts: tsText });
+        historyList.appendChild(li);
+      });
+      historyEl.hidden = false;
+    };
+
+    const renderCards = (container, items, withActions) => {
+      if (!container || !template) return;
+      container.querySelectorAll('[data-admin-card]').forEach((card) => card.remove());
+      items.forEach((item) => {
+        const card = template.content.firstElementChild.cloneNode(true);
+        card.dataset.eventId = item.id;
+        const titleEl = card.querySelector('[data-admin-title]');
+        const metaEl = card.querySelector('[data-admin-meta]');
+        if (titleEl) titleEl.textContent = item.title;
+        if (metaEl) metaEl.textContent = item.meta;
+        if (!withActions) {
+          const actions = card.querySelector('[data-admin-actions]');
+          if (actions) actions.remove();
+          updateStatus(card, 'admin_status_rejected', item.reason);
+        }
+        renderHistory(card, item.history || []);
+        container.appendChild(card);
+      });
+    };
+
+    const renderAudit = (items) => {
+      if (!auditContainer || !auditTemplate) return;
+      auditContainer.querySelectorAll('[data-admin-audit-row]').forEach((row) => row.remove());
+      if (!items || items.length === 0) {
+        if (auditEmptyEl) auditEmptyEl.hidden = false;
+        return;
       }
-    });
+      if (auditEmptyEl) auditEmptyEl.hidden = true;
+      items.forEach((entry) => {
+        const row = auditTemplate.content.firstElementChild.cloneNode(true);
+        const titleEl = row.querySelector('[data-admin-audit-title]');
+        const metaEl = row.querySelector('[data-admin-audit-meta]');
+        const statusEl = row.querySelector('[data-admin-audit-status]');
+        const reasonEl = row.querySelector('[data-admin-audit-reason]');
+        if (titleEl) titleEl.textContent = entry.title;
+        const actor = entry.actorEmail || '—';
+        const ts = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
+        if (metaEl) metaEl.textContent = `${actor} · ${ts}`;
+        const statusKey =
+          entry.action === 'approve' ? 'admin_status_approved' : 'admin_status_rejected';
+        if (statusEl) {
+          statusEl.textContent = formatMessage(statusKey, {});
+          statusEl.classList.remove('status-pill--pending');
+          statusEl.classList.add(
+            entry.action === 'approve' ? 'status-pill--published' : 'status-pill--draft'
+          );
+        }
+        if (reasonEl) {
+          if (entry.reason) {
+            const label = formatMessage('admin_reason_label', {});
+            reasonEl.textContent = `${label}: ${entry.reason}`;
+            reasonEl.hidden = false;
+          } else {
+            reasonEl.hidden = true;
+          }
+        }
+        auditContainer.appendChild(row);
+      });
+    };
+
+    const setEmptyState = (el, isEmpty) => {
+      if (!el) return;
+      el.hidden = !isEmpty;
+    };
+
+    const getAuthHeaders = () => {
+      const token = user?.token?.access_token;
+      return token ? { Authorization: `Bearer ${token}` } : {};
+    };
+
+    const loadModerationQueue = async () => {
+      if (loadingEl) loadingEl.hidden = false;
+      if (emptyEl) emptyEl.hidden = true;
+      if (rejectedEmptyEl) rejectedEmptyEl.hidden = true;
+      if (auditEmptyEl) auditEmptyEl.hidden = true;
+      try {
+        const lang = document.documentElement.lang || 'uk';
+        const response = await fetch(`/.netlify/functions/admin-events?lang=${encodeURIComponent(lang)}`, {
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders(), 'x-locale': lang }
+        });
+        if (!response.ok) {
+          throw new Error('admin events failed');
+        }
+        const result = await response.json();
+        const pending = Array.isArray(result?.pending) ? result.pending : [];
+        const rejected = Array.isArray(result?.rejected) ? result.rejected : [];
+        const audit = Array.isArray(result?.audit) ? result.audit : [];
+        renderCards(pendingContainer, pending, true);
+        renderCards(rejectedContainer, rejected, false);
+        setEmptyState(emptyEl, pending.length === 0);
+        setEmptyState(rejectedEmptyEl, rejected.length === 0);
+        if (superAdmin) {
+          renderAudit(audit);
+        }
+      } catch (error) {
+        setEmptyState(emptyEl, true);
+        setEmptyState(rejectedEmptyEl, true);
+        if (auditEmptyEl) auditEmptyEl.hidden = false;
+      } finally {
+        if (loadingEl) loadingEl.hidden = true;
+      }
+    };
+
+    const sendModerationAction = async (eventId, action, reason) => {
+      try {
+        await fetch('/.netlify/functions/admin-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ id: eventId, action, reason })
+        });
+      } catch (error) {
+        // Ignore network errors for optimistic UI.
+      }
+    };
+
+    if (pendingContainer) {
+      pendingContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const card = target.closest('[data-admin-card]');
+        if (!card) return;
+        const eventId = card.dataset.eventId || '';
+        if (target.dataset.action === 'approve') {
+          updateStatus(card, 'admin_status_approved');
+          sendModerationAction(eventId, 'approve');
+        }
+        if (target.dataset.action === 'reject') {
+          openModal(target, card);
+        }
+      });
+    }
 
     modalCloseButtons.forEach((button) => {
       button.addEventListener('click', () => {
@@ -2154,7 +2582,12 @@
           modalTextarea.reportValidity();
           return;
         }
-        updateStatus(activeCard, 'Rejected', modalTextarea.value.trim());
+        const reason = modalTextarea.value.trim();
+        updateStatus(activeCard, 'admin_status_rejected', reason);
+        sendModerationAction(activeCard.dataset.eventId || '', 'reject', reason);
+        if (superAdmin) {
+          loadModerationQueue();
+        }
         closeModal();
       });
     }
@@ -2178,15 +2611,21 @@
         first.focus();
       }
     });
-  }
+
+    loadModerationQueue();
+  };
+
+  setupAdminAuth();
 
   if (catalogGrid) {
     const filtersForm = document.querySelector('.filters');
     const resultsCount = document.querySelector('.filters__count');
     const emptyState = document.querySelector('.catalog-empty');
     const errorState = document.querySelector('.catalog-error');
-    const loadMoreButton = document.querySelector('.load-more__button');
+    const prevEventsButton = document.querySelector('[data-action="events-prev"]');
+    const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const searchInput = document.querySelector('#event-search');
+    const pastHint = document.querySelector('[data-past-hint]');
     const presetButtons = filtersForm ? Array.from(filtersForm.querySelectorAll('.filters__preset')) : [];
     const presetInputs = filtersForm
       ? {
@@ -2201,7 +2640,11 @@
     let events = [];
     let filteredEvents = [];
     let visibleCount = 0;
-    const pageSize = 12;
+    let windowOffset = 0;
+    const pageSize = 15;
+    const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
+    const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
+    const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
 
     const formatPrice = (event) => {
       if (event.priceType === 'free') {
@@ -2276,6 +2719,58 @@
       }
     };
 
+    const getWindowRange = (showPast) => {
+      const now = new Date();
+      if (showPast) {
+        const end = new Date(now);
+        end.setMonth(end.getMonth() - windowOffset);
+        const start = new Date(end);
+        start.setMonth(start.getMonth() - 1);
+        return { start, end };
+      }
+      const start = new Date(now);
+      start.setMonth(start.getMonth() + windowOffset);
+      const end = new Date(start);
+      end.setMonth(end.getMonth() + 1);
+      return { start, end };
+    };
+
+    const updateWindowButtons = (baseList, range) => {
+      if (!prevEventsButton || !nextEventsButton) return;
+      const showPast = filtersForm && filtersForm.elements['show-past']?.checked;
+      const hasPrev = showPast
+        ? baseList.some((event) => new Date(event.start) < range.start)
+        : windowOffset > 0 && baseList.some((event) => new Date(event.start) < range.start);
+      const hasNext = baseList.some((event) => new Date(event.start) >= range.end);
+      prevEventsButton.disabled = !hasPrev;
+      nextEventsButton.disabled = !hasNext;
+    };
+
+    const syncPastFilterState = (shouldClear) => {
+      if (!showPastField) return;
+      const isPast = Boolean(showPastField.checked);
+      if (dateFromField) {
+        dateFromField.disabled = isPast;
+        if (isPast && shouldClear) {
+          dateFromField.value = '';
+        }
+      }
+      if (dateToField) {
+        dateToField.disabled = isPast;
+        if (isPast && shouldClear) {
+          dateToField.value = '';
+        }
+      }
+      if (isPast && shouldClear) {
+        clearOtherDatePresets();
+        syncPresetButtons();
+        windowOffset = 0;
+      }
+      if (pastHint) {
+        pastHint.hidden = !isPast;
+      }
+    };
+
     updateCatalogI18n = () => {
       updateCount(filteredEvents.length);
     };
@@ -2336,17 +2831,18 @@
       if (hasError) {
         catalogGrid.innerHTML = '';
         updateCount(0);
-        if (loadMoreButton) {
-          loadMoreButton.hidden = true;
-          loadMoreButton.disabled = true;
+        if (prevEventsButton) {
+          prevEventsButton.disabled = true;
+        }
+        if (nextEventsButton) {
+          nextEventsButton.disabled = true;
         }
       }
     };
 
-    const matchesFilters = (event) => {
+    const matchesFilters = (event, formData) => {
       if (event.status !== 'published') return false;
-      if (!filtersForm) return true;
-      const formData = new FormData(filtersForm);
+      if (!filtersForm || !formData) return true;
       const dateFrom = formData.get('date-from');
       const dateTo = formData.get('date-to');
       const city = normalize(formData.get('city'));
@@ -2436,33 +2932,38 @@
     };
 
     const applyFilters = () => {
+      syncPastFilterState(false);
       setErrorState(false);
-      filteredEvents = events.filter(matchesFilters);
-      const showPast = filtersForm && filtersForm.elements['show-past']?.checked;
+      const formData = filtersForm ? new FormData(filtersForm) : null;
+      const baseList = events.filter((event) => matchesFilters(event, formData));
+      const showPast = formData?.get('show-past');
+      const hasDateFilter = Boolean(formData?.get('date-from') || formData?.get('date-to'));
+      const range = hasDateFilter ? null : getWindowRange(Boolean(showPast));
+      filteredEvents = range
+        ? baseList.filter((event) => {
+            const startDate = new Date(event.start);
+            return startDate >= range.start && startDate < range.end;
+          })
+        : baseList;
       if (showPast) {
         filteredEvents.sort((a, b) => {
           const aDate = new Date(a.end || a.start || 0).getTime();
           const bDate = new Date(b.end || b.start || 0).getTime();
           return bDate - aDate;
         });
+      } else {
+        filteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       visibleCount = Math.min(pageSize, filteredEvents.length);
       renderEvents(filteredEvents.slice(0, visibleCount));
-      if (loadMoreButton) {
-        const hasMore = visibleCount < filteredEvents.length;
-        loadMoreButton.hidden = !hasMore;
-        loadMoreButton.disabled = !hasMore;
+      if (range) {
+        updateWindowButtons(baseList, range);
       }
     };
 
-    const showMore = () => {
-      visibleCount = Math.min(visibleCount + pageSize, filteredEvents.length);
-      renderEvents(filteredEvents.slice(0, visibleCount));
-      if (loadMoreButton) {
-        const hasMore = visibleCount < filteredEvents.length;
-        loadMoreButton.hidden = !hasMore;
-        loadMoreButton.disabled = !hasMore;
-      }
+    const stepWindow = (direction) => {
+      windowOffset = Math.max(windowOffset + direction, 0);
+      applyFilters();
     };
 
     const getLocalDateString = (date) => date.toISOString().split('T')[0];
@@ -2533,7 +3034,7 @@
         };
         setValue('date-from', params.get('from') || '');
         setValue('date-to', params.get('to') || '');
-        setValue('city', params.get('city') || 'copenhagen');
+        setValue('city', params.get('city') || '');
         setValue('category', params.get('category') || '');
         setValue('price', params.get('price') || '');
         setValue('format', params.get('format') || '');
@@ -2693,6 +3194,9 @@
               formatField.value = 'online';
             }
           }
+          if (target === showPastField) {
+            syncPastFilterState(true);
+          }
           syncPresetButtons();
         }
         if (target instanceof HTMLInputElement && target.type === 'date') {
@@ -2719,6 +3223,7 @@
           if (searchInput) {
             searchInput.value = '';
           }
+          syncPastFilterState(true);
           syncPresetButtons();
           updateQueryParams();
           applyFilters();
@@ -2742,9 +3247,14 @@
       }
     }
 
-    if (loadMoreButton) {
-      loadMoreButton.addEventListener('click', () => {
-        showMore();
+    if (prevEventsButton) {
+      prevEventsButton.addEventListener('click', () => {
+        stepWindow(-1);
+      });
+    }
+    if (nextEventsButton) {
+      nextEventsButton.addEventListener('click', () => {
+        stepWindow(1);
       });
     }
 

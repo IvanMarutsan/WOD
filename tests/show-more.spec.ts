@@ -6,12 +6,12 @@ test('show more loads next batch without reload', async ({ page }) => {
   await page.goto('/');
   await page.waitForSelector('[data-testid="event-card"]', { state: 'visible' });
   await page.locator('select[name="city"]').selectOption({ index: 0 });
-  const before = await page.getByTestId('event-card').count();
 
-  const btn = page.locator('.load-more__button');
-  await expect(btn).toBeVisible();
-  await btn.click();
+  const firstTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+  const nextBtn = page.getByRole('button', { name: /Показати наступні події|Show next events|Vis næste/i });
+  await expect(nextBtn).toBeEnabled();
+  await nextBtn.click();
 
-  const after = await page.getByTestId('event-card').count();
-  expect(after).toBeGreaterThan(before);
+  const nextFirstTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+  expect(nextFirstTitle).not.toEqual(firstTitle);
 });

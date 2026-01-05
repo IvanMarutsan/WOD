@@ -4,17 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>What's on DK? — Події для українців у Данії</title>
-    <meta name="description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
-    <meta property="og:title" content="Evently — Каталог подій по всій Україні" />
-    <meta property="og:description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
+    <meta name="description" content="Події, зустрічі та спільноти для українців у Данії." />
+    <meta property="og:title" content="What's on DK? — Події для українців у Данії" />
+    <meta property="og:description" content="Події, зустрічі та спільноти для українців у Данії." />
     <meta property="og:type" content="website" />
     <!-- TODO: Replace OG image URL -->
     <meta property="og:image" content="static/og-placeholder-white.png" />
-    <meta property="og:url" content="https://example.com/index.html" />
+    <meta property="og:url" content="https://whatsondk.netlify.app/index.html" />
     <meta property="og:locale" content="uk_UA" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Evently — Каталог подій по всій Україні" />
-    <meta name="twitter:description" content="Placeholder: discover upcoming events, workshops, and meetups across Ukraine." />
+    <meta name="twitter:title" content="What's on DK? — Події для українців у Данії" />
+    <meta name="twitter:description" content="Події, зустрічі та спільноти для українців у Данії." />
     <meta name="twitter:image" content="static/og-placeholder-white.png" />
     <link rel="alternate" hreflang="uk" href="./index.html?lang=uk" />
     <link rel="alternate" hreflang="en" href="./index.html?lang=en" />
@@ -40,9 +40,9 @@
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
 <div class="lang-switch" role="group" aria-label="Мова" data-i18n-aria="lang_switch_aria">
-                    <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UK</button>
+                    <button class="lang-switch__button" type="button" data-lang="uk" data-testid="lang-uk" aria-pressed="true" aria-label="Обрати українську">UA</button>
           <button class="lang-switch__button" type="button" data-lang="en" data-testid="lang-en" aria-pressed="false" aria-label="Choose English">EN</button>
-          <button class="lang-switch__button" type="button" data-lang="da" data-testid="lang-da" aria-pressed="false" aria-label="Vælg dansk">DA</button>
+          <button class="lang-switch__button" type="button" data-lang="da" data-testid="lang-da" aria-pressed="false" aria-label="Vælg dansk">DK</button>
         </div>
         <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
         <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Перемкнути тему" data-i18n-aria="theme_toggle_aria">Світла</button>
@@ -202,12 +202,12 @@
                 <label class="filters__field">
                   <span data-i18n="filters_city">Місто</span>
                   <select name="city">
-                    <option value="" data-i18n="filters_all_cities">Усі міста</option>
-                    <option value="copenhagen" selected>Копенгаген</option>
-                    <option value="aarhus">Орхус</option>
-                    <option value="odense">Оденсе</option>
-                    <option value="aalborg">Ольборг</option>
-                    <option value="esbjerg">Есб'єрг</option>
+                    <option value="" selected data-i18n="filters_all_cities">Усі міста</option>
+                    <option value="copenhagen" data-i18n="filters_city_copenhagen">Копенгаген</option>
+                    <option value="aarhus" data-i18n="filters_city_aarhus">Орхус</option>
+                    <option value="odense" data-i18n="filters_city_odense">Оденсе</option>
+                    <option value="aalborg" data-i18n="filters_city_aalborg">Ольборг</option>
+                    <option value="esbjerg" data-i18n="filters_city_esbjerg">Есб'єрг</option>
                   </select>
                 </label>
                 <label class="filters__field">
@@ -283,6 +283,9 @@
                 <input type="checkbox" name="show-past" />
                 <span data-i18n="filters_past">Показати минулі</span>
               </label>
+              <p class="filters__hint" data-past-hint data-i18n="filters_past_hint" hidden>
+                Показати минулі події має пріоритет над датами, діапазон очищено.
+              </p>
               <p class="filters__count" aria-live="polite" role="status" data-i18n="found_count">N знайдено</p>
               <button class="btn ghost" type="reset" data-i18n="reset_filters">Скинути фільтри</button>
             </div>
@@ -307,8 +310,13 @@
               Повторити
             </button>
           </div>
-          <div class="load-more">
-            <button class="btn ghost load-more__button" type="button" data-i18n="cta_explore">Показати ще</button>
+          <div class="catalog-nav" aria-label="Навігація списку подій">
+            <button class="btn ghost" type="button" data-action="events-prev" data-i18n="events_prev">
+              Показати попередні події
+            </button>
+            <button class="btn ghost" type="button" data-action="events-next" data-i18n="events_next">
+              Показати наступні події
+            </button>
           </div>
         </div>
       </section>

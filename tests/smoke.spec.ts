@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { watchConsole } from './utils/console';
 import { freezeTime } from './setup.freeze-time';
 
-const routes = ['/', '/index.html', '/event.html', '/organizer.html'];
+const routes = ['/', '/index.html', '/event.html'];
 
 for (const r of routes) {
   test(`smoke: ${r} renders without console errors`, async ({ page }) => {

@@ -20,7 +20,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://identity.netlify.com; connect-src 'self' https://identity.netlify.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     Cache-Control = "public, max-age=300"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Referrer-Policy = "strict-origin-when-cross-origin"
