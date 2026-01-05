@@ -4,6 +4,7 @@ test('create event without end time', async ({ page }) => {
   await page.goto('/dashboard-new.html');
   // Step 1
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
+  await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description.');
   await page.getByLabel(/Категорія|Category|Kategori/i).selectOption({ index: 1 });
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
@@ -20,12 +21,20 @@ test('create event without end time', async ({ page }) => {
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 4: skip media
+  await page.locator('input[name="image"]').setInputFiles({
+    name: 'event.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4z8DwHwAE/wJ/lYt9NwAAAABJRU5ErkJggg==',
+      'base64'
+    )
+  });
   await page.locator('input[name="contact-name"]').fill('Olena K.');
   await page.locator('input[name="contact-email"]').fill('verify@example.com');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 5: Preview shows only start date/time
   const previewTime = page.locator('#preview-time');
-  await expect(previewTime).toContainText(/2030/);
-  await expect(previewTime).not.toContainText(/→/); // no end time range
+  await expect(previewTime).toContainText(/01\.05\.2030/);
+  await expect(previewTime).not.toContainText(/–/); // no end time range
 });

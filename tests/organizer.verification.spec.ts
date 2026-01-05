@@ -7,6 +7,7 @@ test('submission blocked until organizer is verified', async ({ page }) => {
 
   // Step 1: basics
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
+  await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description.');
   await page.getByLabel(/Категорія|Category|Kategori/i).selectOption({ index: 1 });
   const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
   await tagsInput.fill('design');
@@ -24,6 +25,14 @@ test('submission blocked until organizer is verified', async ({ page }) => {
   await next.click();
 
   // Step 4: contacts (required)
+  await page.locator('input[name="image"]').setInputFiles({
+    name: 'event.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4z8DwHwAE/wJ/lYt9NwAAAABJRU5ErkJggg==',
+      'base64'
+    )
+  });
   await page.locator('input[name="contact-name"]').fill('Olena K.');
   await page.locator('input[name="contact-email"]').fill('verify@example.com');
   await next.click();

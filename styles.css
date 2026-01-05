@@ -110,9 +110,9 @@ button:disabled,
   background: var(--bg);
   border-bottom: 1px solid var(--line);
   box-shadow: none;
-  --logo-min: 40px;
-  --logo-mid: 6vw;
-  --logo-max: 64px;
+  --logo-min: 58px;
+  --logo-mid: 8.6vw;
+  --logo-max: 92px;
 }
 
 .catalog {
@@ -125,7 +125,7 @@ button:disabled,
 
 .header__inner {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 16px;
   min-height: 64px;
@@ -221,6 +221,7 @@ button:disabled,
   display: flex;
   gap: 12px;
   align-items: center;
+  margin-left: auto;
 }
 
 .lang-switch {
@@ -2308,7 +2309,14 @@ body[data-admin-auth="denied"] [data-admin-protected] {
     border: none;
     padding: 0;
     gap: 24px;
-    margin-right: auto;
+    margin-right: 0;
+    order: 2;
+    margin-left: auto;
+  }
+
+  .header-utils {
+    order: 3;
+    margin-left: 12px;
   }
 
   .hero-search__field {
@@ -2359,7 +2367,7 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 
 @media (min-width: 900px) {
   :root {
-    --logo-max: 160px;
+    --logo-max: 230px;
   }
 
   .catalog-grid {

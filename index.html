@@ -41,7 +41,12 @@
         </nav>
         <div class="header-utils">
           <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-</div>
+          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
+            <option value="uk">UA</option>
+            <option value="en">EN</option>
+            <option value="da">DK</option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -78,20 +83,20 @@
               </p>
             </form>
           </div>
-          <div class="hero-card" role="presentation">
+          <a class="hero-card" data-hero-link href="./index.html#events">
             <div class="hero-card__header">
               <span>Next up</span>
               <span class="status">Live</span>
             </div>
             <div class="hero-card__body">
-              <p class="hero-card__title">Design Systems Meetup</p>
-              <p class="hero-card__meta">Kyiv · Fri 7:00 PM</p>
-              <div class="hero-card__tags">
+              <p class="hero-card__title" data-hero-title>Design Systems Meetup</p>
+              <p class="hero-card__meta" data-hero-meta>Kyiv · Fri 7:00 PM</p>
+              <div class="hero-card__tags" data-hero-tags>
                 <span>Community</span>
                 <span>Workshop</span>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 

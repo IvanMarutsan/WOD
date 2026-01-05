@@ -40,7 +40,12 @@
         </nav>
         <div class="header-utils">
           <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-</div>
+          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
+            <option value="uk">UA</option>
+            <option value="en">EN</option>
+            <option value="da">DK</option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -51,14 +56,7 @@
             <p class="eyebrow" data-i18n="dashboard_eyebrow">Робочий простір організатора</p>
             <h1 data-i18n="dashboard_title">Дашборд</h1>
           </div>
-          <a class="btn primary" href="#" data-i18n="dashboard_create_cta">Створити подію</a>
         </header>
-
-        <nav class="dashboard-tabs" aria-label="Розділи дашборду" data-i18n-aria="dashboard_tabs_aria">
-          <a class="dashboard-tabs__link" href="./dashboard.html#events" aria-current="page" data-i18n="dashboard_tab_events">Мої події</a>
-          <a class="dashboard-tabs__link" href="./dashboard.html#create" data-i18n="dashboard_tab_create">Створити подію</a>
-          <a class="dashboard-tabs__link" href="./dashboard.html#settings" data-i18n="dashboard_tab_settings">Налаштування</a>
-        </nav>
 
         <section id="events" class="dashboard__section" aria-labelledby="events-title">
           <header class="section-header">
@@ -115,7 +113,11 @@
             <div class="verification__option">
               <h3 data-i18n="verification_email_title">Верифікація через email</h3>
               <label class="form-field">
-                <span data-i18n="verification_email_label">Email для верифікації</span>
+                <span class="form-field__label">
+                  <span data-i18n="verification_email_label">Email для верифікації</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
                 <input type="email" name="verification-email" autocomplete="email" required />
                 <small data-i18n="verification_email_help">Ми надішлемо 6-значний код.</small>
               </label>
@@ -135,8 +137,12 @@
             <div class="verification__option">
               <h3 data-i18n="verification_link_title">Сайт або соцмережа</h3>
               <label class="form-field">
-                <span data-i18n="verification_link_label">Посилання</span>
-                <input type="url" name="verification-link" placeholder="https://example.com" />
+                <span class="form-field__label">
+                  <span data-i18n="verification_link_label">Посилання</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
+                <input type="url" name="verification-link" placeholder="https://example.com" required />
                 <small data-i18n="verification_link_help">Ми перевіримо вручну.</small>
               </label>
               <div class="verification__actions">

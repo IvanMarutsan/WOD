@@ -11,6 +11,7 @@ export async function createEventToPreview(page) {
 
   // Step 1: basics
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
+  await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description for preview.');
   await page.getByLabel(/Категорія|Category|Kategori/i).selectOption({ value: 'music' });
   const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
   await tagsInput.fill('Community');
@@ -31,6 +32,14 @@ export async function createEventToPreview(page) {
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 4: contacts
+  await page.locator('input[name="image"]').setInputFiles({
+    name: 'event.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4z8DwHwAE/wJ/lYt9NwAAAABJRU5ErkJggg==',
+      'base64'
+    )
+  });
   await page.getByLabel(/Організація|Organization|Organisation/i).fill('Community Hub');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 }

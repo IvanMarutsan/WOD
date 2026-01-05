@@ -173,6 +173,7 @@
       title_home: 'Події для українців у Данії',
       tagline: 'Концерти, зустрічі, освітні події — у містах Данії та онлайн.',
       hero_eyebrow: 'Найближчі події',
+      next_up_empty: 'Немає майбутніх подій за цим запитом.',
       nav_events: 'Події',
       nav_organizers: 'Організатори',
       nav_about: 'Про нас',
@@ -519,7 +520,7 @@
       verification_verify_code: 'Підтвердити код',
       verification_link_title: 'Сайт або соцмережа',
       verification_link_label: 'Посилання',
-      verification_link_help: 'Ми перевіримо вручну.',
+      verification_link_help: 'Обовʼязково. Ми перевіримо вручну.',
       verification_link_submit: 'Перевіримо вручну',
       verification_pending: 'Очікує підтвердження',
       verification_note: 'Для публікації подій потрібна верифікація організатора.',
@@ -600,6 +601,7 @@
       title_home: 'Events for Ukrainians in Denmark',
       tagline: 'Concerts, meetups, and education events — across Denmark and online.',
       hero_eyebrow: 'Upcoming experiences',
+      next_up_empty: 'No upcoming events match your filters.',
       nav_events: 'Events',
       nav_organizers: 'Organizers',
       nav_about: 'About',
@@ -946,7 +948,7 @@
       verification_verify_code: 'Confirm code',
       verification_link_title: 'Website or social link',
       verification_link_label: 'Link',
-      verification_link_help: 'We will review it manually.',
+      verification_link_help: 'Required. We will review it manually.',
       verification_link_submit: 'Submit for review',
       verification_pending: 'Pending review',
       verification_note: 'Verification requires email and a website/social link.',
@@ -1027,6 +1029,7 @@
       title_home: 'Begivenheder for ukrainere i Danmark',
       tagline: 'Koncerter, møder og læring — i byer i Danmark og online.',
       hero_eyebrow: 'Kommende oplevelser',
+      next_up_empty: 'Ingen kommende events matcher dine filtre.',
       nav_events: 'Begivenheder',
       nav_organizers: 'Arrangører',
       nav_about: 'Om',
@@ -1373,7 +1376,7 @@
       verification_verify_code: 'Bekræft kode',
       verification_link_title: 'Website eller sociale medier',
       verification_link_label: 'Link',
-      verification_link_help: 'Vi gennemgår den manuelt.',
+      verification_link_help: 'Påkrævet. Vi gennemgår den manuelt.',
       verification_link_submit: 'Send til gennemgang',
       verification_pending: 'Afventer godkendelse',
       verification_note: 'Bekræftelse kræver email og et website/socialt link.',
@@ -1579,6 +1582,24 @@
 
   const ADMIN_ROLES = ['admin', 'super_admin'];
   const UI_LOCALE_MAP = { uk: 'uk-UA', en: 'en-US', da: 'da-DK' };
+
+  const handleLanguageChange = (lang) => {
+    if (!lang) return;
+    applyTranslations(lang);
+    setStoredLang(lang);
+  };
+
+  langButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      handleLanguageChange(button.dataset.lang);
+    });
+  });
+
+  if (langSelect) {
+    langSelect.addEventListener('change', (event) => {
+      handleLanguageChange(event.target.value);
+    });
+  }
 
   const getUserRoles = (user) => {
     const roles = user?.app_metadata?.roles;
@@ -1968,7 +1989,8 @@
     const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
     window.history.replaceState({}, '', nextUrl);
   }
-  applyTranslations('uk');
+  const initialLang = getStoredLang() || 'uk';
+  applyTranslations(initialLang);
   injectEventJsonLd();
 
   const getPreferredTheme = () => {
@@ -2005,7 +2027,7 @@
   }
 
   if (langButtons.length || langSelect) {
-    setStoredLang('uk');
+    setStoredLang(initialLang);
   }
 
   const verificationSection = document.querySelector('[data-verification]');
@@ -2995,6 +3017,10 @@
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const resetEventsButton = document.querySelector('[data-action="events-reset"]');
     const searchInput = document.querySelector('#event-search');
+    const heroTitle = document.querySelector('[data-hero-title]');
+    const heroMeta = document.querySelector('[data-hero-meta]');
+    const heroTags = document.querySelector('[data-hero-tags]');
+    const heroLink = document.querySelector('[data-hero-link]');
     const pastHint = document.querySelector('[data-past-hint]');
     const advancedToggle = document.querySelector('[data-action="filters-advanced"]');
     const advancedPanel = document.querySelector('#filters-advanced');
@@ -3011,6 +3037,7 @@
     const errorRetryButton = errorState ? errorState.querySelector('[data-action="retry-load"]') : null;
     let events = [];
     let filteredEvents = [];
+    let currentFormData = null;
     let visibleCount = 0;
     let windowOffset = 0;
     const pageSize = 15;
@@ -3361,6 +3388,53 @@
       highlightsTrack.innerHTML = selection.map(buildHighlightCard).join('');
     };
 
+    const getNextUpcomingEvent = (formData) => {
+      if (!formData) return null;
+      const upcoming = events
+        .filter((event) => matchesFilters(event, formData, { ignorePastToggle: true }))
+        .filter((event) => {
+          const start = new Date(event.start);
+          return !Number.isNaN(start.getTime()) && start >= new Date();
+        })
+        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+      return upcoming[0] || null;
+    };
+
+    const renderNextUp = (event) => {
+      if (!heroTitle || !heroMeta || !heroTags) return;
+      if (!event) {
+        heroTitle.textContent = formatMessage('next_up_empty', {});
+        heroMeta.textContent = '';
+        heroTags.innerHTML = '';
+        heroTags.hidden = true;
+        if (heroLink) {
+          heroLink.setAttribute('href', './index.html#events');
+          heroLink.setAttribute('aria-disabled', 'true');
+        }
+        return;
+      }
+      const lang = document.documentElement.lang || 'uk';
+      const title = getLocalizedEventTitle(event, lang);
+      const city = getLocalizedCity(event.city, lang);
+      const timeLabel = formatDateRange(event.start, event.end);
+      heroTitle.textContent = title;
+      heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
+      const tagLabels = [];
+      if (event.category?.label) {
+        tagLabels.push(getLocalizedCategory(event.category.label, lang));
+      }
+      const firstTag = getTagList(event.tags)[0];
+      if (firstTag) {
+        tagLabels.push(getLocalizedTag(firstTag.label, lang));
+      }
+      heroTags.innerHTML = tagLabels.map((label) => `<span>${label}</span>`).join('');
+      heroTags.hidden = tagLabels.length === 0;
+      if (heroLink) {
+        heroLink.setAttribute('href', `event.html?id=${encodeURIComponent(event.id)}`);
+        heroLink.removeAttribute('aria-disabled');
+      }
+    };
+
     const buildCard = (event) => {
       const lang = document.documentElement.lang || 'uk';
       const image = event.images && event.images.length ? event.images[0] : '';
@@ -3475,6 +3549,7 @@
     updateCatalogI18n = () => {
       renderEvents(filteredEvents.slice(0, visibleCount));
       renderHighlights(events);
+      renderNextUp(getNextUpcomingEvent(currentFormData || (filtersForm ? new FormData(filtersForm) : null)));
     };
 
     const seenCards = new Set();
@@ -3554,7 +3629,8 @@
       }
     };
 
-    const matchesFilters = (event, formData) => {
+    const matchesFilters = (event, formData, options = {}) => {
+      const ignorePastToggle = options.ignorePastToggle;
       if (event.status !== 'published') return false;
       if (!filtersForm || !formData) return true;
       const lang = document.documentElement.lang || 'uk';
@@ -3574,8 +3650,12 @@
       const audienceVolunteer = formData.get('audience-volunteer');
       const searchValue = normalize(searchInput ? searchInput.value : '');
 
-      if (showPast) {
-        if (!isPast(event)) return false;
+      if (!ignorePastToggle) {
+        if (showPast) {
+          if (!isPast(event)) return false;
+        } else if (isPast(event)) {
+          return false;
+        }
       } else if (isPast(event)) {
         return false;
       }
@@ -3652,6 +3732,7 @@
       syncPastFilterState(false);
       setErrorState(false);
       const formData = filtersForm ? new FormData(filtersForm) : null;
+      currentFormData = formData;
       const baseList = events.filter((event) => matchesFilters(event, formData));
       const showPast = formData?.get('show-past');
       const hasDateFilter = Boolean(formData?.get('date-from') || formData?.get('date-to'));
@@ -3673,6 +3754,7 @@
       }
       visibleCount = Math.min(pageSize, filteredEvents.length);
       renderEvents(filteredEvents.slice(0, visibleCount));
+      renderNextUp(getNextUpcomingEvent(formData));
       if (range) {
         updateWindowButtons(baseList, range);
       } else if (resetEventsButton) {

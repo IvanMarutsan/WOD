@@ -8,12 +8,13 @@ test('create event flow reaches preview with expected data', async ({ page }) =>
 
   // Step 5: preview
   await expect(page.locator('#preview-title')).toContainText('Test meetup');
-  await expect(page.locator('#preview-category')).toContainText(/music/i);
+  await expect(page.locator('#preview-category')).toContainText(/music|музика|musik/i);
   await expect(page.locator('#preview-tags')).toContainText(/Community/i);
-  await expect(page.locator('#preview-time')).toContainText('2030-05-01T18:00');
-  await expect(page.locator('#preview-time')).toContainText('→');
+  await expect(page.locator('#preview-time')).toContainText(/01\.05\.2030/);
+  await expect(page.locator('#preview-time')).toContainText('18:00');
+  await expect(page.locator('#preview-time')).toContainText('20:00');
   await expect(page.locator('#preview-location')).toContainText('Copenhagen, Main St 10');
-  await expect(page.locator('#preview-tickets')).toContainText(/paid/i);
+  await expect(page.locator('#preview-tickets')).toContainText(/Платно|Paid|Betalt/i);
   await expect(page.locator('#preview-tickets')).toContainText(/50–120/);
-  await expect(page.locator('#preview-format')).toContainText(/offline/i);
+  await expect(page.locator('#preview-format')).toContainText(/Офлайн|Offline/i);
 });
