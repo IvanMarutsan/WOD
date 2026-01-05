@@ -10,25 +10,25 @@ export const handler = async (event: HandlerEvent) => {
     const store = getStore('wod-admin');
     if (event.body) {
       const payload = JSON.parse(event.body);
-      const email = String(payload.email || '').trim().toLowerCase();
       const link = String(payload.link || '').trim();
       const name = String(payload.name || '').trim();
-      if (!isNonEmptyString(email) || !isNonEmptyString(link)) {
+      if (!isNonEmptyString(link)) {
         return {
           statusCode: 400,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ok: false, error: 'invalid_payload' })
         };
       }
+      const linkKey = link.toLowerCase();
       const existing = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
       const requests = Array.isArray(existing) ? existing : [];
-      const hasPending = requests.some((req) => req.email === email && req.status === 'pending');
+      const hasPending = requests.some((req) => req.linkKey === linkKey && req.status === 'pending');
       if (!hasPending) {
         requests.unshift({
           id: `ver_${Date.now()}`,
-          email,
-          name: name || email,
           link,
+          linkKey,
+          name: name || link,
           status: 'pending',
           createdAt: new Date().toISOString()
         });
@@ -43,21 +43,22 @@ export const handler = async (event: HandlerEvent) => {
       };
     }
 
-    const email = String(event.queryStringParameters?.email || '').trim().toLowerCase();
-    if (!isNonEmptyString(email)) {
+    const link = String(event.queryStringParameters?.link || '').trim();
+    if (!isNonEmptyString(link)) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ok: false, error: 'missing_email' })
+        body: JSON.stringify({ ok: false, error: 'missing_link' })
       };
     }
+    const linkKey = link.toLowerCase();
     const organizers = (await store.get('organizers', { type: 'json' })) as any[] | null;
     const requests = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
     const verified = Array.isArray(organizers)
-      ? organizers.find((item) => item.email === email)
+      ? organizers.find((item) => item.linkKey === linkKey)
       : null;
     const pending = Array.isArray(requests)
-      ? requests.some((item) => item.email === email && item.status === 'pending')
+      ? requests.some((item) => item.linkKey === linkKey && item.status === 'pending')
       : false;
     return {
       statusCode: 200,

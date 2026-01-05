@@ -21,22 +21,22 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
     const payload = event.body ? JSON.parse(event.body) : {};
-    const email = String(payload.email || '').trim().toLowerCase();
     const action = String(payload.action || '').trim();
     const link = String(payload.link || '').trim();
     const name = String(payload.name || '').trim();
-    if (!email || !['approve', 'reject'].includes(action)) {
+    if (!link || !['approve', 'reject'].includes(action)) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ok: false, error: 'invalid_payload' })
       };
     }
+    const linkKey = link.toLowerCase();
 
     const store = getStore('wod-admin');
     const existingRequests = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
     const requests = Array.isArray(existingRequests) ? existingRequests : [];
-    const nextRequests = requests.filter((req) => req.email !== email || req.status !== 'pending');
+    const nextRequests = requests.filter((req) => req.linkKey !== linkKey || req.status !== 'pending');
     await store.set('verificationRequests', JSON.stringify(nextRequests), {
       contentType: 'application/json'
     });
@@ -44,11 +44,11 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (action === 'approve') {
       const existingOrganizers = (await store.get('organizers', { type: 'json' })) as any[] | null;
       const organizers = Array.isArray(existingOrganizers) ? existingOrganizers : [];
-      const existing = organizers.find((item) => item.email === email);
+      const existing = organizers.find((item) => item.linkKey === linkKey);
       const record = {
-        email,
-        name: name || email,
         link,
+        linkKey,
+        name: name || link,
         verifiedAt: new Date().toISOString()
       };
       if (existing) {

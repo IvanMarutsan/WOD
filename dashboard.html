@@ -109,31 +109,7 @@
           </header>
           <div class="verification" data-verification>
             <p class="verification__status" role="status" aria-live="polite"></p>
-            <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-            <div class="verification__option">
-              <h3 data-i18n="verification_email_title">Верифікація через email</h3>
-              <label class="form-field">
-                <span class="form-field__label">
-                  <span data-i18n="verification_email_label">Email для верифікації</span>
-                  <span class="required" aria-hidden="true">*</span>
-                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
-                </span>
-                <input type="email" name="verification-email" autocomplete="email" required />
-                <small data-i18n="verification_email_help">Ми надішлемо 6-значний код.</small>
-              </label>
-              <div class="verification__actions">
-                <button class="btn secondary" type="button" data-action="send-code" data-i18n="verification_send_code">Надіслати код</button>
-              </div>
-              <div class="verification__code" hidden>
-                <label class="form-field">
-                  <span data-i18n="verification_code_label">Код підтвердження</span>
-                  <input type="text" name="verification-code" inputmode="numeric" pattern="\\d{6}" maxlength="6" autocomplete="one-time-code" aria-describedby="verification-code-help" />
-                  <small id="verification-code-help" data-i18n="verification_code_help">Введіть 6 цифр із листа.</small>
-                </label>
-                <button class="btn primary" type="button" data-action="verify-code" data-i18n="verification_verify_code">Підтвердити код</button>
-              </div>
-            </div>
-
+            <input class="honeypot" type="text" name="company-website" tabindex="-1" autocomplete="off" aria-hidden="true" data-honeypot />
             <div class="verification__option">
               <h3 data-i18n="verification_link_title">Сайт або соцмережа</h3>
               <label class="form-field">

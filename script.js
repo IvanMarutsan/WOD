@@ -369,7 +369,7 @@
       docs_past_body_2: 'За потреби увімкніть фільтр “Показати минулі”, щоб переглянути архів.',
       docs_verification_title: 'Верифікація організаторів',
       docs_verification_body_1:
-        'Верифікація потрібна для публікації подій. Потрібно підтвердити email і додати сайт або соцмережі.',
+        'Верифікація потрібна для публікації подій. Додайте сайт або соцмережу для перевірки.',
       docs_verification_body_2: 'Після перевірки статус організатора змінюється на “Верифіковано”.',
       privacy_title: 'Політика конфіденційності',
       privacy_summary: 'Ми збираємо мінімум даних, потрібних для роботи платформи, і не використовуємо сторонні трекери.',
@@ -522,14 +522,14 @@
       verification_link_label: 'Посилання',
       verification_link_help: 'Обовʼязково. Ми перевіримо вручну.',
       verification_link_submit: 'Перевіримо вручну',
-      verification_pending: 'Очікує підтвердження',
-      verification_note: 'Для публікації подій потрібна верифікація організатора.',
-      verification_code_sent: 'Код надіслано. Перевірте пошту.',
-      verification_success: 'Email підтверджено. Додайте сайт або соцмережу для завершення.',
+      verification_pending: 'Запит на верифікацію надіслано.',
+      verification_note: 'Для публікації подій потрібна верифікація через сайт або соцмережу.',
+      verification_code_sent: 'Запит на верифікацію надіслано.',
+      verification_success: 'Запит на верифікацію надіслано.',
       verification_invalid_code: 'Невірний код. Спробуйте ще раз.',
       verification_error: 'Не вдалося виконати дію. Спробуйте пізніше.',
-      verification_blocked: 'Щоб опублікувати подію, підтвердьте email і додайте сайт або соцмережу.',
-      verification_banner_text: 'Потрібні email та сайт/соцмережа для верифікації організатора.',
+      verification_blocked: 'Щоб опублікувати подію, додайте сайт або соцмережу для верифікації.',
+      verification_banner_text: 'Для публікації подій потрібна верифікація через сайт або соцмережу.',
       verification_banner_action: 'Перейти до верифікації',
       submit_success: 'Подію надіслано на модерацію.',
       submit_error: 'Не вдалося надіслати подію. Спробуйте ще раз.',
@@ -797,7 +797,7 @@
       docs_past_body_2: 'Use the “Show past” filter to browse the archive.',
       docs_verification_title: 'Organizer verification',
       docs_verification_body_1:
-        'Verification is required to publish events. Confirm your email and add a website or social link.',
+        'Verification is required to publish events. Add a website or social link for review.',
       docs_verification_body_2: 'After review, the organizer status updates to “Verified”.',
       privacy_title: 'Privacy Policy',
       privacy_summary: 'We collect the minimum data needed to run the platform and do not use third-party trackers.',
@@ -950,14 +950,14 @@
       verification_link_label: 'Link',
       verification_link_help: 'Required. We will review it manually.',
       verification_link_submit: 'Submit for review',
-      verification_pending: 'Pending review',
-      verification_note: 'Verification requires email and a website/social link.',
-      verification_code_sent: 'Code sent. Check your inbox.',
-      verification_success: 'Email verified. Add a website or social link to finish.',
+      verification_pending: 'Verification request sent.',
+      verification_note: 'Verification requires a website or social link.',
+      verification_code_sent: 'Verification request sent.',
+      verification_success: 'Verification request sent.',
       verification_invalid_code: 'Invalid code. Try again.',
       verification_error: 'Action failed. Please try again.',
-      verification_blocked: 'Confirm email and add a website/social link before publishing.',
-      verification_banner_text: 'Email plus website/social link is required for verification.',
+      verification_blocked: 'Add a website or social link before publishing.',
+      verification_banner_text: 'A website or social link is required for verification.',
       verification_banner_action: 'Open verification',
       submit_success: 'Event submitted for moderation.',
       submit_error: 'Failed to submit the event. Please try again.',
@@ -1225,7 +1225,7 @@
       docs_past_body_2: 'Brug filteret “Vis tidligere” for at se arkivet.',
       docs_verification_title: 'Arrangørbekræftelse',
       docs_verification_body_1:
-        'Bekræftelse kræves for at udgive events. Bekræft din email og tilføj en hjemmeside eller et socialt link.',
+        'Bekræftelse kræves for at udgive events. Tilføj en hjemmeside eller et socialt link til gennemgang.',
       docs_verification_body_2: 'Efter gennemgang opdateres status til “Bekræftet”.',
       privacy_title: 'Privatlivspolitik',
       privacy_summary: 'Vi indsamler kun de data, der er nødvendige for platformen, og bruger ingen tredjeparts-trackere.',
@@ -1378,14 +1378,14 @@
       verification_link_label: 'Link',
       verification_link_help: 'Påkrævet. Vi gennemgår den manuelt.',
       verification_link_submit: 'Send til gennemgang',
-      verification_pending: 'Afventer godkendelse',
-      verification_note: 'Bekræftelse kræver email og et website/socialt link.',
-      verification_code_sent: 'Koden er sendt. Tjek din indbakke.',
-      verification_success: 'Email bekræftet. Tilføj et website eller socialt link for at færdiggøre.',
+      verification_pending: 'Bekræftelsesanmodning sendt.',
+      verification_note: 'Bekræftelse kræver et website eller socialt link.',
+      verification_code_sent: 'Bekræftelsesanmodning sendt.',
+      verification_success: 'Bekræftelsesanmodning sendt.',
       verification_invalid_code: 'Ugyldig kode. Prøv igen.',
       verification_error: 'Handling mislykkedes. Prøv igen senere.',
-      verification_blocked: 'Bekræft email og tilføj website/socialt link før udgivelse.',
-      verification_banner_text: 'Email + website/socialt link kræves for bekræftelse.',
+      verification_blocked: 'Tilføj et website eller socialt link før udgivelse.',
+      verification_banner_text: 'Et website eller socialt link kræves for bekræftelse.',
       verification_banner_action: 'Åbn bekræftelse',
       submit_success: 'Eventet er sendt til moderation.',
       submit_error: 'Kunne ikke sende eventet. Prøv igen.',
@@ -1581,6 +1581,7 @@
   };
 
   const ADMIN_ROLES = ['admin', 'super_admin'];
+  const ADMIN_SESSION_KEY = 'wodAdminSession';
   const UI_LOCALE_MAP = { uk: 'uk-UA', en: 'en-US', da: 'da-DK' };
 
   const handleLanguageChange = (lang) => {
@@ -1645,6 +1646,17 @@
 
     const setAuthState = (state) => {
       document.body.dataset.adminAuth = state;
+    };
+    const setAdminSession = (value) => {
+      try {
+        if (value) {
+          localStorage.setItem(ADMIN_SESSION_KEY, '1');
+        } else {
+          localStorage.removeItem(ADMIN_SESSION_KEY);
+        }
+      } catch (error) {
+        return;
+      }
     };
 
     const updateMeta = (user) => {
@@ -1725,6 +1737,7 @@
         if (logoutButton) logoutButton.hidden = true;
         updateMeta(null);
         setSuperAdminVisibility(false);
+        setAdminSession(false);
         if (isAdminPage) {
           window.location.href = getAdminLoginRedirect();
         }
@@ -1738,6 +1751,7 @@
         if (logoutButton) logoutButton.hidden = false;
         updateMeta(user);
         setSuperAdminVisibility(false);
+        setAdminSession(false);
         if (isLoginPage) {
           setStatus('admin_login_error');
         }
@@ -1750,6 +1764,7 @@
       if (logoutButton) logoutButton.hidden = false;
       updateMeta(user);
       setSuperAdminVisibility(isSuperAdmin(user));
+      setAdminSession(true);
 
       if (isLoginPage) {
         const redirect = searchParams.get('redirect') || './admin.html';
@@ -1816,18 +1831,17 @@
   };
 
   const VERIFICATION_KEY = 'organizerVerification';
-  const VERIFICATION_EMAIL_KEY = 'organizerVerificationEmail';
+  const VERIFICATION_LINK_KEY = 'organizerVerificationLink';
 
   const getVerificationState = () => {
     try {
       const stored = JSON.parse(localStorage.getItem(VERIFICATION_KEY) || '{}');
       return {
-        emailVerified: Boolean(stored.emailVerified),
         websitePending: Boolean(stored.websitePending),
         websiteApproved: Boolean(stored.websiteApproved)
       };
     } catch (error) {
-      return { emailVerified: false, websitePending: false, websiteApproved: false };
+      return { websitePending: false, websiteApproved: false };
     }
   };
 
@@ -1839,23 +1853,23 @@
     }
   };
 
-  const getStoredVerificationEmail = () => {
+  const getStoredVerificationLink = () => {
     try {
-      return localStorage.getItem(VERIFICATION_EMAIL_KEY) || '';
+      return localStorage.getItem(VERIFICATION_LINK_KEY) || '';
     } catch (error) {
       return '';
     }
   };
 
-  const setStoredVerificationEmail = (email) => {
+  const setStoredVerificationLink = (link) => {
     try {
-      localStorage.setItem(VERIFICATION_EMAIL_KEY, email);
+      localStorage.setItem(VERIFICATION_LINK_KEY, link);
     } catch (error) {
       return;
     }
   };
 
-  const isOrganizerVerified = (state) => state.emailVerified && state.websiteApproved;
+  const isOrganizerVerified = (state) => state.websiteApproved;
 
   const parseDateTime = (value) => {
     if (!value) return null;
@@ -2035,20 +2049,7 @@
     ? verificationSection.querySelector('.verification__status')
     : null;
   const verificationHoneypot = verificationSection
-    ? verificationSection.querySelector('input[name="website"]')
-    : null;
-  const emailInput = verificationSection
-    ? verificationSection.querySelector('input[name="verification-email"]')
-    : null;
-  const sendCodeButton = verificationSection
-    ? verificationSection.querySelector('[data-action="send-code"]')
-    : null;
-  const codeWrap = verificationSection ? verificationSection.querySelector('.verification__code') : null;
-  const codeInput = verificationSection
-    ? verificationSection.querySelector('input[name="verification-code"]')
-    : null;
-  const verifyCodeButton = verificationSection
-    ? verificationSection.querySelector('[data-action="verify-code"]')
+    ? verificationSection.querySelector('[data-honeypot]')
     : null;
   const linkInput = verificationSection
     ? verificationSection.querySelector('input[name="verification-link"]')
@@ -2060,7 +2061,6 @@
     ? verificationSection.querySelector('.verification__pending')
     : null;
   let verificationStatusKey = null;
-  let pendingCode = null;
 
   const setVerificationStatus = (key, isError = false) => {
     verificationStatusKey = key;
@@ -2079,11 +2079,11 @@
   };
 
   const syncVerificationWithServer = async () => {
-    const email = getStoredVerificationEmail();
-    if (!email) return;
+    const link = getStoredVerificationLink();
+    if (!link) return;
     try {
       const response = await fetch(
-        `/.netlify/functions/organizer-verification?email=${encodeURIComponent(email)}`
+        `/.netlify/functions/organizer-verification?link=${encodeURIComponent(link)}`
       );
       if (!response.ok) return;
       const result = await response.json();
@@ -2114,70 +2114,6 @@
     const state = getVerificationState();
     applyVerificationState(state);
     syncVerificationWithServer();
-    if (sendCodeButton && emailInput) {
-      sendCodeButton.addEventListener('click', async () => {
-        try {
-          if (!emailInput.checkValidity()) {
-            emailInput.reportValidity();
-            return;
-          }
-          setStoredVerificationEmail(emailInput.value.trim());
-          if (verificationHoneypot && verificationHoneypot.value.trim()) {
-            setVerificationStatus('verification_spam', true);
-            return;
-          }
-          const response = await fetch('/.netlify/functions/send-code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: emailInput.value,
-              website: verificationHoneypot ? verificationHoneypot.value : ''
-            })
-          });
-          if (response.ok) {
-            const result = await response.json();
-            pendingCode = result?.code || '123456';
-          } else {
-            pendingCode = '123456';
-          }
-          if (codeWrap) {
-            codeWrap.hidden = false;
-          }
-          setVerificationStatus('verification_code_sent', false);
-        } catch (error) {
-          pendingCode = '123456';
-          if (codeWrap) {
-            codeWrap.hidden = false;
-          }
-          setVerificationStatus('verification_code_sent', false);
-        }
-      });
-    }
-
-    if (verifyCodeButton && codeInput) {
-      verifyCodeButton.addEventListener('click', () => {
-        try {
-          if (!codeInput.checkValidity()) {
-            codeInput.reportValidity();
-            return;
-          }
-          if (!pendingCode || codeInput.value !== pendingCode) {
-            setVerificationStatus('verification_invalid_code', true);
-            return;
-          }
-          const nextState = { ...getVerificationState(), emailVerified: true };
-          saveVerificationState(nextState);
-          applyVerificationState(nextState);
-          setVerificationStatus('verification_success', false);
-          pendingCode = null;
-          codeInput.value = '';
-          updatePublishState();
-        } catch (error) {
-          setVerificationStatus('verification_error', true);
-        }
-      });
-    }
-
     if (linkSubmitButton && linkInput) {
       linkSubmitButton.addEventListener('click', async () => {
         try {
@@ -2185,18 +2121,18 @@
             linkInput.reportValidity();
             return;
           }
-          const email = getStoredVerificationEmail();
-          if (!email) {
-            setVerificationStatus('verification_error', true);
+          if (verificationHoneypot && verificationHoneypot.value.trim()) {
+            setVerificationStatus('verification_spam', true);
             return;
           }
+          const linkValue = linkInput.value.trim();
+          setStoredVerificationLink(linkValue);
           await fetch('/.netlify/functions/organizer-verification', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email,
-              link: linkInput.value.trim(),
-              name: email
+              link: linkValue,
+              name: linkValue
             })
           });
           const nextState = { ...getVerificationState(), websitePending: true, websiteApproved: false };
@@ -2334,7 +2270,14 @@
     const organizerId = multiStepForm.dataset.organizerId || 'org-001';
     let organizerStatus = 'none';
     let previewImageUrl = null;
-    const isAdminBypass = () => identityUser && hasAdminRole(identityUser);
+    const isAdminBypass = () => {
+      if (identityUser && hasAdminRole(identityUser)) return true;
+      try {
+        return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
+      } catch (error) {
+        return false;
+      }
+    };
 
     const initIdentitySession = () => {
       if (!window.netlifyIdentity) return;
@@ -2567,8 +2510,8 @@
       const verification = getVerificationState();
       if (isAdminBypass()) return 'admin';
       if (organizerStatus && organizerStatus !== 'none') return organizerStatus;
-      if (verification.emailVerified && verification.websiteApproved) return 'verified';
-      if (verification.emailVerified && verification.websitePending) return 'pending_manual';
+      if (verification.websiteApproved) return 'verified';
+      if (verification.websitePending) return 'pending_manual';
       return 'none';
     };
 
@@ -2797,15 +2740,14 @@
         const nameEl = row.querySelector('[data-admin-verification-name]');
         const metaEl = row.querySelector('[data-admin-verification-meta]');
         const linkEl = row.querySelector('[data-admin-verification-link]');
-        const email = item.email || '—';
+        const link = item.link || '—';
         const createdAt = item.createdAt
           ? new Date(item.createdAt).toLocaleString(getUiLocale())
           : '—';
-        row.dataset.email = email;
         row.dataset.link = item.link || '';
-        row.dataset.name = item.name || email;
-        if (nameEl) nameEl.textContent = item.name || email;
-        if (metaEl) metaEl.textContent = `${email} · ${createdAt}`;
+        row.dataset.name = item.name || link;
+        if (nameEl) nameEl.textContent = item.name || link;
+        if (metaEl) metaEl.textContent = createdAt;
         if (linkEl) {
           linkEl.href = item.link || '#';
           linkEl.textContent = item.link || '—';
@@ -2914,12 +2856,12 @@
       }
     };
 
-    const sendVerificationAction = async ({ email, link, name, action }) => {
+    const sendVerificationAction = async ({ link, name, action }) => {
       try {
         await fetch('/.netlify/functions/admin-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ email, link, name, action })
+          body: JSON.stringify({ link, name, action })
         });
       } catch (error) {
         // Ignore network errors for optimistic UI.
@@ -2950,10 +2892,9 @@
         if (target.dataset.action !== 'approve-verification') return;
         const card = target.closest('[data-admin-verification-row]');
         if (!card) return;
-        const email = card.dataset.email || '';
         const link = card.dataset.link || '';
         const name = card.dataset.name || '';
-        sendVerificationAction({ email, link, name, action: 'approve' });
+        sendVerificationAction({ link, name, action: 'approve' });
         card.remove();
         const remaining =
           verificationContainer.querySelectorAll('[data-admin-verification-row]').length === 0;
