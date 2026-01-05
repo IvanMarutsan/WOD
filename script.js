@@ -396,7 +396,6 @@
       filters_city_odense: 'Оденсе',
       filters_city_aalborg: 'Ольборг',
       filters_city_esbjerg: "Есб'єрг",
-      events_prev: 'Показати попередні події',
       events_next: 'Показати наступні події',
       filters_category: 'Категорія',
       filters_all_categories: 'Усі категорії',
@@ -799,7 +798,6 @@
       filters_city_odense: 'Odense',
       filters_city_aalborg: 'Aalborg',
       filters_city_esbjerg: 'Esbjerg',
-      events_prev: 'Show previous events',
       events_next: 'Show next events',
       filters_category: 'Category',
       filters_all_categories: 'All categories',
@@ -1202,7 +1200,6 @@
       filters_city_odense: 'Odense',
       filters_city_aalborg: 'Aalborg',
       filters_city_esbjerg: 'Esbjerg',
-      events_prev: 'Vis tidligere events',
       events_next: 'Vis næste events',
       filters_category: 'Kategori',
       filters_all_categories: 'Alle kategorier',
@@ -2622,7 +2619,6 @@
     const resultsCount = document.querySelector('.filters__count');
     const emptyState = document.querySelector('.catalog-empty');
     const errorState = document.querySelector('.catalog-error');
-    const prevEventsButton = document.querySelector('[data-action="events-prev"]');
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const searchInput = document.querySelector('#event-search');
     const pastHint = document.querySelector('[data-past-hint]');
@@ -2736,13 +2732,8 @@
     };
 
     const updateWindowButtons = (baseList, range) => {
-      if (!prevEventsButton || !nextEventsButton) return;
-      const showPast = filtersForm && filtersForm.elements['show-past']?.checked;
-      const hasPrev = showPast
-        ? baseList.some((event) => new Date(event.start) < range.start)
-        : windowOffset > 0 && baseList.some((event) => new Date(event.start) < range.start);
+      if (!nextEventsButton) return;
       const hasNext = baseList.some((event) => new Date(event.start) >= range.end);
-      prevEventsButton.disabled = !hasPrev;
       nextEventsButton.disabled = !hasNext;
     };
 
@@ -2831,8 +2822,8 @@
       if (hasError) {
         catalogGrid.innerHTML = '';
         updateCount(0);
-        if (prevEventsButton) {
-          prevEventsButton.disabled = true;
+        if (nextEventsButton) {
+          nextEventsButton.disabled = true;
         }
         if (nextEventsButton) {
           nextEventsButton.disabled = true;
@@ -3247,11 +3238,6 @@
       }
     }
 
-    if (prevEventsButton) {
-      prevEventsButton.addEventListener('click', () => {
-        stepWindow(-1);
-      });
-    }
     if (nextEventsButton) {
       nextEventsButton.addEventListener('click', () => {
         stepWindow(1);
