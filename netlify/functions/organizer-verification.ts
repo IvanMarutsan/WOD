@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getAdminStore } from './blob-store';
 
 type HandlerEvent = { body?: string; queryStringParameters?: Record<string, string> };
 
@@ -7,7 +7,7 @@ const isNonEmptyString = (value: unknown) =>
 
 export const handler = async (event: HandlerEvent) => {
   try {
-    const store = getStore('wod-admin');
+    const store = getAdminStore();
     if (event.body) {
       const payload = JSON.parse(event.body);
       const link = String(payload.link || '').trim();

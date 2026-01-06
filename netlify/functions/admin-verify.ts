@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getAdminStore } from './blob-store';
 
 type HandlerEvent = { body?: string };
 type HandlerContext = { clientContext?: { user?: { email?: string; app_metadata?: { roles?: string[] } } } };
@@ -33,7 +33,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
     const linkKey = link.toLowerCase();
 
-    const store = getStore('wod-admin');
+    const store = getAdminStore();
     const existingRequests = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
     const requests = Array.isArray(existingRequests) ? existingRequests : [];
     const nextRequests = requests.filter((req) => req.linkKey !== linkKey || req.status !== 'pending');

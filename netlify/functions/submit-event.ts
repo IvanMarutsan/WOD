@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getAdminStore } from './blob-store';
 import { pruneEvents } from './admin-storage';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
@@ -55,10 +55,6 @@ const parseTags = (value: unknown) => {
 
 export const handler = async (event: HandlerEvent) => {
   try {
-    console.log('submit-event env', {
-      hasSiteId: Boolean(process.env.NETLIFY_BLOBS_SITE_ID),
-      hasToken: Boolean(process.env.NETLIFY_BLOBS_TOKEN)
-    });
     const payload = event.body ? JSON.parse(event.body) : {};
     const ip = getClientIp(event.headers || {});
     if (isRateLimited(ip)) {
@@ -101,7 +97,7 @@ export const handler = async (event: HandlerEvent) => {
     }
 
     const id = `evt_${Date.now()}`;
-    const store = getStore('wod-admin');
+    const store = getAdminStore();
     const existing = (await store.get('events', { type: 'json' })) as any[] | null;
     const events = Array.isArray(existing) ? existing : [];
     const title = payload.title || payload.name || payload.eventTitle || 'Untitled event';

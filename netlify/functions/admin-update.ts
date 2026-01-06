@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { getAdminStore } from './blob-store';
 import { pruneAudit, pruneEvents } from './admin-storage';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
@@ -43,7 +43,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    const store = getStore('wod-admin');
+    const store = getAdminStore();
     const existing = (await store.get('events', { type: 'json' })) as any[] | null;
     const events = Array.isArray(existing) ? existing : [];
     const idx = events.findIndex((evt) => evt.id === id);
