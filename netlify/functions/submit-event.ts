@@ -2,6 +2,7 @@ import { getAdminStore } from './blob-store';
 import { pruneEvents } from './admin-storage';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
+type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
 
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5;
@@ -53,7 +54,14 @@ const parseTags = (value: unknown) => {
     .filter(Boolean);
 };
 
-export const handler = async (event: HandlerEvent) => {
+const getRoles = (context: HandlerContext) => {
+  const roles = context.clientContext?.user?.app_metadata?.roles;
+  return Array.isArray(roles) ? roles : [];
+};
+
+const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
+
+export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const payload = event.body ? JSON.parse(event.body) : {};
     const ip = getClientIp(event.headers || {});
@@ -102,7 +110,9 @@ export const handler = async (event: HandlerEvent) => {
     const events = Array.isArray(existing) ? existing : [];
     const title = payload.title || payload.name || payload.eventTitle || 'Untitled event';
     const createdAt = new Date().toISOString();
-    const status = payload.status === 'approved' ? 'approved' : 'pending';
+    const roles = getRoles(context);
+    const canApprove = hasAdminRole(roles);
+    const status = canApprove && payload.status === 'approved' ? 'approved' : 'pending';
     const eventRecord = {
       id,
       title,
