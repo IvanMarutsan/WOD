@@ -35,6 +35,14 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
+    if (!['approve', 'reject', 'edit'].includes(action)) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ok: false, error: 'invalid_action' })
+      };
+    }
+
     if (action === 'reject' && !reason) {
       return {
         statusCode: 400,
@@ -62,6 +70,26 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const historyEntry = { action, reason, actorEmail, actorRole, ts };
 
     const eventRecord = { ...events[idx] };
+    if (action === 'edit') {
+      const incoming = payload.payload && typeof payload.payload === 'object' ? payload.payload : {};
+      const nextPayload = { ...(eventRecord.payload || {}), ...incoming };
+      eventRecord.payload = nextPayload;
+      if (nextPayload.title) eventRecord.title = String(nextPayload.title);
+      if (nextPayload.city) eventRecord.city = String(nextPayload.city);
+      if (nextPayload.start) eventRecord.start = String(nextPayload.start);
+      eventRecord.end = nextPayload.end ? String(nextPayload.end) : '';
+      eventRecord.updatedAt = ts;
+      events[idx] = eventRecord;
+      const prunedEvents = pruneEvents(events);
+      await store.set('events', JSON.stringify(prunedEvents), { contentType: 'application/json' });
+      console.log('admin-update edit', { id, actorEmail });
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ok: true })
+      };
+    }
+
     eventRecord.status = action === 'approve' ? 'approved' : 'rejected';
     eventRecord.updatedAt = ts;
     eventRecord.lastReason = reason || '';

@@ -77,6 +77,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
         id: event.id,
         title: event.title || 'Untitled event',
         meta: formatMeta(event, locale),
+        payload: event.payload || {},
         history: Array.isArray(event.reasonHistory) ? event.reasonHistory : []
       }));
     const rejected = roles.includes('super_admin')
@@ -87,6 +88,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
             title: event.title || 'Untitled event',
             meta: formatMeta(event, locale),
             reason: event.lastReason || '',
+            payload: event.payload || {},
             history: Array.isArray(event.reasonHistory) ? event.reasonHistory : []
           }))
       : [];

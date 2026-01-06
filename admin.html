@@ -132,6 +132,7 @@
           </details>
         </div>
         <div class="moderation-card__actions" data-admin-actions>
+          <button class="btn ghost" type="button" data-action="view" data-i18n="admin_action_view">Переглянути</button>
           <button class="btn primary" type="button" data-action="approve" data-i18n="admin_action_approve">Схвалити</button>
           <button class="btn ghost" type="button" data-action="reject" data-i18n="admin_action_reject">Відхилити</button>
         </div>
@@ -178,6 +179,112 @@
         <div class="modal__actions">
           <button class="btn ghost" type="button" data-modal-close data-i18n="admin_modal_cancel">Скасувати</button>
           <button class="btn primary" type="button" data-modal-confirm data-i18n="admin_modal_reject">Відхилити</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" hidden data-admin-edit-modal>
+      <div class="modal__overlay" data-admin-edit-close></div>
+      <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="edit-title" aria-describedby="edit-help">
+        <h2 id="edit-title" data-i18n="admin_edit_title">Редагувати подію</h2>
+        <p id="edit-help" data-i18n="admin_edit_help">Внесіть зміни та збережіть.</p>
+        <form class="form-grid admin-edit" data-admin-edit-form>
+          <label class="form-field form-field--full">
+            <span>Назва</span>
+            <input type="text" name="title" required />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Опис</span>
+            <textarea name="description" rows="4"></textarea>
+          </label>
+          <label class="form-field">
+            <span>Категорія</span>
+            <input type="text" name="category" />
+          </label>
+          <label class="form-field">
+            <span>Теги</span>
+            <input type="text" name="tags" placeholder="tag1, tag2" />
+          </label>
+          <label class="form-field">
+            <span>Початок</span>
+            <input type="datetime-local" name="start" />
+          </label>
+          <label class="form-field">
+            <span>Завершення</span>
+            <input type="datetime-local" name="end" />
+          </label>
+          <label class="form-field">
+            <span>Формат</span>
+            <select name="format">
+              <option value="">Оберіть формат</option>
+              <option value="offline">Офлайн</option>
+              <option value="online">Онлайн</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Місто</span>
+            <input type="text" name="city" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Адреса</span>
+            <input type="text" name="address" />
+          </label>
+          <label class="form-field">
+            <span>Тип квитків</span>
+            <select name="ticket-type">
+              <option value="">Оберіть тип</option>
+              <option value="free">Безкоштовно</option>
+              <option value="paid">Платно</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Мін. ціна</span>
+            <input type="number" name="price-min" min="0" />
+          </label>
+          <label class="form-field">
+            <span>Макс. ціна</span>
+            <input type="number" name="price-max" min="0" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Посилання на квитки</span>
+            <input type="url" name="ticket-url" />
+          </label>
+          <label class="form-field">
+            <span>Організатор</span>
+            <input type="text" name="contact-name" />
+          </label>
+          <label class="form-field">
+            <span>Email</span>
+            <input type="email" name="contact-email" />
+          </label>
+          <label class="form-field">
+            <span>Телефон</span>
+            <input type="tel" name="contact-phone" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Facebook</span>
+            <input type="url" name="contact-facebook" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Instagram</span>
+            <input type="url" name="contact-instagram" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Telegram</span>
+            <input type="url" name="contact-telegram" />
+          </label>
+          <label class="form-field form-field--full">
+            <span>Сайт</span>
+            <input type="url" name="contact-website" />
+          </label>
+          <div class="form-field form-field--full">
+            <span data-i18n="admin_edit_links">Посилання організатора</span>
+            <div class="admin-edit__links" data-admin-edit-links></div>
+          </div>
+        </form>
+        <div class="modal__actions">
+          <button class="btn ghost" type="button" data-admin-edit-close data-i18n="admin_edit_cancel">Скасувати</button>
+          <button class="btn primary" type="button" data-admin-edit-save data-i18n="admin_edit_save">Зберегти зміни</button>
         </div>
       </div>
     </div>

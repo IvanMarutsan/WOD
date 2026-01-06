@@ -168,6 +168,46 @@
     document.head.appendChild(script);
   };
 
+  const fetchJson = async (url) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to load ${url}`);
+    }
+    return response.json();
+  };
+
+  const fetchMergedEvents = async () => {
+    let baseData = null;
+    let publicData = null;
+    let baseError = null;
+    let publicError = null;
+    try {
+      baseData = await fetchJson('./data/events.json');
+    } catch (error) {
+      baseError = error;
+    }
+    try {
+      publicData = await fetchJson('/.netlify/functions/public-events');
+    } catch (error) {
+      publicError = error;
+    }
+    if (!baseData && !publicData) {
+      throw baseError || publicError || new Error('events');
+    }
+    const map = new Map();
+    if (Array.isArray(baseData)) {
+      baseData.forEach((event) => {
+        if (event?.id) map.set(event.id, event);
+      });
+    }
+    if (Array.isArray(publicData)) {
+      publicData.forEach((event) => {
+        if (event?.id) map.set(event.id, event);
+      });
+    }
+    return Array.from(map.values());
+  };
+
   const translations = {
     uk: {
       title_home: 'Події для українців у Данії',
@@ -234,8 +274,14 @@
       admin_status_pending: 'На розгляді',
       admin_status_approved: 'Схвалено',
       admin_status_rejected: 'Відхилено',
+      admin_action_view: 'Переглянути',
       admin_action_approve: 'Схвалити',
       admin_action_reject: 'Відхилити',
+      admin_edit_title: 'Редагувати подію',
+      admin_edit_help: 'Внесіть зміни та збережіть.',
+      admin_edit_save: 'Зберегти зміни',
+      admin_edit_cancel: 'Скасувати',
+      admin_edit_links: 'Посилання організатора',
       admin_modal_title: 'Відхилити подію',
       admin_modal_help: 'Вкажіть коротку причину відхилення.',
       admin_modal_reason_label: 'Причина',
@@ -662,8 +708,14 @@
       admin_status_pending: 'Pending',
       admin_status_approved: 'Approved',
       admin_status_rejected: 'Rejected',
+      admin_action_view: 'View',
       admin_action_approve: 'Approve',
       admin_action_reject: 'Reject',
+      admin_edit_title: 'Edit event',
+      admin_edit_help: 'Review details and save updates.',
+      admin_edit_save: 'Save changes',
+      admin_edit_cancel: 'Cancel',
+      admin_edit_links: 'Organizer links',
       admin_modal_title: 'Reject event',
       admin_modal_help: 'Provide a short reason for rejection.',
       admin_modal_reason_label: 'Reason',
@@ -1090,8 +1142,14 @@
       admin_status_pending: 'Afventer',
       admin_status_approved: 'Godkendt',
       admin_status_rejected: 'Afvist',
+      admin_action_view: 'Se',
       admin_action_approve: 'Godkend',
       admin_action_reject: 'Afvis',
+      admin_edit_title: 'Rediger event',
+      admin_edit_help: 'Gennemgå detaljer og gem ændringer.',
+      admin_edit_save: 'Gem ændringer',
+      admin_edit_cancel: 'Annuller',
+      admin_edit_links: 'Arrangør-links',
       admin_modal_title: 'Afvis event',
       admin_modal_help: 'Angiv en kort begrundelse for afvisning.',
       admin_modal_reason_label: 'Begrundelse',
@@ -2656,8 +2714,19 @@
     const modalTextarea = modal.querySelector('textarea[name="reject-reason"]');
     const modalCloseButtons = modal.querySelectorAll('[data-modal-close]');
     const modalConfirm = modal.querySelector('[data-modal-confirm]');
+    const editModal = document.querySelector('[data-admin-edit-modal]');
+    const editDialog = editModal?.querySelector('.modal__dialog');
+    const editForm = editModal?.querySelector('[data-admin-edit-form]');
+    const editLinks = editModal?.querySelector('[data-admin-edit-links]');
+    const editCloseButtons = editModal
+      ? editModal.querySelectorAll('[data-admin-edit-close]')
+      : [];
+    const editSave = editModal?.querySelector('[data-admin-edit-save]');
     let activeCard = null;
     let lastTrigger = null;
+    let activeEditId = null;
+    let lastEditTrigger = null;
+    const pendingById = new Map();
 
     const focusableSelector =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -2677,6 +2746,89 @@
       activeCard = null;
       if (lastTrigger) {
         lastTrigger.focus();
+      }
+    };
+
+    const closeEditModal = () => {
+      if (!editModal) return;
+      editModal.hidden = true;
+      activeEditId = null;
+      if (lastEditTrigger) {
+        lastEditTrigger.focus();
+      }
+    };
+
+    const normalizeUrl = (value) => {
+      const trimmed = String(value || '').trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return `https://${trimmed}`;
+    };
+
+    const renderEditLinks = (payload) => {
+      if (!editLinks) return;
+      const entries = [
+        { label: 'Website', value: payload['contact-website'] || payload.website },
+        { label: 'Instagram', value: payload['contact-instagram'] },
+        { label: 'Facebook', value: payload['contact-facebook'] },
+        { label: 'Telegram', value: payload['contact-telegram'] }
+      ]
+        .map((entry) => ({ ...entry, url: normalizeUrl(entry.value) }))
+        .filter((entry) => entry.url);
+      if (!entries.length) {
+        editLinks.innerHTML = '<span class="admin-edit__links-empty">Немає посилань.</span>';
+        return;
+      }
+      editLinks.innerHTML = entries
+        .map(
+          (entry) =>
+            `<a class="admin-edit__link" href="${entry.url}" target="_blank" rel="noopener">${entry.label}</a>`
+        )
+        .join('');
+    };
+
+    const openEditModal = (triggerButton, item) => {
+      if (!editModal || !editForm) return;
+      const payload = item?.payload || {};
+      activeEditId = item?.id || null;
+      lastEditTrigger = triggerButton;
+      const setValue = (name, value) => {
+        const field = editForm.querySelector(`[name="${CSS.escape(name)}"]`);
+        if (!field) return;
+        if (
+          field instanceof HTMLInputElement ||
+          field instanceof HTMLTextAreaElement ||
+          field instanceof HTMLSelectElement
+        ) {
+          field.value = value ?? '';
+        }
+      };
+      setValue('title', payload.title || item?.title || '');
+      setValue('description', payload.description || '');
+      setValue('category', payload.category || '');
+      const tagsValue = Array.isArray(payload.tags) ? payload.tags.join(', ') : payload.tags || '';
+      setValue('tags', tagsValue);
+      setValue('start', payload.start || '');
+      setValue('end', payload.end || '');
+      setValue('format', payload.format || '');
+      setValue('address', payload.address || '');
+      setValue('city', payload.city || '');
+      setValue('ticket-type', payload['ticket-type'] || '');
+      setValue('price-min', payload['price-min'] || '');
+      setValue('price-max', payload['price-max'] || '');
+      setValue('ticket-url', payload['ticket-url'] || '');
+      setValue('contact-name', payload['contact-name'] || '');
+      setValue('contact-email', payload['contact-email'] || '');
+      setValue('contact-phone', payload['contact-phone'] || '');
+      setValue('contact-facebook', payload['contact-facebook'] || '');
+      setValue('contact-instagram', payload['contact-instagram'] || '');
+      setValue('contact-telegram', payload['contact-telegram'] || '');
+      setValue('contact-website', payload['contact-website'] || '');
+      renderEditLinks(payload);
+      editModal.hidden = false;
+      const firstField = editForm.querySelector('input, textarea, select');
+      if (firstField instanceof HTMLElement) {
+        firstField.focus();
       }
     };
 
@@ -2839,6 +2991,10 @@
         const rejected = Array.isArray(result?.rejected) ? result.rejected : [];
         const audit = Array.isArray(result?.audit) ? result.audit : [];
         const verifications = Array.isArray(result?.verifications) ? result.verifications : [];
+        pendingById.clear();
+        pending.forEach((item) => {
+          if (item?.id) pendingById.set(item.id, item);
+        });
         renderCards(pendingContainer, pending, true);
         renderCards(rejectedContainer, rejected, false);
         renderVerifications(verifications);
@@ -2858,12 +3014,16 @@
       }
     };
 
-    const sendModerationAction = async (eventId, action, reason) => {
+    const sendModerationAction = async (eventId, action, reason, payload) => {
       try {
+        const body = { id: eventId, action, reason };
+        if (payload && typeof payload === 'object') {
+          body.payload = payload;
+        }
         await fetch('/.netlify/functions/admin-update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ id: eventId, action, reason })
+          body: JSON.stringify(body)
         });
       } catch (error) {
         // Ignore network errors for optimistic UI.
@@ -2889,9 +3049,16 @@
         const card = target.closest('[data-admin-card]');
         if (!card) return;
         const eventId = card.dataset.eventId || '';
+        if (target.dataset.action === 'view') {
+          const item = pendingById.get(eventId);
+          if (item) {
+            openEditModal(target, item);
+          }
+          return;
+        }
         if (target.dataset.action === 'approve') {
           updateStatus(card, 'admin_status_approved');
-          sendModerationAction(eventId, 'approve');
+          sendModerationAction(eventId, 'approve').then(loadModerationQueue);
         }
         if (target.dataset.action === 'reject') {
           openModal(target, card);
@@ -2931,10 +3098,9 @@
         }
         const reason = modalTextarea.value.trim();
         updateStatus(activeCard, 'admin_status_rejected', reason);
-        sendModerationAction(activeCard.dataset.eventId || '', 'reject', reason);
-        if (superAdmin) {
-          loadModerationQueue();
-        }
+        sendModerationAction(activeCard.dataset.eventId || '', 'reject', reason).then(
+          loadModerationQueue
+        );
         closeModal();
       });
     }
@@ -2958,6 +3124,47 @@
         first.focus();
       }
     });
+
+    editCloseButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        closeEditModal();
+      });
+    });
+
+    if (editSave) {
+      editSave.addEventListener('click', () => {
+        if (!editForm || !activeEditId) return;
+        const formData = new FormData(editForm);
+        const updatedPayload = {};
+        formData.forEach((value, key) => {
+          updatedPayload[key] = String(value).trim();
+        });
+        sendModerationAction(activeEditId, 'edit', '', updatedPayload).then(loadModerationQueue);
+        closeEditModal();
+      });
+    }
+
+    if (editDialog && editModal) {
+      editModal.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeEditModal();
+          return;
+        }
+        if (event.key !== 'Tab') return;
+        const focusable = Array.from(editDialog.querySelectorAll(focusableSelector));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    }
 
     loadModerationQueue();
   };
@@ -3397,6 +3604,9 @@
       const isFree = event.priceType === 'free';
       const pastEvent = isPast(event);
       const title = getLocalizedEventTitle(event, lang);
+      const imageMarkup = image
+        ? `<img class="event-card__image" src="${image}" alt="${title}" loading="lazy" width="800" height="540" />`
+        : '<div class="event-card__image event-card__image--placeholder" aria-hidden="true"></div>';
       const cardClass = `event-card ${isFree ? 'event-card--free' : 'event-card--paid'}${
         pastEvent ? ' event-card--archived' : ''
       }`;
@@ -3440,7 +3650,7 @@
       const detailUrl = `event.html?id=${encodeURIComponent(event.id)}`;
       const cityLabel = getLocalizedCity(event.city, lang);
       const location = `${cityLabel} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          <img class=\"event-card__image\" src=\"${image}\" alt=\"${title}\" loading=\"lazy\" width=\"800\" height=\"540\" />\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"${detailUrl}\">${title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <div class=\"event-card__actions\">\n              <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n              <a class=\"event-card__cta event-card__cta--details\" href=\"${detailUrl}\" data-i18n=\"cta_details\">${formatMessage('cta_details', {})}</a>\n            </div>\n          </div>\n        </article>\n      `;
+      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          ${imageMarkup}\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"${detailUrl}\">${title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <div class=\"event-card__actions\">\n              <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n              <a class=\"event-card__cta event-card__cta--details\" href=\"${detailUrl}\" data-i18n=\"cta_details\">${formatMessage('cta_details', {})}</a>\n            </div>\n          </div>\n        </article>\n      `;
     };
 
     const updateCount = (count) => {
@@ -3984,11 +4194,7 @@
 
     const loadEvents = async () => {
       try {
-        const response = await fetch('./data/events.json');
-        if (!response.ok) {
-          throw new Error('Failed to load events');
-        }
-        events = await response.json();
+        events = await fetchMergedEvents();
         setErrorState(false);
         readQueryParams();
         applyFilters();
@@ -4315,8 +4521,7 @@
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('id');
     if (eventId) {
-      fetch('./data/events.json')
-        .then((response) => (response.ok ? response.json() : Promise.reject(new Error('events'))))
+      fetchMergedEvents()
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
           if (eventData) {
