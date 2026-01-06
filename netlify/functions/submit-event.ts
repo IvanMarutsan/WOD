@@ -55,6 +55,10 @@ const parseTags = (value: unknown) => {
 
 export const handler = async (event: HandlerEvent) => {
   try {
+    console.log('submit-event env', {
+      hasSiteId: Boolean(process.env.NETLIFY_BLOBS_SITE_ID),
+      hasToken: Boolean(process.env.NETLIFY_BLOBS_TOKEN)
+    });
     const payload = event.body ? JSON.parse(event.body) : {};
     const ip = getClientIp(event.headers || {});
     if (isRateLimited(ip)) {
