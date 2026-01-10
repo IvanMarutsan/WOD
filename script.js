@@ -1,27 +1,33 @@
+import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
+import { EventCard } from './components/event-card.js';
+import { HighlightCard } from './components/highlight-card.js';
+import { ADMIN_SESSION_KEY } from './modules/auth.js';
+
 (() => {
   const header = document.querySelector('.site-header');
   const menuToggle = document.querySelector('.menu-toggle');
   const primaryNav = document.querySelector('#primary-nav');
   const filterToggles = document.querySelectorAll('.filters__toggle-btn');
   const smallScreenQuery = window.matchMedia('(max-width: 767px)');
-  const multiStepForm = document.querySelector('.multi-step');
-  const moderationList = document.querySelector('.moderation-list');
-  const modal = document.querySelector('.modal');
-  const catalogGrid = document.querySelector('.catalog-grid');
+  
+    const catalogGrid = document.querySelector('.catalog-grid');
   const highlightsTrack = document.querySelector('.highlights__track');
   const ticketCtas = document.querySelectorAll('.event-sidebar__cta--ticket');
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
-  const langButtons = document.querySelectorAll('.lang-switch__button');
-  const langSelect = document.querySelector('[data-testid="lang-select"]');
-  if (langSelect) {
-    document.documentElement.classList.add('has-lang-select');
-  }
   const themeToggle = document.querySelector('.theme-toggle');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
   const logBuffer = [];
   let debugPanel = null;
   let debugList = null;
-  let identityUser = null;
+  const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+  const hasServerlessSupport = !LOCAL_HOSTNAMES.has(window.location.hostname);
+  const isAdminSession = () => {
+    try {
+      return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
+    } catch (error) {
+      return false;
+    }
+  };
 
   const redirectIdentityHashToLogin = () => {
     const hash = window.location.hash || '';
@@ -34,11 +40,22 @@
     }
     const path = window.location.pathname;
     if (path.includes('admin-login')) return;
-    if (!path.endsWith('/') && !path.endsWith('/index.html')) return;
+    if (!path.endsWith('/') && !path.endsWith('/main-page.html')) return;
     window.location.replace(`./admin-login.html${hash}`);
   };
 
   redirectIdentityHashToLogin();
+
+  if (document.body.classList.contains('new-event-page') && !isAdminSession()) {
+    const redirect = encodeURIComponent('./new-event.html');
+    window.location.replace(`./admin-login.html?redirect=${redirect}`);
+    return;
+  }
+
+  if (document.body.classList.contains('organizer-dashboard-page')) {
+    window.location.replace('./main-page.html');
+    return;
+  }
 
   const appendLogEntry = (entry) => {
     logBuffer.push(entry);
@@ -186,10 +203,12 @@
     } catch (error) {
       baseError = error;
     }
-    try {
-      publicData = await fetchJson('/.netlify/functions/public-events');
-    } catch (error) {
-      publicError = error;
+    if (hasServerlessSupport) {
+      try {
+        publicData = await fetchJson('/.netlify/functions/public-events');
+      } catch (error) {
+        publicError = error;
+      }
     }
     if (!baseData && !publicData) {
       throw baseError || publicError || new Error('events');
@@ -275,6 +294,7 @@
       admin_status_approved: 'Схвалено',
       admin_status_rejected: 'Відхилено',
       admin_action_view: 'Переглянути',
+      admin_action_edit: 'Редагувати',
       admin_action_approve: 'Схвалити',
       admin_action_reject: 'Відхилити',
       admin_edit_title: 'Редагувати подію',
@@ -638,891 +658,24 @@
       form_category_submit: 'Надіслати на затвердження',
       form_tags_label: 'Теги',
       form_tags_help: 'Натисніть Enter, щоб додати тег.',
+      form_tags_required: 'Додайте хоча б один тег.',
       form_tags_input_label: 'Додати тег',
       pending_label: '(на розгляді)',
       pending_tooltip: 'Очікує підтвердження',
       remove_tag_label: 'Видалити тег {tag}'
-    },
-    en: {
-      title_home: 'Events for Ukrainians in Denmark',
-      tagline: 'Concerts, meetups, and education events — across Denmark and online.',
-      hero_eyebrow: 'Upcoming experiences',
-      next_up_empty: 'No upcoming events match your filters.',
-      nav_events: 'Events',
-      nav_organizers: 'Organizers',
-      nav_about: 'About',
-      nav_contacts: 'Contacts',
-      nav_dashboard: 'Dashboard',
-      skip_link: 'Skip to content',
-      nav_toggle: 'Toggle navigation',
-      nav_primary_aria: 'Primary navigation',
-      brand_aria: 'Platform brand',
-      lang_switch_aria: 'Language',
-      theme_toggle_aria: 'Toggle theme',
-      theme_light: 'Light',
-      theme_dark: 'Dark',
-      back_to_catalog: 'Back to catalog',
-      back_to_dashboard: 'Back to dashboard',
-      search_placeholder: 'Search by city, theme, or date',
-      presets: {
-        today: 'Today',
-        tomorrow: 'Tomorrow',
-        weekend: 'Weekend',
-        online: 'Online'
-      },
-      search_label: 'Search events',
-      search_help: 'For example: Copenhagen, music, or weekend.',
-      cta_explore: 'Browse events',
-      cta_add_event: 'Add event',
-      home_link: 'Home',
-      cta_details: 'Details',
-      ticket_cta: 'Tickets',
-      register_cta: 'Register',
-      dashboard_create_cta: 'Create event',
-      dashboard_tab_events: 'My events',
-      dashboard_tab_create: 'Create event',
-      dashboard_tab_settings: 'Settings',
-      dashboard_eyebrow: 'Organizer workspace',
-      dashboard_title: 'Dashboard',
-      dashboard_tabs_aria: 'Dashboard sections',
-      dashboard_events_summary: 'Manage your drafts and published events.',
-      dashboard_table_aria: 'Events status table',
-      dashboard_table_event: 'Event',
-      dashboard_table_date: 'Date',
-      dashboard_table_status: 'Status',
-      dashboard_table_actions: 'Actions',
-      dashboard_status_published: 'Published',
-      dashboard_status_pending: 'Pending',
-      dashboard_status_draft: 'Draft',
-      dashboard_action_view: 'View',
-      dashboard_action_edit: 'Edit',
-      dashboard_action_continue: 'Continue',
-      dashboard_empty_eyebrow: 'No upcoming events',
-      dashboard_empty_title: 'Start planning your next event.',
-      dashboard_empty_summary: 'Create a draft to keep ideas organized.',
-      dashboard_settings_summary: 'Configure your organizer profile and verification.',
-      admin_eyebrow: 'Admin workspace',
-      admin_title: 'Moderation queue',
-      admin_pending_title: 'Pending events',
-      admin_pending_summary: 'Review new submissions and publish them.',
-      admin_status_pending: 'Pending',
-      admin_status_approved: 'Approved',
-      admin_status_rejected: 'Rejected',
-      admin_action_view: 'View',
-      admin_action_approve: 'Approve',
-      admin_action_reject: 'Reject',
-      admin_edit_title: 'Edit event',
-      admin_edit_help: 'Review details and save updates.',
-      admin_edit_save: 'Save changes',
-      admin_edit_cancel: 'Cancel',
-      admin_edit_links: 'Organizer links',
-      admin_modal_title: 'Reject event',
-      admin_modal_help: 'Provide a short reason for rejection.',
-      admin_modal_reason_label: 'Reason',
-      admin_modal_cancel: 'Cancel',
-      admin_modal_reject: 'Reject',
-      admin_pending_empty: 'No events are awaiting moderation.',
-      admin_verification_title: 'Verification requests',
-      admin_verification_summary: 'Review links and verify organizers.',
-      admin_verification_empty: 'No verification requests yet.',
-      admin_verification_approve: 'Approve',
-      admin_rejected_title: 'Rejected events',
-      admin_rejected_summary: 'Visible to super admins only.',
-      admin_rejected_empty: 'No rejected events.',
-      admin_loading: 'Loading...',
-      admin_reason_label: 'Reason',
-      admin_history_title: 'Decision history',
-      admin_history_entry: '{action} · {actor} · {ts}',
-      admin_audit_title: 'Decision log',
-      admin_audit_summary: 'Latest moderation decisions.',
-      admin_audit_empty: 'No audit entries yet.',
-      admin_access_checking: 'Checking access...',
-      admin_access_granted: 'Access confirmed.',
-      admin_access_required: 'Admin login required.',
-      admin_access_denied: 'You do not have access to the admin panel.',
-      admin_access_login: 'Sign in',
-      admin_access_logout: 'Sign out',
-      admin_access_user: 'Signed in as',
-      admin_access_role_admin: 'Role: admin',
-      admin_access_role_super: 'Role: super admin',
-      admin_login_title: 'Admin login',
-      admin_login_summary: 'Access is limited to the moderation team.',
-      admin_login_button: 'Sign in',
-      admin_login_back: 'Back to home',
-      admin_login_error: 'Admin role required.',
-      create_event_eyebrow: 'Create new event',
-      stepper_aria: 'Event creation steps',
-      step_basic: '1. Basics',
-      step_time: '2. Time & location',
-      step_tickets: '3. Tickets',
-      step_media: '4. Media',
-      step_preview: '5. Preview',
-      form_title_label: 'Event title',
-      form_title_help: 'Minimum 3 characters.',
-      form_description_label: 'Event description',
-      form_description_placeholder: 'Briefly describe the event',
-      form_description_help: 'Up to 400 characters, no spam.',
-      form_category_placeholder: 'Select a category',
-      form_category_music: 'Music',
-      form_category_food: 'Food',
-      form_category_sport: 'Sport',
-      form_category_tech: 'Tech',
-      form_tags_placeholder: 'design',
-      form_start_label: 'Start',
-      form_start_help: 'Use local time.',
-      form_format_label: 'Format',
-      form_format_placeholder: 'Select format',
-      form_format_offline: 'Offline',
-      form_format_online: 'Online',
-      form_address_label: 'Address',
-      form_address_placeholder: 'Copenhagen, Main St 10',
-      form_address_help: 'For online events, specify the platform.',
-      form_ticket_type_label: 'Ticket type',
-      form_ticket_free: 'Free',
-      form_ticket_paid: 'Paid',
-      form_price_min: 'Minimum price',
-      form_price_max: 'Maximum price',
-      form_ticket_url: 'External ticket link',
-      form_ticket_help: 'Optional.',
-      form_image_label: 'Event image',
-      form_image_alt_label: 'Alt text',
-      form_image_alt_placeholder: 'Image description',
-      form_image_alt_help: 'For example: a stage with lighting.',
-      preview_title: 'Title',
-      preview_organizer: 'Organizer',
-      preview_description: 'Description',
-      preview_category: 'Category',
-      preview_tags: 'Tags',
-      preview_time: 'Time',
-      preview_location: 'Location',
-      preview_tickets: 'Tickets',
-      preview_format: 'Format',
-      form_submit_moderation: 'Submit for moderation',
-      form_back: 'Back',
-      form_next: 'Next',
-      required_label: 'Required',
-      event_eyebrow: 'Design & Product',
-      event_description_title: 'Description',
-      event_description_body:
-        'A community meetup focused on scalable design systems. Hear case studies, join a workshop, and connect with peers.',
-      event_description_more: 'Show more',
-      event_description_less: 'Show less',
-      event_where_title: 'Where',
-      event_map_placeholder: 'Map placeholder',
-      event_language_title: 'Event language',
-      event_language_value: 'uk / en',
-      event_tags_title: 'Tags',
-      event_organizer_title: 'Organizer',
-      event_share_title: 'Share',
-      event_share_facebook: 'Facebook',
-      event_share_x: 'X',
-      event_share_linkedin: 'LinkedIn',
-      event_ticket_note: 'Buy tickets (DKK 350–520)',
-      ticket_panel_aria: 'Ticket panel',
-      organizer_meta: 'Non-profit meetup collective',
-      organizer_contact_email: 'Email',
-      organizer_contact_phone: 'Phone',
-      organizer_contact_website: 'Website',
-      organizer_logo_placeholder: 'Logo',
-      organizer_description:
-        'Non-profit collective hosting events for designers, builders, and community leaders.',
-      organizer_events_title: 'Events',
-      organizer_events_summary: 'Latest events hosted by this organizer.',
-      docs_title: 'Help & guidelines',
-      docs_summary: 'Quick answers about moderation, naming, and organizer verification.',
-      docs_nav_aria: 'Table of contents',
-      docs_nav_naming: 'Event naming rules',
-      docs_nav_tags: 'Tags and categories (how to create)',
-      docs_nav_past: 'What counts as a past event',
-      docs_nav_verification: 'Organizer verification',
-      docs_naming_title: 'Event naming rules',
-      docs_naming_body_1:
-        'Keep titles short, avoid all caps, and remove extra symbols. Add the city only when it is essential.',
-      docs_naming_body_2: 'Example: “Copenhagen Film Night: Docu UA”.',
-      docs_tags_title: 'Tags and categories (how to create)',
-      docs_tags_body_1:
-        'Choose the most relevant category and 2–5 tags. Use “Add category” when you need a new one.',
-      docs_tags_body_2: 'New tags go to moderation and are marked as pending.',
-      docs_past_title: 'What counts as a past event',
-      docs_past_body_1:
-        'If the event ended, or the start time already passed and no end time is set, it is treated as past.',
-      docs_past_body_2: 'Use the “Show past” filter to browse the archive.',
-      docs_verification_title: 'Organizer verification',
-      docs_verification_body_1:
-        'Verification is required to publish events. Add a website or social link for review.',
-      docs_verification_body_2: 'After review, the organizer status updates to “Verified”.',
-      privacy_title: 'Privacy Policy',
-      privacy_summary: 'We collect the minimum data needed to run the platform and do not use third-party trackers.',
-      privacy_nav_data: 'What data we collect',
-      privacy_nav_usage: 'How we use it',
-      privacy_nav_storage: 'Storage',
-      privacy_nav_contact: 'Contact',
-      privacy_data_title: 'What data we collect',
-      privacy_data_body:
-        'We only store basic event details and organizer contacts that you provide in the forms.',
-      privacy_usage_title: 'How we use it',
-      privacy_usage_body:
-        'Data is used for publishing events, moderation, and contacting organizers. We do not share it with third parties.',
-      privacy_storage_title: 'Storage',
-      privacy_storage_body:
-        'We keep data only as long as needed for the service. You can request removal at any time.',
-      privacy_contact_title: 'Contact',
-      privacy_contact_body:
-        'If you have privacy questions, reach out using the email listed in the contacts section.',
-      terms_title: 'Terms of Use',
-      terms_summary: 'These terms explain how the platform works and the responsibilities of organizers and visitors.',
-      legal_nav_aria: 'Contents',
-      terms_nav_rules: 'Core rules',
-      terms_nav_content: 'Content and moderation',
-      terms_nav_liability: 'Liability',
-      terms_nav_contact: 'Contact',
-      terms_rules_title: 'Core rules',
-      terms_rules_body:
-        'Publish only accurate events and respect the community. Spam, discrimination, and unsafe content are not allowed.',
-      terms_content_title: 'Content and moderation',
-      terms_content_body:
-        'We review events before publishing. Moderators can reject events that do not meet the rules.',
-      terms_liability_title: 'Liability',
-      terms_liability_body:
-        'Organizers are responsible for event accuracy and delivery. The platform is not a party to user agreements.',
-      terms_contact_title: 'Contact',
-      terms_contact_body:
-        'For questions about these terms, use the contact form or email.',
-      filter_title: 'Catalog',
-      catalog_summary: 'Use filters to browse events in a compact list.',
-      highlights_title: 'Weekly highlights',
-      highlights_prev: 'Prev',
-      highlights_next: 'Next',
-      highlights_prev_aria: 'Previous highlights',
-      highlights_next_aria: 'Next highlights',
-      highlights_list_aria: 'Weekly highlights list',
-      filters_date: 'Date',
-      filters_from: 'From',
-      filters_to: 'To',
-      filters_today: 'Today',
-      filters_tomorrow: 'Tomorrow',
-      filters_weekend: 'Weekend',
-      filters_online: 'Online',
-      filters_location: 'Location & category',
-      filters_aria: 'Catalog filters',
-      filters_advanced: 'Advanced filters',
-      filters_city: 'City',
-      filters_all_cities: 'All cities',
-      filters_city_copenhagen: 'Copenhagen',
-      filters_city_aarhus: 'Aarhus',
-      filters_city_odense: 'Odense',
-      filters_city_aalborg: 'Aalborg',
-      filters_city_esbjerg: 'Esbjerg',
-      events_next: 'Show next events',
-      events_reset: 'Back to upcoming events',
-      filters_category: 'Category',
-      filters_all_categories: 'All categories',
-      category_music: 'Music',
-      category_networking: 'Networking',
-      category_cinema: 'Cinema',
-      category_education: 'Education',
-      category_kids: 'For kids',
-      category_community: 'Community',
-      filters_preferences: 'Preferences',
-      filters_price: 'Price',
-      filters_any_price: 'Any',
-      filters_free: 'Free',
-      filters_paid: 'Paid',
-      price_free: 'Free',
-      filters_format: 'Format',
-      filters_any_format: 'Any',
-      filters_offline: 'Offline',
-      filters_audience: 'Audience',
-      filters_ua: 'UA',
-      filters_family: 'For families',
-      filters_volunteer: 'For volunteers',
-      filters_past: 'Show past',
-      filters_past_hint: 'Past events override the date range. The dates were cleared.',
-      reset_filters: 'Reset filters',
-      empty_state: 'No events match your search.',
-      similar_cta: 'Similar events',
-      error_eyebrow: 'Error',
-      error_title: 'We could not load events.',
-      error_summary: 'Check your connection and try again.',
-      error_retry: 'Try again',
-      home_about_title: 'About',
-      home_about_summary: 'A quick overview of the platform and moderation approach.',
-      home_contact_title: 'Contacts',
-      home_contact_summary: 'Reach out if you have questions or want to add an event.',
-      found_count: 'Found {count}',
-      footer_rights: '© 2024 What’s on DK?. All rights reserved.',
-      footer_help: 'Help',
-      footer_privacy: 'Privacy Policy',
-      footer_terms: 'Terms of Use',
-      footer_socials: 'Socials',
-      not_found_title: 'Page not found',
-      not_found_summary: 'Check the address or try search — the event might already be here.',
-      not_found_search_label: 'Search events',
-      not_found_search_placeholder: 'Search by city or topic',
-      not_found_search_action: 'Search',
-      not_found_help: 'If the issue persists, contact us and we will help you find the right info.',
-      not_found_back: 'Back home',
-      switch_lang: 'Language',
-      meta_index_title: 'What’s on DK? — Events for Ukrainians in Denmark',
-      meta_index_desc: 'Discover events for Ukrainians in Denmark: concerts, meetups, education, and online events.',
-      meta_event_title: 'Design Systems Meetup — What’s on DK?',
-      meta_event_desc: 'Event details, tickets, and location for Design Systems Meetup.',
-      meta_org_title: 'Evently Community — What’s on DK?',
-      meta_org_desc: 'Organizer profile with upcoming events in Denmark.',
-      meta_about_title: 'About — What’s on DK?',
-      meta_about_desc: 'Platform mission and moderation principles for events in Denmark.',
-      meta_contacts_title: 'Contacts — What’s on DK?',
-      meta_contacts_desc: 'Contact details and FAQs about events in Denmark.',
-      meta_docs_title: 'Help — What’s on DK?',
-      meta_docs_desc: 'Rules for event naming, tags, archive, and verification.',
-      meta_privacy_title: 'Privacy Policy — What’s on DK?',
-      meta_privacy_desc: 'Minimal data collection and no third-party trackers.',
-      meta_terms_title: 'Terms of Use — What’s on DK?',
-      meta_terms_desc: 'Platform usage rules and organizer responsibilities.',
-      meta_dashboard_title: 'Dashboard — What’s on DK?',
-      meta_dashboard_desc: 'Manage events, statuses, and organizer verification.',
-      meta_dashboard_new_title: 'Create event — What’s on DK?',
-      meta_dashboard_new_desc: 'Step-by-step event creation form.',
-      meta_admin_title: 'Moderation — What’s on DK?',
-      meta_admin_desc: 'Review new event submissions.',
-      meta_admin_login_title: 'Admin login — What’s on DK?',
-      meta_admin_login_desc: 'Sign in to access moderation tools.',
-      meta_not_found_title: '404 — What’s on DK?',
-      meta_not_found_desc: 'Page not found. Return home or try search.',
-      organizer_location: 'Organizer in Denmark',
-      verified_badge: 'Verified',
-      verification_email_title: 'Verify by email',
-      verification_email_label: 'Verification email',
-      verification_email_help: 'We will send a 6-digit code.',
-      verification_send_code: 'Send code',
-      verification_code_label: 'Verification code',
-      verification_code_help: 'Enter the 6 digits from the email.',
-      verification_verify_code: 'Confirm code',
-      verification_link_title: 'Website or social link',
-      verification_link_label: 'Link',
-      verification_link_help: 'Required. We will review it manually.',
-      verification_link_submit: 'Submit for review',
-      verification_pending: 'Verification request sent.',
-      verification_note: 'Verification requires a website or social link.',
-      verification_code_sent: 'Verification request sent.',
-      verification_success: 'Verification request sent.',
-      verification_invalid_code: 'Invalid code. Try again.',
-      verification_error: 'Action failed. Please try again.',
-      verification_blocked: 'Add a website or social link before publishing.',
-      verification_banner_text: 'A website or social link is required for verification.',
-      verification_banner_action: 'Open verification',
-      submit_success: 'Event submitted for moderation.',
-      submit_error: 'Failed to submit the event. Please try again.',
-      spam_blocked: 'Request rejected. Please try again.',
-      verification_spam: 'Request rejected. Please try again.',
-      archived_label: 'Archived',
-      event_past_banner: 'This event has passed',
-      tag_aria: 'Tag: {label}',
-      tag_pending_aria: 'Tag: {label}, pending approval',
-      category_aria: 'Category: {label}',
-      category_pending_aria: 'Category: {label}, pending approval',
-      about_title: 'About the project',
-      about_tagline: 'A platform for the Ukrainian community in Denmark, connecting events and initiatives.',
-      about_mission_title: 'Our mission',
-      about_mission_body: 'We help Ukrainians in Denmark find events, support, and new connections.',
-      about_submit_title: 'How to submit an event',
-      about_submit_body: 'Send your event via the form or email. We review submissions before publishing.',
-      about_moderation_title: 'Moderation',
-      about_moderation_body: 'We moderate events to keep the community safe and aligned with our guidelines.',
-      contacts_title: 'Contacts',
-      contacts_tagline: 'Get in touch if you have questions or want to submit an event.',
-      contacts_email_title: 'Email',
-      contacts_email_body: 'hello@whatsondk.test',
-      contacts_faq_title: 'FAQ',
-      contacts_faq_q1: 'How do I add an event?',
-      contacts_faq_a1: 'Send the event via the form or email and we will review it.',
-      contacts_faq_q2: 'Which languages are supported?',
-      contacts_faq_a2: 'We publish events in Ukrainian, Danish, or English.',
-      contacts_faq_q3: 'Which cities are covered?',
-      contacts_faq_a3: 'Copenhagen, Aarhus, Odense, Aalborg, Esbjerg, and online.',
-      form_end_label: 'End time',
-      form_optional_hint: '(optional)',
-      form_contact_legend: 'Organizer / contact',
-      form_contact_name: 'Organization or contact',
-      form_contact_name_help: 'For example: NGO “HelpHub” or Olena K.',
-      form_contact_email: 'Email',
-      form_contact_email_help: 'Optional. For example: name@example.com.',
-      form_contact_phone: 'Phone',
-      form_contact_phone_help: 'Optional. Format: +45 12 34 56 78.',
-      form_contact_website: 'Website',
-      form_contact_website_help: 'Optional.',
-      form_contact_website_placeholder: 'https://',
-      form_contact_instagram: 'Instagram',
-      form_contact_instagram_placeholder: 'https://instagram.com/',
-      form_contact_facebook: 'Facebook',
-      form_contact_facebook_placeholder: 'https://facebook.com/',
-      form_contact_telegram: 'Telegram',
-      form_contact_telegram_placeholder: 'https://t.me/',
-      form_contact_social_help: 'Optional.',
-      event_contact_title: 'Contacts',
-      event_contact_name: 'Name',
-      event_contact_email_label: 'Email',
-      event_contact_phone_label: 'Phone',
-      form_category_label: 'Category',
-      form_add_category: 'Add category',
-      form_category_modal_title: 'New category',
-      form_category_input_label: 'Category name',
-      form_category_help: 'A moderator will review the category.',
-      form_category_cancel: 'Cancel',
-      form_category_submit: 'Submit for approval',
-      form_tags_label: 'Tags',
-      form_tags_help: 'Press Enter to add a tag.',
-      form_tags_input_label: 'Add tag',
-      pending_label: '(pending)',
-      pending_tooltip: 'Pending approval',
-      remove_tag_label: 'Remove tag {tag}'
-    },
-    da: {
-      title_home: 'Begivenheder for ukrainere i Danmark',
-      tagline: 'Koncerter, møder og læring — i byer i Danmark og online.',
-      hero_eyebrow: 'Kommende oplevelser',
-      next_up_empty: 'Ingen kommende events matcher dine filtre.',
-      nav_events: 'Begivenheder',
-      nav_organizers: 'Arrangører',
-      nav_about: 'Om',
-      nav_contacts: 'Kontakt',
-      nav_dashboard: 'Dashboard',
-      skip_link: 'Spring til indhold',
-      nav_toggle: 'Skift navigation',
-      nav_primary_aria: 'Primær navigation',
-      brand_aria: 'Platformens brand',
-      lang_switch_aria: 'Sprog',
-      theme_toggle_aria: 'Skift tema',
-      theme_light: 'Lys',
-      theme_dark: 'Mørk',
-      back_to_catalog: 'Tilbage til katalog',
-      back_to_dashboard: 'Tilbage til dashboard',
-      search_placeholder: 'Søg efter by, tema eller dato',
-      presets: {
-        today: 'I dag',
-        tomorrow: 'I morgen',
-        weekend: 'Weekend',
-        online: 'Online'
-      },
-      search_label: 'Søg efter events',
-      search_help: 'For eksempel: København, musik eller weekend.',
-      cta_explore: 'Se begivenheder',
-      cta_add_event: 'Tilføj begivenhed',
-      home_link: 'Forside',
-      cta_details: 'Detaljer',
-      ticket_cta: 'Billetter',
-      register_cta: 'Tilmelding',
-      dashboard_create_cta: 'Opret event',
-      dashboard_tab_events: 'Mine events',
-      dashboard_tab_create: 'Opret event',
-      dashboard_tab_settings: 'Indstillinger',
-      dashboard_eyebrow: 'Arrangørens arbejdsområde',
-      dashboard_title: 'Dashboard',
-      dashboard_tabs_aria: 'Dashboard-sektioner',
-      dashboard_events_summary: 'Administrer dine kladder og publicerede events.',
-      dashboard_table_aria: 'Eventstatus tabel',
-      dashboard_table_event: 'Event',
-      dashboard_table_date: 'Dato',
-      dashboard_table_status: 'Status',
-      dashboard_table_actions: 'Handlinger',
-      dashboard_status_published: 'Publiceret',
-      dashboard_status_pending: 'Afventer',
-      dashboard_status_draft: 'Kladde',
-      dashboard_action_view: 'Se',
-      dashboard_action_edit: 'Rediger',
-      dashboard_action_continue: 'Fortsæt',
-      dashboard_empty_eyebrow: 'Ingen kommende events',
-      dashboard_empty_title: 'Begynd at planlægge dit næste event.',
-      dashboard_empty_summary: 'Opret en kladde for at holde styr på idéer.',
-      dashboard_settings_summary: 'Konfigurer arrangørens profil og bekræftelse.',
-      admin_eyebrow: 'Administratorens arbejdsområde',
-      admin_title: 'Moderationskø',
-      admin_pending_title: 'Afventende events',
-      admin_pending_summary: 'Gennemgå nye indsendelser og udgiv dem.',
-      admin_status_pending: 'Afventer',
-      admin_status_approved: 'Godkendt',
-      admin_status_rejected: 'Afvist',
-      admin_action_view: 'Se',
-      admin_action_approve: 'Godkend',
-      admin_action_reject: 'Afvis',
-      admin_edit_title: 'Rediger event',
-      admin_edit_help: 'Gennemgå detaljer og gem ændringer.',
-      admin_edit_save: 'Gem ændringer',
-      admin_edit_cancel: 'Annuller',
-      admin_edit_links: 'Arrangør-links',
-      admin_modal_title: 'Afvis event',
-      admin_modal_help: 'Angiv en kort begrundelse for afvisning.',
-      admin_modal_reason_label: 'Begrundelse',
-      admin_modal_cancel: 'Annuller',
-      admin_modal_reject: 'Afvis',
-      admin_pending_empty: 'Der er ingen events til moderation lige nu.',
-      admin_rejected_title: 'Afviste events',
-      admin_rejected_summary: 'Kun synligt for superadmins.',
-      admin_rejected_empty: 'Ingen afviste events.',
-      admin_verification_title: 'Bekræftelsesanmodninger',
-      admin_verification_summary: 'Gennemgå links og bekræft arrangører.',
-      admin_verification_empty: 'Ingen bekræftelsesanmodninger endnu.',
-      admin_verification_approve: 'Bekræft',
-      admin_loading: 'Indlæser...',
-      admin_reason_label: 'Begrundelse',
-      admin_history_title: 'Beslutningshistorik',
-      admin_history_entry: '{action} · {actor} · {ts}',
-      admin_audit_title: 'Beslutningslog',
-      admin_audit_summary: 'Seneste moderationsbeslutninger.',
-      admin_audit_empty: 'Ingen logposter endnu.',
-      admin_access_checking: 'Kontrollerer adgang...',
-      admin_access_granted: 'Adgang bekræftet.',
-      admin_access_required: 'Admin-login er påkrævet.',
-      admin_access_denied: 'Du har ikke adgang til adminpanelet.',
-      admin_access_login: 'Log ind',
-      admin_access_logout: 'Log ud',
-      admin_access_user: 'Logget ind som',
-      admin_access_role_admin: 'Rolle: admin',
-      admin_access_role_super: 'Rolle: superadmin',
-      admin_login_title: 'Admin-login',
-      admin_login_summary: 'Adgang er begrænset til moderationsholdet.',
-      admin_login_button: 'Log ind',
-      admin_login_back: 'Tilbage til forsiden',
-      admin_login_error: 'Adminrolle kræves.',
-      create_event_eyebrow: 'Opret nyt event',
-      stepper_aria: 'Trin til eventoprettelse',
-      step_basic: '1. Grundlæggende',
-      step_time: '2. Tid og sted',
-      step_tickets: '3. Billetter',
-      step_media: '4. Medier',
-      step_preview: '5. Forhåndsvisning',
-      form_title_label: 'Eventtitel',
-      form_title_help: 'Minimum 3 tegn.',
-      form_description_label: 'Eventbeskrivelse',
-      form_description_placeholder: 'Beskriv eventet kort',
-      form_description_help: 'Op til 400 tegn, ingen spam.',
-      form_category_placeholder: 'Vælg kategori',
-      form_category_music: 'Musik',
-      form_category_food: 'Mad',
-      form_category_sport: 'Sport',
-      form_category_tech: 'Tech',
-      form_tags_placeholder: 'design',
-      form_start_label: 'Start',
-      form_start_help: 'Brug lokal tid.',
-      form_format_label: 'Format',
-      form_format_placeholder: 'Vælg format',
-      form_format_offline: 'Offline',
-      form_format_online: 'Online',
-      form_address_label: 'Adresse',
-      form_address_placeholder: 'København, Main St 10',
-      form_address_help: 'For online events, angiv platformen.',
-      form_ticket_type_label: 'Billet-type',
-      form_ticket_free: 'Gratis',
-      form_ticket_paid: 'Betalt',
-      form_price_min: 'Minimumspris',
-      form_price_max: 'Maksimumspris',
-      form_ticket_url: 'Eksternt billetlink',
-      form_ticket_help: 'Valgfrit.',
-      form_image_label: 'Eventbillede',
-      form_image_alt_label: 'Alt-tekst',
-      form_image_alt_placeholder: 'Billedbeskrivelse',
-      form_image_alt_help: 'For eksempel: en scene med lys.',
-      preview_title: 'Titel',
-      preview_organizer: 'Arrangør',
-      preview_description: 'Beskrivelse',
-      preview_category: 'Kategori',
-      preview_tags: 'Tags',
-      preview_time: 'Tid',
-      preview_location: 'Sted',
-      preview_tickets: 'Billetter',
-      preview_format: 'Format',
-      form_submit_moderation: 'Send til moderation',
-      form_back: 'Tilbage',
-      form_next: 'Næste',
-      required_label: 'Påkrævet',
-      event_eyebrow: 'Design og produkt',
-      event_description_title: 'Beskrivelse',
-      event_description_body:
-        'Et community-møde om skalerbare design systemer. Vi gennemgår cases, holder workshop og mødes med andre.',
-      event_description_more: 'Vis mere',
-      event_description_less: 'Vis mindre',
-      event_where_title: 'Hvor',
-      event_map_placeholder: 'Kort-placering',
-      event_language_title: 'Event-sprog',
-      event_language_value: 'uk / en',
-      event_tags_title: 'Tags',
-      event_organizer_title: 'Arrangør',
-      event_share_title: 'Del',
-      event_share_facebook: 'Facebook',
-      event_share_x: 'X',
-      event_share_linkedin: 'LinkedIn',
-      event_ticket_note: 'Køb billetter (DKK 350–520)',
-      ticket_panel_aria: 'Billetpanel',
-      organizer_meta: 'Non-profit meetup fællesskab',
-      organizer_contact_email: 'Email',
-      organizer_contact_phone: 'Telefon',
-      organizer_contact_website: 'Website',
-      organizer_logo_placeholder: 'Logo',
-      organizer_description:
-        'Non-profit fællesskab, der afholder events for designere, skabere og community-ledere.',
-      organizer_events_title: 'Events',
-      organizer_events_summary: 'Seneste events arrangeret af denne arrangør.',
-      docs_title: 'Hjælp og regler',
-      docs_summary: 'Korte svar om moderation, navngivning og arrangørbekræftelse.',
-      docs_nav_aria: 'Indholdsfortegnelse',
-      docs_nav_naming: 'Regler for eventnavne',
-      docs_nav_tags: 'Tags og kategorier (sådan opretter du)',
-      docs_nav_past: 'Hvad tæller som et tidligere event',
-      docs_nav_verification: 'Arrangørbekræftelse',
-      docs_naming_title: 'Regler for eventnavne',
-      docs_naming_body_1:
-        'Hold titler korte, undgå versaler og ekstra symboler. Tilføj by kun når det er vigtigt.',
-      docs_naming_body_2: 'Eksempel: “København Filmaften: Docu UA”.',
-      docs_tags_title: 'Tags og kategorier (sådan opretter du)',
-      docs_tags_body_1:
-        'Vælg den mest relevante kategori og 2–5 tags. Brug “Tilføj kategori” når du mangler en.',
-      docs_tags_body_2: 'Nye tags sendes til moderation og markeres som afventende.',
-      docs_past_title: 'Hvad tæller som et tidligere event',
-      docs_past_body_1:
-        'Hvis eventet er slut, eller starttidspunktet allerede er passeret og slutdato ikke er angivet, regnes det som tidligere.',
-      docs_past_body_2: 'Brug filteret “Vis tidligere” for at se arkivet.',
-      docs_verification_title: 'Arrangørbekræftelse',
-      docs_verification_body_1:
-        'Bekræftelse kræves for at udgive events. Tilføj en hjemmeside eller et socialt link til gennemgang.',
-      docs_verification_body_2: 'Efter gennemgang opdateres status til “Bekræftet”.',
-      privacy_title: 'Privatlivspolitik',
-      privacy_summary: 'Vi indsamler kun de data, der er nødvendige for platformen, og bruger ingen tredjeparts-trackere.',
-      privacy_nav_data: 'Hvilke data vi indsamler',
-      privacy_nav_usage: 'Hvordan vi bruger dem',
-      privacy_nav_storage: 'Opbevaring',
-      privacy_nav_contact: 'Kontakt',
-      privacy_data_title: 'Hvilke data vi indsamler',
-      privacy_data_body:
-        'Vi gemmer kun grundlæggende eventoplysninger og arrangørkontakter, som du selv udfylder i formularerne.',
-      privacy_usage_title: 'Hvordan vi bruger dem',
-      privacy_usage_body:
-        'Data bruges til publicering, moderation og kontakt med arrangører. Vi deler dem ikke med tredjepart.',
-      privacy_storage_title: 'Opbevaring',
-      privacy_storage_body:
-        'Vi opbevarer data kun så længe, det er nødvendigt for tjenesten. Du kan anmode om sletning.',
-      privacy_contact_title: 'Kontakt',
-      privacy_contact_body:
-        'Har du spørgsmål om privatliv, så skriv til os via emailen i kontaktsektionen.',
-      terms_title: 'Vilkår',
-      terms_summary: 'Disse vilkår beskriver brugen af platformen og ansvar for arrangører og besøgende.',
-      legal_nav_aria: 'Indhold',
-      terms_nav_rules: 'Grundregler',
-      terms_nav_content: 'Indhold og moderation',
-      terms_nav_liability: 'Ansvar',
-      terms_nav_contact: 'Kontakt',
-      terms_rules_title: 'Grundregler',
-      terms_rules_body:
-        'Publicér kun korrekte events og respekter fællesskabet. Spam, diskrimination og farligt indhold er ikke tilladt.',
-      terms_content_title: 'Indhold og moderation',
-      terms_content_body:
-        'Vi gennemgår events før publicering. Moderatorer kan afvise events, der ikke følger reglerne.',
-      terms_liability_title: 'Ansvar',
-      terms_liability_body:
-        'Arrangører er ansvarlige for eventinfo og afvikling. Platformen er ikke part i aftaler mellem brugere.',
-      terms_contact_title: 'Kontakt',
-      terms_contact_body:
-        'Har du spørgsmål til vilkår, kontakt os via formularen eller email.',
-      filter_title: 'Katalog',
-      catalog_summary: 'Brug filtre til at se begivenheder i en kompakt liste.',
-      highlights_title: 'Ugens højdepunkter',
-      highlights_prev: 'Tilbage',
-      highlights_next: 'Næste',
-      highlights_prev_aria: 'Forrige højdepunkter',
-      highlights_next_aria: 'Næste højdepunkter',
-      highlights_list_aria: 'Liste med ugens højdepunkter',
-      filters_date: 'Dato',
-      filters_from: 'Fra',
-      filters_to: 'Til',
-      filters_today: 'I dag',
-      filters_tomorrow: 'I morgen',
-      filters_weekend: 'Weekend',
-      filters_online: 'Online',
-      filters_location: 'Sted og kategori',
-      filters_aria: 'Katalogfiltre',
-      filters_advanced: 'Avancerede filtre',
-      filters_city: 'By',
-      filters_all_cities: 'Alle byer',
-      filters_city_copenhagen: 'København',
-      filters_city_aarhus: 'Aarhus',
-      filters_city_odense: 'Odense',
-      filters_city_aalborg: 'Aalborg',
-      filters_city_esbjerg: 'Esbjerg',
-      events_next: 'Vis næste events',
-      events_reset: 'Tilbage til aktuelle events',
-      filters_category: 'Kategori',
-      filters_all_categories: 'Alle kategorier',
-      category_music: 'Musik',
-      category_networking: 'Networking',
-      category_cinema: 'Film',
-      category_education: 'Uddannelse',
-      category_kids: 'For børn',
-      category_community: 'Fællesskab',
-      filters_preferences: 'Indstillinger',
-      filters_price: 'Pris',
-      filters_any_price: 'Alle',
-      filters_free: 'Gratis',
-      filters_paid: 'Betalt',
-      price_free: 'Gratis',
-      filters_format: 'Format',
-      filters_any_format: 'Alle',
-      filters_offline: 'Offline',
-      filters_audience: 'Målgruppe',
-      filters_ua: 'UA',
-      filters_family: 'For familier',
-      filters_volunteer: 'For frivillige',
-      filters_past: 'Vis tidligere',
-      filters_past_hint: 'Tidligere events har prioritet over datoer. Datointervallet blev ryddet.',
-      reset_filters: 'Nulstil filtre',
-      empty_state: 'Ingen begivenheder matcher din søgning.',
-      similar_cta: 'Lignende begivenheder',
-      error_eyebrow: 'Fejl',
-      error_title: 'Vi kunne ikke hente events.',
-      error_summary: 'Tjek forbindelsen og prøv igen.',
-      error_retry: 'Prøv igen',
-      home_about_title: 'Om',
-      home_about_summary: 'En kort oversigt over platformen og moderationen.',
-      home_contact_title: 'Kontakt',
-      home_contact_summary: 'Kontakt os, hvis du har spørgsmål eller vil tilføje en begivenhed.',
-      found_count: 'Fundet {count}',
-      footer_rights: '© 2024 What’s on DK?. Alle rettigheder forbeholdes.',
-      footer_help: 'Hjælp',
-      footer_privacy: 'Privatlivspolitik',
-      footer_terms: 'Vilkår',
-      footer_socials: 'Sociale medier',
-      not_found_title: 'Siden blev ikke fundet',
-      not_found_summary: 'Tjek adressen eller brug søgning — måske er eventet allerede her.',
-      not_found_search_label: 'Søg events',
-      not_found_search_placeholder: 'Søg efter by eller emne',
-      not_found_search_action: 'Søg',
-      not_found_help: 'Hvis problemet fortsætter, så kontakt os — vi hjælper dig gerne.',
-      not_found_back: 'Tilbage til forsiden',
-      switch_lang: 'Sprog',
-      meta_index_title: 'What’s on DK? — Events for ukrainere i Danmark',
-      meta_index_desc: 'Find events for ukrainere i Danmark: koncerter, møder, læring og online events.',
-      meta_event_title: 'Design Systems Meetup — What’s on DK?',
-      meta_event_desc: 'Eventdetaljer, billetter og lokation for Design Systems Meetup.',
-      meta_org_title: 'Evently Community — What’s on DK?',
-      meta_org_desc: 'Arrangørprofil med kommende events i Danmark.',
-      meta_about_title: 'Om — What’s on DK?',
-      meta_about_desc: 'Platformens mission og moderationsprincipper for events i Danmark.',
-      meta_contacts_title: 'Kontakt — What’s on DK?',
-      meta_contacts_desc: 'Kontaktoplysninger og FAQ om events i Danmark.',
-      meta_docs_title: 'Hjælp — What’s on DK?',
-      meta_docs_desc: 'Regler for eventnavne, tags, arkiv og bekræftelse.',
-      meta_privacy_title: 'Privatlivspolitik — What’s on DK?',
-      meta_privacy_desc: 'Minimal dataindsamling og ingen tredjeparts-trackere.',
-      meta_terms_title: 'Vilkår — What’s on DK?',
-      meta_terms_desc: 'Regler for platformen og arrangøransvar.',
-      meta_dashboard_title: 'Dashboard — What’s on DK?',
-      meta_dashboard_desc: 'Administrer events, status og arrangørbekræftelse.',
-      meta_dashboard_new_title: 'Opret event — What’s on DK?',
-      meta_dashboard_new_desc: 'Trinvis oprettelse af event.',
-      meta_admin_title: 'Moderation — What’s on DK?',
-      meta_admin_desc: 'Gennemgå nye eventindsendelser.',
-      meta_admin_login_title: 'Admin-login — What’s on DK?',
-      meta_admin_login_desc: 'Log ind for at få adgang til moderation.',
-      meta_not_found_title: '404 — What’s on DK?',
-      meta_not_found_desc: 'Siden blev ikke fundet. Gå til forsiden eller søg.',
-      organizer_location: 'Arrangør i Danmark',
-      verified_badge: 'Bekræftet',
-      verification_email_title: 'Bekræft via email',
-      verification_email_label: 'Email til bekræftelse',
-      verification_email_help: 'Vi sender en 6-cifret kode.',
-      verification_send_code: 'Send kode',
-      verification_code_label: 'Bekræftelseskode',
-      verification_code_help: 'Indtast de 6 cifre fra emailen.',
-      verification_verify_code: 'Bekræft kode',
-      verification_link_title: 'Website eller sociale medier',
-      verification_link_label: 'Link',
-      verification_link_help: 'Påkrævet. Vi gennemgår den manuelt.',
-      verification_link_submit: 'Send til gennemgang',
-      verification_pending: 'Bekræftelsesanmodning sendt.',
-      verification_note: 'Bekræftelse kræver et website eller socialt link.',
-      verification_code_sent: 'Bekræftelsesanmodning sendt.',
-      verification_success: 'Bekræftelsesanmodning sendt.',
-      verification_invalid_code: 'Ugyldig kode. Prøv igen.',
-      verification_error: 'Handling mislykkedes. Prøv igen senere.',
-      verification_blocked: 'Tilføj et website eller socialt link før udgivelse.',
-      verification_banner_text: 'Et website eller socialt link kræves for bekræftelse.',
-      verification_banner_action: 'Åbn bekræftelse',
-      submit_success: 'Eventet er sendt til moderation.',
-      submit_error: 'Kunne ikke sende eventet. Prøv igen.',
-      spam_blocked: 'Anmodning afvist. Prøv igen.',
-      verification_spam: 'Anmodning afvist. Prøv igen.',
-      archived_label: 'Arkiveret',
-      event_past_banner: 'Denne begivenhed er allerede afholdt',
-      tag_aria: 'Tag: {label}',
-      tag_pending_aria: 'Tag: {label}, afventer godkendelse',
-      category_aria: 'Kategori: {label}',
-      category_pending_aria: 'Kategori: {label}, afventer godkendelse',
-      about_title: 'Om projektet',
-      about_tagline: 'En platform for det ukrainske fællesskab i Danmark med events og initiativer.',
-      about_mission_title: 'Vores mission',
-      about_mission_body: 'Vi hjælper ukrainere i Danmark med at finde events, støtte og nye forbindelser.',
-      about_submit_title: 'Sådan indsender du et event',
-      about_submit_body: 'Send dit event via formularen eller email. Vi gennemgår før offentliggørelse.',
-      about_moderation_title: 'Moderation',
-      about_moderation_body: 'Vi modererer events for at sikre kvalitet og sikkerhed i fællesskabet.',
-      contacts_title: 'Kontakt',
-      contacts_tagline: 'Kontakt os, hvis du har spørgsmål eller vil indsende et event.',
-      contacts_email_title: 'Email',
-      contacts_email_body: 'hello@whatsondk.test',
-      contacts_faq_title: 'FAQ',
-      contacts_faq_q1: 'Hvordan tilføjer jeg et event?',
-      contacts_faq_a1: 'Send eventet via formularen eller email, så gennemgår vi det.',
-      contacts_faq_q2: 'Hvilke sprog understøttes?',
-      contacts_faq_a2: 'Vi publicerer events på ukrainsk, dansk eller engelsk.',
-      contacts_faq_q3: 'Hvilke byer dækker I?',
-      contacts_faq_a3: 'København, Aarhus, Odense, Aalborg, Esbjerg og online.',
-      form_end_label: 'Sluttidspunkt',
-      form_optional_hint: '(valgfrit)',
-      form_contact_legend: 'Arrangør / kontakt',
-      form_contact_name: 'Organisation eller kontakt',
-      form_contact_name_help: 'For eksempel: NGO “HelpHub” eller Olena K.',
-      form_contact_email: 'Email',
-      form_contact_email_help: 'Valgfrit. For eksempel: name@example.com.',
-      form_contact_phone: 'Telefon',
-      form_contact_phone_help: 'Valgfrit. Format: +45 12 34 56 78.',
-      form_contact_website: 'Website',
-      form_contact_website_help: 'Valgfrit.',
-      form_contact_website_placeholder: 'https://',
-      form_contact_instagram: 'Instagram',
-      form_contact_instagram_placeholder: 'https://instagram.com/',
-      form_contact_facebook: 'Facebook',
-      form_contact_facebook_placeholder: 'https://facebook.com/',
-      form_contact_telegram: 'Telegram',
-      form_contact_telegram_placeholder: 'https://t.me/',
-      form_contact_social_help: 'Valgfrit.',
-      event_contact_title: 'Kontakt',
-      event_contact_name: 'Navn',
-      event_contact_email_label: 'Email',
-      event_contact_phone_label: 'Telefon',
-      form_category_label: 'Kategori',
-      form_add_category: 'Tilføj kategori',
-      form_category_modal_title: 'Ny kategori',
-      form_category_input_label: 'Kategorinavn',
-      form_category_help: 'En moderator gennemgår kategorien.',
-      form_category_cancel: 'Annuller',
-      form_category_submit: 'Send til godkendelse',
-      form_tags_label: 'Tags',
-      form_tags_help: 'Tryk Enter for at tilføje et tag.',
-      form_tags_input_label: 'Tilføj tag',
-      pending_label: '(afventer)',
-      pending_tooltip: 'Afventer godkendelse',
-      remove_tag_label: 'Fjern tag {tag}'
     }
   };
 
-  const getDictionary = (lang) => translations[lang] || translations.uk;
+  const getDictionary = () => translations.uk;
 
   let refreshVerificationUI = () => {};
-  let updatePublishState = () => {};
+  const publishState = { update: () => {} };
   let updateStaticTagAria = () => {};
   let updateCatalogI18n = () => {};
 
-  const applyTranslations = (lang) => {
-    const dictionary = getDictionary(lang);
-    document.documentElement.lang = lang;
+  const applyTranslations = () => {
+    const dictionary = getDictionary();
+    document.documentElement.lang = 'uk';
     document.querySelectorAll('[data-i18n]').forEach((element) => {
       const key = element.dataset.i18n;
       const value = dictionary[key];
@@ -1556,19 +709,8 @@
         element.setAttribute('title', dictionary[key]);
       }
     });
-    langButtons.forEach((button) => {
-      button.setAttribute('aria-pressed', String(button.dataset.lang === lang));
-    });
-    if (langSelect) {
-      langSelect.value = lang;
-    }
 
-    const localeMap = {
-      uk: 'uk_UA',
-      en: 'en_US',
-      da: 'da_DK'
-    };
-    const locale = localeMap[lang] || 'uk_UA';
+    const locale = 'uk_UA';
     const path = window.location.pathname;
     const page = document.body.classList.contains('event-page')
       ? 'event'
@@ -1586,13 +728,13 @@
                   ? 'privacy'
                   : document.body.classList.contains('legal-page')
                     ? 'terms'
-                    : path.includes('dashboard-new')
+                    : path.includes('new-event')
                       ? 'dashboard_new'
                       : path.includes('dashboard')
                         ? 'dashboard'
                         : path.includes('admin-login')
                           ? 'admin_login'
-                          : path.includes('admin')
+                          : path.includes('admin-page')
                             ? 'admin'
                             : 'index';
     const titleKey = `meta_${page}_title`;
@@ -1630,237 +772,12 @@
   };
 
   const formatMessage = (key, replacements) => {
-    const dictionary = getDictionary(document.documentElement.lang || 'uk');
+    const dictionary = getDictionary();
     const template = dictionary[key] || translations.uk[key] || '';
     if (!template) return '';
     return Object.keys(replacements).reduce((text, token) => {
       return text.replace(`{${token}}`, String(replacements[token]));
     }, template);
-  };
-
-  const ADMIN_ROLES = ['admin', 'super_admin'];
-  const ADMIN_SESSION_KEY = 'wodAdminSession';
-  const UI_LOCALE_MAP = { uk: 'uk-UA', en: 'en-US', da: 'da-DK' };
-
-  const handleLanguageChange = (lang) => {
-    if (!lang) return;
-    applyTranslations(lang);
-    setStoredLang(lang);
-  };
-
-  langButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      handleLanguageChange(button.dataset.lang);
-    });
-  });
-
-  if (langSelect) {
-    langSelect.addEventListener('change', (event) => {
-      handleLanguageChange(event.target.value);
-    });
-  }
-
-  const getUserRoles = (user) => {
-    const roles = user?.app_metadata?.roles;
-    return Array.isArray(roles) ? roles : [];
-  };
-
-  const hasAdminRole = (user) => {
-    const roles = getUserRoles(user);
-    return roles.some((role) => ADMIN_ROLES.includes(role));
-  };
-
-  const isSuperAdmin = (user) => getUserRoles(user).includes('super_admin');
-
-  const getAdminLoginRedirect = () => {
-    const redirect = encodeURIComponent(
-      `${window.location.pathname}${window.location.search}${window.location.hash}`
-    );
-    return `./admin-login.html?redirect=${redirect}`;
-  };
-
-  const getUiLocale = () => {
-    const lang = document.documentElement.lang || 'uk';
-    return UI_LOCALE_MAP[lang] || 'uk-UA';
-  };
-
-  const setupAdminAuth = () => {
-    const path = window.location.pathname;
-    const isAdminPage = path.includes('admin.html');
-    const isLoginPage = path.includes('admin-login');
-    if (!isAdminPage && !isLoginPage) return;
-
-    const statusEl = document.querySelector('[data-admin-status]');
-    const loginButton = document.querySelector('[data-admin-login]');
-    const logoutButton = document.querySelector('[data-admin-logout]');
-    const userMeta = document.querySelector('[data-admin-user]');
-    const roleMeta = document.querySelector('[data-admin-role]');
-    const metaContainer = document.querySelector('.admin-auth__meta');
-    const superAdminSections = document.querySelectorAll('[data-super-admin-only]');
-
-    const setStatus = (key) => {
-      if (statusEl) statusEl.textContent = formatMessage(key, {});
-    };
-
-    const setAuthState = (state) => {
-      document.body.dataset.adminAuth = state;
-    };
-    const setAdminSession = (value) => {
-      try {
-        if (value) {
-          localStorage.setItem(ADMIN_SESSION_KEY, '1');
-        } else {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      } catch (error) {
-        return;
-      }
-    };
-
-    const updateMeta = (user) => {
-      if (!userMeta || !roleMeta || !metaContainer) return;
-      if (!user) {
-        metaContainer.hidden = true;
-        return;
-      }
-      const roles = getUserRoles(user);
-      const roleLabel = roles.includes('super_admin')
-        ? formatMessage('admin_access_role_super', {})
-        : formatMessage('admin_access_role_admin', {});
-      userMeta.textContent = `${formatMessage('admin_access_user', {})}: ${user.email || '—'}`;
-      roleMeta.textContent = roleLabel;
-      metaContainer.hidden = false;
-    };
-
-    const setSuperAdminVisibility = (allowed) => {
-      superAdminSections.forEach((section) => {
-        section.hidden = !allowed;
-      });
-    };
-
-    const openLogin = () => {
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.open('login');
-      }
-    };
-
-    if (loginButton) {
-      loginButton.addEventListener('click', openLogin);
-    }
-
-    if (logoutButton) {
-      logoutButton.addEventListener('click', () => {
-        if (window.netlifyIdentity) {
-          window.netlifyIdentity.logout();
-        }
-      });
-    }
-
-    if (!window.netlifyIdentity) {
-      if (!document.querySelector('[data-identity-widget]')) {
-        const identityScript = document.createElement('script');
-        identityScript.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
-        identityScript.async = true;
-        identityScript.defer = true;
-        identityScript.dataset.identityWidget = 'true';
-        identityScript.onload = () => {
-          setupAdminAuth();
-        };
-        document.body.appendChild(identityScript);
-      }
-      setAuthState('checking');
-      setStatus('admin_access_checking');
-      return;
-    }
-
-    setAuthState('checking');
-
-    let initTimer = null;
-
-    const handleUser = (user) => {
-      if (initTimer) {
-        clearTimeout(initTimer);
-        initTimer = null;
-      }
-      if (!user) {
-        setAuthState('denied');
-        setStatus('admin_access_required');
-        if (loginButton) loginButton.hidden = false;
-        if (logoutButton) logoutButton.hidden = true;
-        updateMeta(null);
-        setSuperAdminVisibility(false);
-        setAdminSession(false);
-        if (isAdminPage) {
-          window.location.href = getAdminLoginRedirect();
-        }
-        return;
-      }
-
-      if (!hasAdminRole(user)) {
-        setAuthState('denied');
-        setStatus('admin_access_denied');
-        if (loginButton) loginButton.hidden = true;
-        if (logoutButton) logoutButton.hidden = false;
-        updateMeta(user);
-        setSuperAdminVisibility(false);
-        setAdminSession(false);
-        if (isLoginPage) {
-          setStatus('admin_login_error');
-        }
-        return;
-      }
-
-      setAuthState('granted');
-      setStatus('admin_access_granted');
-      if (loginButton) loginButton.hidden = true;
-      if (logoutButton) logoutButton.hidden = false;
-      updateMeta(user);
-      setSuperAdminVisibility(isSuperAdmin(user));
-      setAdminSession(true);
-
-      if (isLoginPage) {
-        const redirect = searchParams.get('redirect') || './admin.html';
-        window.location.href = hasAuthToken ? './admin.html' : redirect;
-      }
-
-      if (isAdminPage) {
-        initModerationPanel(user, isSuperAdmin(user));
-      }
-    };
-
-    const searchParams = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(
-      window.location.hash && window.location.hash.includes('=')
-        ? window.location.hash.slice(1)
-        : ''
-    );
-    const hasRecoveryToken = searchParams.has('recovery_token') || hashParams.has('recovery_token');
-    const hasInviteToken = searchParams.has('invite_token') || hashParams.has('invite_token');
-    const hasConfirmToken =
-      searchParams.has('confirmation_token') || hashParams.has('confirmation_token');
-    const hasAuthToken = hasRecoveryToken || hasInviteToken || hasConfirmToken;
-
-    window.netlifyIdentity.on('init', (user) => {
-      handleUser(user);
-      if (isLoginPage && !user && hasAuthToken) {
-        const action = hasRecoveryToken ? 'recovery' : 'signup';
-        window.netlifyIdentity.open(action);
-      }
-    });
-    window.netlifyIdentity.on('login', (user) => {
-      handleUser(user);
-      window.netlifyIdentity.close();
-    });
-    window.netlifyIdentity.on('logout', () => {
-      handleUser(null);
-    });
-    initTimer = window.setTimeout(() => {
-      if (document.body.dataset.adminAuth === 'checking') {
-        handleUser(null);
-      }
-    }, 500);
-
-    window.netlifyIdentity.init();
   };
 
   updateStaticTagAria = () => {
@@ -1942,7 +859,7 @@
   const formatDateTime = (value) => {
     const date = parseDateTime(value);
     if (!date) return value;
-    const parts = new Intl.DateTimeFormat('da-DK', {
+    const parts = new Intl.DateTimeFormat('uk-UA', {
       timeZone: 'Europe/Copenhagen',
       day: '2-digit',
       month: '2-digit',
@@ -1958,7 +875,7 @@
   const formatShortDate = (value) => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '';
-    const parts = new Intl.DateTimeFormat('da-DK', {
+    const parts = new Intl.DateTimeFormat('uk-UA', {
       timeZone: 'Europe/Copenhagen',
       day: '2-digit',
       month: '2-digit'
@@ -1970,7 +887,7 @@
   const formatTime = (value) => {
     const date = parseDateTime(value);
     if (!date) return value;
-    const parts = new Intl.DateTimeFormat('da-DK', {
+    const parts = new Intl.DateTimeFormat('uk-UA', {
       timeZone: 'Europe/Copenhagen',
       hour: '2-digit',
       minute: '2-digit',
@@ -2012,6 +929,8 @@
     return !Number.isNaN(startDate.getTime()) && startDate < now;
   };
 
+  const isArchivedEvent = (event) => event?.archived === true || event?.status === 'archived';
+
   const formatCurrency = (value) => `DKK ${value}`;
 
   const formatPriceLabel = (priceType, min, max) => {
@@ -2032,31 +951,7 @@
     return 'DKK';
   };
 
-  const getStoredLang = () => {
-    try {
-      return localStorage.getItem('lang');
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const setStoredLang = (lang) => {
-    try {
-      localStorage.setItem('lang', lang);
-    } catch (error) {
-      return;
-    }
-  };
-
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('lang')) {
-    params.delete('lang');
-    const nextQuery = params.toString();
-    const nextUrl = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
-    window.history.replaceState({}, '', nextUrl);
-  }
-  const initialLang = getStoredLang() || 'uk';
-  applyTranslations(initialLang);
+  applyTranslations();
   injectEventJsonLd();
 
   const getPreferredTheme = () => {
@@ -2090,10 +985,6 @@
       localStorage.setItem('theme', next);
       applyTheme(next);
     });
-  }
-
-  if (langButtons.length || langSelect) {
-    setStoredLang(initialLang);
   }
 
   const verificationSection = document.querySelector('[data-verification]');
@@ -2159,7 +1050,7 @@
     if (verificationStatusKey) {
       setVerificationStatus(verificationStatusKey, verificationStatus?.classList.contains('is-error'));
     }
-    updatePublishState();
+    publishState.update();
   };
 
   if (verificationSection) {
@@ -2191,7 +1082,7 @@
           saveVerificationState(nextState);
           applyVerificationState(nextState);
           setVerificationStatus('verification_pending', false);
-          updatePublishState();
+          publishState.update();
         } catch (error) {
           setVerificationStatus('verification_error', true);
         }
@@ -2199,6 +1090,25 @@
     }
   }
   refreshVerificationUI();
+
+  const shouldLoadAdmin =
+    document.body.classList.contains('admin-page') ||
+    document.body.classList.contains('admin-login-page');
+  if (shouldLoadAdmin) {
+    import('./modules/admin.js')
+      .then(({ initAdmin }) => {
+        initAdmin({ formatMessage });
+      })
+      .catch(() => {});
+  }
+
+  if (document.querySelector('.multi-step')) {
+    import('./modules/event-form.js')
+      .then(({ initEventForm }) => {
+        initEventForm({ formatMessage, getVerificationState, publishState });
+      })
+      .catch(() => {});
+  }
 
   const closeMenu = () => {
     if (!header || !menuToggle) return;
@@ -2286,896 +1196,12 @@
     }
   });
 
-  if (multiStepForm) {
-    const steps = Array.from(multiStepForm.querySelectorAll('.form-step'));
-    const stepperItems = Array.from(document.querySelectorAll('.stepper__item'));
-    const nextButton = multiStepForm.querySelector('[data-action="next"]');
-    const backButton = multiStepForm.querySelector('[data-action="back"]');
-    const previewTitle = document.querySelector('#preview-title');
-    const previewOrganizer = document.querySelector('#preview-organizer');
-    const previewDescription = document.querySelector('#preview-description');
-    const previewCategory = document.querySelector('#preview-category');
-    const previewTags = document.querySelector('#preview-tags');
-    const previewTime = document.querySelector('#preview-time');
-    const previewLocation = document.querySelector('#preview-location');
-    const previewTickets = document.querySelector('#preview-tickets');
-    const previewFormat = document.querySelector('#preview-format');
-    const previewImage = document.querySelector('#preview-image');
-    const categorySelect = multiStepForm.querySelector('select[name="category"]');
-    const formatSelect = multiStepForm.querySelector('select[name="format"]');
-    const imageInput = multiStepForm.querySelector('input[name="image"]');
-    const imageAltInput = multiStepForm.querySelector('input[name="image-alt"]');
-    const contactNameField = multiStepForm.querySelector('input[name="contact-name"]');
-    const tagsInput = multiStepForm.querySelector('.tags-input__field');
-    const tagsList = multiStepForm.querySelector('.tags-input__list');
-    const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
-    const statusField = multiStepForm.querySelector('input[name="status"]');
-    const verificationBanner = multiStepForm.querySelector('[data-verification-banner]');
-    const verificationBannerButton = multiStepForm.querySelector('[data-action="open-verification"]');
-    const honeypotField = multiStepForm.querySelector('input[name="website"]');
-    const pendingCategories = new Set();
-    const pendingTags = new Set();
-    let currentStep = 0;
-    const publishButton = multiStepForm.querySelector('button[type="submit"]');
-    const verificationWarning = multiStepForm.querySelector('[data-verification-warning]');
-    const submitStatus = multiStepForm.querySelector('[data-submit-status]');
-    const organizerId = multiStepForm.dataset.organizerId || 'org-001';
-    let organizerStatus = 'none';
-    let previewImageUrl = null;
-    const isAdminBypass = () => {
-      if (identityUser && hasAdminRole(identityUser)) return true;
-      try {
-        return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
-      } catch (error) {
-        return false;
-      }
-    };
 
-    const updateAdminSessionFlag = (user) => {
-      try {
-        if (user && hasAdminRole(user)) {
-          localStorage.setItem(ADMIN_SESSION_KEY, '1');
-        } else {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      } catch (error) {
-        return;
-      }
-    };
-
-    const initIdentitySession = () => {
-      if (!window.netlifyIdentity) {
-        window.addEventListener('load', () => {
-          if (window.netlifyIdentity) initIdentitySession();
-        }, { once: true });
-        return;
-      }
-      window.netlifyIdentity.on('init', (user) => {
-        identityUser = user;
-        updateAdminSessionFlag(user);
-        updatePublishState();
-      });
-      window.netlifyIdentity.on('login', (user) => {
-        identityUser = user;
-        updateAdminSessionFlag(user);
-        updatePublishState();
-      });
-      window.netlifyIdentity.on('logout', () => {
-        identityUser = null;
-        updateAdminSessionFlag(null);
-        updatePublishState();
-      });
-      window.netlifyIdentity.init();
-    };
-
-    const setStep = (index) => {
-      steps.forEach((step, stepIndex) => {
-        const isActive = stepIndex === index;
-        step.classList.toggle('is-active', isActive);
-        step.hidden = !isActive;
-      });
-      stepperItems.forEach((item, itemIndex) => {
-        if (itemIndex === index) {
-          item.setAttribute('aria-current', 'step');
-        } else {
-          item.removeAttribute('aria-current');
-        }
-      });
-      if (backButton) {
-        backButton.disabled = index === 0;
-      }
-      if (nextButton) {
-        nextButton.hidden = index === steps.length - 1;
-      }
-      updatePreview();
-    };
-
-    const getFieldValue = (name) => {
-      const field = multiStepForm.elements[name];
-      if (!field) return '';
-      if (field instanceof RadioNodeList) {
-        return field.value;
-      }
-      return field.value;
-    };
-
-    const getSelectLabel = (select, fallback) => {
-      if (!select) return fallback;
-      const option = Array.from(select.options).find((item) => item.value === fallback);
-      return option?.textContent?.trim() || fallback;
-    };
-
-    const updatePreviewImage = () => {
-      if (!previewImage || !imageInput) return;
-      const file = imageInput.files?.[0];
-      if (!file) {
-        previewImage.hidden = true;
-        previewImage.removeAttribute('src');
-        return;
-      }
-      if (previewImageUrl) {
-        URL.revokeObjectURL(previewImageUrl);
-      }
-      previewImageUrl = URL.createObjectURL(file);
-      previewImage.src = previewImageUrl;
-      previewImage.alt = imageAltInput?.value?.trim()
-        || formatMessage('form_image_alt_placeholder', {});
-      previewImage.hidden = false;
-    };
-
-    const updatePreview = () => {
-      const pendingLabel = formatMessage('pending_label', {});
-      const pendingTooltip = formatMessage('pending_tooltip', {});
-      if (previewTitle) {
-        previewTitle.textContent = getFieldValue('title') || '—';
-      }
-      if (previewOrganizer) {
-        const contactName = contactNameField?.value || getFieldValue('contact-name');
-        previewOrganizer.textContent = contactName || '—';
-      }
-      if (previewDescription) {
-        previewDescription.textContent = getFieldValue('description') || '—';
-      }
-      if (previewCategory) {
-        const value = getFieldValue('category');
-        const isPending = pendingCategories.has(value);
-        const label = value ? getSelectLabel(categorySelect, value) : '';
-        previewCategory.textContent = value
-          ? `${label}${isPending ? ` ${pendingLabel}` : ''}`
-          : '—';
-        if (previewCategory && isPending) {
-          previewCategory.setAttribute('title', pendingTooltip);
-        } else if (previewCategory) {
-          previewCategory.removeAttribute('title');
-        }
-      }
-      if (previewTags) {
-        const tags = tagsHidden?.value
-          ? tagsHidden.value.split(',').map((tag) => tag.trim()).filter(Boolean)
-          : [];
-        previewTags.textContent = tags.length ? tags.join(', ') : '—';
-        if (tags.length) {
-          if (pendingTags.size) {
-            previewTags.setAttribute('title', pendingTooltip);
-          } else {
-            previewTags.removeAttribute('title');
-          }
-        } else {
-          previewTags.removeAttribute('title');
-        }
-      }
-      if (previewTime) {
-        const start = getFieldValue('start');
-        const end = getFieldValue('end');
-        previewTime.textContent = start ? (formatDateRange(start, end) || start) : '—';
-      }
-      if (previewLocation) {
-        previewLocation.textContent = getFieldValue('address') || '—';
-      }
-      if (previewTickets) {
-        const ticketType = getFieldValue('ticket-type') || '—';
-        const minPrice = getFieldValue('price-min');
-        const maxPrice = getFieldValue('price-max');
-        const priceLabel = minPrice || maxPrice ? `${minPrice || '0'}–${maxPrice || '∞'}` : '—';
-        if (ticketType === 'free') {
-          previewTickets.textContent = formatMessage('form_ticket_free', {});
-        } else if (ticketType === 'paid') {
-          previewTickets.textContent = `${formatMessage('form_ticket_paid', {})} · ${priceLabel}`;
-        } else {
-          previewTickets.textContent = '—';
-        }
-      }
-      if (previewFormat) {
-        const value = getFieldValue('format');
-        previewFormat.textContent = value ? getSelectLabel(formatSelect, value) : '—';
-      }
-      updatePreviewImage();
-    };
-
-    multiStepForm.addEventListener('input', () => {
-      updatePreview();
-    });
-
-    multiStepForm.addEventListener('change', () => {
-      updatePreview();
-    });
-
-    const renderTagChips = () => {
-      if (!tagsList || !tagsHidden) return;
-      const pendingLabel = formatMessage('pending_label', {});
-      const pendingTooltip = formatMessage('pending_tooltip', {});
-      tagsList.innerHTML = Array.from(pendingTags)
-        .map((tag) => {
-          const removeLabel = formatMessage('remove_tag_label', { tag });
-          return `
-            <span class="tags-input__chip pending" title="${pendingTooltip}" aria-label="${tag} ${pendingLabel}">
-              ${tag}
-              <span class="tags-input__pending">${pendingLabel}</span>
-              <button type="button" data-tag="${tag}" aria-label="${removeLabel}">&times;</button>
-            </span>
-          `;
-        })
-        .join('');
-      tagsHidden.value = Array.from(pendingTags).join(', ');
-    };
-
-
-    if (tagsInput && tagsList) {
-      tagsInput.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter') return;
-        event.preventDefault();
-        const value = tagsInput.value.trim();
-        if (!value) return;
-        const normalized = value.toLowerCase();
-        const hasTag = Array.from(pendingTags).some((tag) => tag.toLowerCase() === normalized);
-        if (hasTag) {
-          tagsInput.value = '';
-          return;
-        }
-        pendingTags.add(value);
-        tagsInput.value = '';
-        renderTagChips();
-        updatePreview();
-      });
-
-      tagsList.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const tag = target.dataset.tag;
-        if (!tag) return;
-        pendingTags.forEach((existing) => {
-          if (existing === tag) {
-            pendingTags.delete(existing);
-          }
-        });
-        renderTagChips();
-        updatePreview();
-      });
-    }
-
-    if (imageInput) {
-      imageInput.addEventListener('change', () => {
-        updatePreview();
-      });
-    }
-
-    if (imageAltInput) {
-      imageAltInput.addEventListener('input', () => {
-        updatePreview();
-      });
-    }
-
-    const validateStep = () => {
-      const activeStep = steps[currentStep];
-      if (!activeStep) return true;
-      const fields = Array.from(activeStep.querySelectorAll('input, select, textarea'));
-      for (const field of fields) {
-        if (!field.checkValidity()) {
-          field.reportValidity();
-          return false;
-        }
-      }
-      return true;
-    };
-
-    const getEffectiveOrganizerStatus = () => {
-      const verification = getVerificationState();
-      if (isAdminBypass()) return 'admin';
-      if (organizerStatus && organizerStatus !== 'none') return organizerStatus;
-      if (verification.websiteApproved) return 'verified';
-      if (verification.websitePending) return 'pending_manual';
-      return 'none';
-    };
-
-    const loadOrganizerStatus = async () => {
-      try {
-        const response = await fetch('./data/organizers.json');
-        if (!response.ok) return;
-        const list = await response.json();
-        const organizer = Array.isArray(list)
-          ? list.find((item) => item.id === organizerId)
-          : null;
-        if (organizer && organizer.verificationStatus) {
-          organizerStatus = organizer.verificationStatus;
-          updatePublishState();
-        }
-      } catch (error) {
-        return;
-      }
-    };
-
-    setStep(currentStep);
-    renderTagChips();
-    updatePublishState = () => {
-      const verified = getEffectiveOrganizerStatus() !== 'none';
-      if (publishButton) {
-        publishButton.disabled = !verified;
-      }
-      if (verificationWarning) {
-        verificationWarning.hidden = verified;
-      }
-      if (verificationBanner) {
-        verificationBanner.hidden = verified;
-      }
-    };
-    updatePublishState();
-    initIdentitySession();
-    loadOrganizerStatus();
-
-    if (verificationBannerButton) {
-      verificationBannerButton.addEventListener('click', () => {
-        window.location.href = 'dashboard.html#settings';
-      });
-    }
-
-    if (nextButton) {
-      nextButton.addEventListener('click', () => {
-        if (!validateStep()) return;
-        currentStep = Math.min(currentStep + 1, steps.length - 1);
-        setStep(currentStep);
-      });
-    }
-
-    if (backButton) {
-      backButton.addEventListener('click', () => {
-        currentStep = Math.max(currentStep - 1, 0);
-        setStep(currentStep);
-      });
-    }
-
-    multiStepForm.addEventListener('submit', async (event) => {
-      const verified = getEffectiveOrganizerStatus() !== 'none';
-      if (!verified) {
-        event.preventDefault();
-        if (verificationWarning) {
-          verificationWarning.hidden = false;
-        }
-        return;
-      }
-      event.preventDefault();
-      if (honeypotField && honeypotField.value.trim()) {
-        if (submitStatus) {
-          submitStatus.textContent = formatMessage('spam_blocked', {});
-        }
-        return;
-      }
-      if (statusField) {
-        statusField.value = isAdminBypass() ? 'approved' : 'pending';
-      }
-      if (!validateStep()) {
-        return;
-      }
-      if (submitStatus) {
-        submitStatus.textContent = '';
-      }
-      try {
-        const formData = new FormData(multiStepForm);
-        const payload = Object.fromEntries(formData.entries());
-        const response = await fetch('/.netlify/functions/submit-event', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!response.ok) {
-          throw new Error('Submit failed');
-        }
-        const result = await response.json();
-        if (!result?.ok) {
-          throw new Error('Submit failed');
-        }
-        if (submitStatus) {
-          submitStatus.textContent = formatMessage('submit_success', {});
-        }
-      } catch (error) {
-        if (submitStatus) {
-          submitStatus.textContent = formatMessage('submit_error', {});
-        }
-      }
-    });
-  }
-
-  const initModerationPanel = (user, superAdmin) => {
-    if (!moderationList || !modal || moderationList.dataset.ready) return;
-    moderationList.dataset.ready = 'true';
-
-    const pendingContainer = document.querySelector('[data-admin-pending]');
-    const verificationContainer = document.querySelector('[data-admin-verifications]');
-    const rejectedContainer = document.querySelector('[data-admin-rejected]');
-    const auditContainer = document.querySelector('[data-admin-audit]');
-    const template = document.querySelector('#moderation-card-template');
-    const verificationTemplate = document.querySelector('#verification-card-template');
-    const auditTemplate = document.querySelector('#audit-row-template');
-    const loadingEl = pendingContainer?.querySelector('[data-admin-loading]');
-    const emptyEl = pendingContainer?.querySelector('[data-admin-empty]');
-    const verificationEmptyEl = verificationContainer?.querySelector('[data-admin-verifications-empty]');
-    const rejectedEmptyEl = rejectedContainer?.querySelector('[data-admin-rejected-empty]');
-    const auditEmptyEl = auditContainer?.querySelector('[data-admin-audit-empty]');
-    const modalDialog = modal.querySelector('.modal__dialog');
-    const modalTextarea = modal.querySelector('textarea[name="reject-reason"]');
-    const modalCloseButtons = modal.querySelectorAll('[data-modal-close]');
-    const modalConfirm = modal.querySelector('[data-modal-confirm]');
-    const editModal = document.querySelector('[data-admin-edit-modal]');
-    const editDialog = editModal?.querySelector('.modal__dialog');
-    const editForm = editModal?.querySelector('[data-admin-edit-form]');
-    const editLinks = editModal?.querySelector('[data-admin-edit-links]');
-    const editCloseButtons = editModal
-      ? editModal.querySelectorAll('[data-admin-edit-close]')
-      : [];
-    const editSave = editModal?.querySelector('[data-admin-edit-save]');
-    let activeCard = null;
-    let lastTrigger = null;
-    let activeEditId = null;
-    let lastEditTrigger = null;
-    const pendingById = new Map();
-
-    const focusableSelector =
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-    const openModal = (triggerButton, card) => {
-      activeCard = card;
-      lastTrigger = triggerButton;
-      modal.hidden = false;
-      if (modalTextarea) {
-        modalTextarea.value = '';
-        modalTextarea.focus();
-      }
-    };
-
-    const closeModal = () => {
-      modal.hidden = true;
-      activeCard = null;
-      if (lastTrigger) {
-        lastTrigger.focus();
-      }
-    };
-
-    const closeEditModal = () => {
-      if (!editModal) return;
-      editModal.hidden = true;
-      activeEditId = null;
-      if (lastEditTrigger) {
-        lastEditTrigger.focus();
-      }
-    };
-
-    const normalizeUrl = (value) => {
-      const trimmed = String(value || '').trim();
-      if (!trimmed) return '';
-      if (/^https?:\/\//i.test(trimmed)) return trimmed;
-      return `https://${trimmed}`;
-    };
-
-    const renderEditLinks = (payload) => {
-      if (!editLinks) return;
-      const entries = [
-        { label: 'Website', value: payload['contact-website'] || payload.website },
-        { label: 'Instagram', value: payload['contact-instagram'] },
-        { label: 'Facebook', value: payload['contact-facebook'] },
-        { label: 'Telegram', value: payload['contact-telegram'] }
-      ]
-        .map((entry) => ({ ...entry, url: normalizeUrl(entry.value) }))
-        .filter((entry) => entry.url);
-      if (!entries.length) {
-        editLinks.innerHTML = '<span class="admin-edit__links-empty">Немає посилань.</span>';
-        return;
-      }
-      editLinks.innerHTML = entries
-        .map(
-          (entry) =>
-            `<a class="admin-edit__link" href="${entry.url}" target="_blank" rel="noopener">${entry.label}</a>`
-        )
-        .join('');
-    };
-
-    const openEditModal = (triggerButton, item) => {
-      if (!editModal || !editForm) return;
-      const payload = item?.payload || {};
-      activeEditId = item?.id || null;
-      lastEditTrigger = triggerButton;
-      const setValue = (name, value) => {
-        const field = editForm.querySelector(`[name="${CSS.escape(name)}"]`);
-        if (!field) return;
-        if (
-          field instanceof HTMLInputElement ||
-          field instanceof HTMLTextAreaElement ||
-          field instanceof HTMLSelectElement
-        ) {
-          field.value = value ?? '';
-        }
-      };
-      setValue('title', payload.title || item?.title || '');
-      setValue('description', payload.description || '');
-      setValue('category', payload.category || '');
-      const tagsValue = Array.isArray(payload.tags) ? payload.tags.join(', ') : payload.tags || '';
-      setValue('tags', tagsValue);
-      setValue('start', payload.start || '');
-      setValue('end', payload.end || '');
-      setValue('format', payload.format || '');
-      setValue('address', payload.address || '');
-      setValue('city', payload.city || '');
-      setValue('ticket-type', payload['ticket-type'] || '');
-      setValue('price-min', payload['price-min'] || '');
-      setValue('price-max', payload['price-max'] || '');
-      setValue('ticket-url', payload['ticket-url'] || '');
-      setValue('contact-name', payload['contact-name'] || '');
-      setValue('contact-email', payload['contact-email'] || '');
-      setValue('contact-phone', payload['contact-phone'] || '');
-      setValue('contact-facebook', payload['contact-facebook'] || '');
-      setValue('contact-instagram', payload['contact-instagram'] || '');
-      setValue('contact-telegram', payload['contact-telegram'] || '');
-      setValue('contact-website', payload['contact-website'] || '');
-      renderEditLinks(payload);
-      editModal.hidden = false;
-      const firstField = editForm.querySelector('input, textarea, select');
-      if (firstField instanceof HTMLElement) {
-        firstField.focus();
-      }
-    };
-
-    const updateStatus = (card, statusKey, reason) => {
-      const statusPill = card.querySelector('.status-pill');
-      const reasonText = card.querySelector('[data-admin-reason]');
-      if (!statusPill) return;
-      statusPill.textContent = formatMessage(statusKey, {});
-      statusPill.classList.remove('status-pill--pending', 'status-pill--published', 'status-pill--draft');
-      if (statusKey === 'admin_status_approved') {
-        statusPill.classList.add('status-pill--published');
-        if (reasonText) {
-          reasonText.hidden = true;
-        }
-      } else if (statusKey === 'admin_status_rejected') {
-        statusPill.classList.add('status-pill--draft');
-        if (reasonText) {
-          reasonText.hidden = false;
-          const label = formatMessage('admin_reason_label', {});
-          reasonText.textContent = reason ? `${label}: ${reason}` : `${label}: —`;
-        }
-      }
-    };
-
-    const renderHistory = (card, history) => {
-      const historyEl = card.querySelector('[data-admin-history]');
-      const historyList = card.querySelector('[data-admin-history-list]');
-      if (!historyEl || !historyList) return;
-      historyList.innerHTML = '';
-      if (!history || history.length === 0) {
-        historyEl.hidden = true;
-        return;
-      }
-      history.forEach((entry) => {
-        const li = document.createElement('li');
-        const actionKey =
-          entry.action === 'approve' ? 'admin_status_approved' : 'admin_status_rejected';
-        const actionLabel = formatMessage(actionKey, {});
-        const actor = entry.actorEmail || '—';
-        const ts = entry.ts ? new Date(entry.ts).toLocaleString() : '—';
-        const tsText = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
-        li.textContent = formatMessage('admin_history_entry', { action: actionLabel, actor, ts: tsText });
-        historyList.appendChild(li);
-      });
-      historyEl.hidden = false;
-    };
-
-    const renderCards = (container, items, withActions) => {
-      if (!container || !template) return;
-      container.querySelectorAll('[data-admin-card]').forEach((card) => card.remove());
-      items.forEach((item) => {
-        const card = template.content.firstElementChild.cloneNode(true);
-        card.dataset.eventId = item.id;
-        const titleEl = card.querySelector('[data-admin-title]');
-        const metaEl = card.querySelector('[data-admin-meta]');
-        if (titleEl) titleEl.textContent = item.title;
-        if (metaEl) metaEl.textContent = item.meta;
-        if (!withActions) {
-          const actions = card.querySelector('[data-admin-actions]');
-          if (actions) actions.remove();
-          updateStatus(card, 'admin_status_rejected', item.reason);
-        }
-        renderHistory(card, item.history || []);
-        container.appendChild(card);
-      });
-    };
-
-    const renderVerifications = (items) => {
-      if (!verificationContainer || !verificationTemplate) return;
-      verificationContainer
-        .querySelectorAll('[data-admin-verification-row]')
-        .forEach((card) => card.remove());
-      items.forEach((item) => {
-        const row = verificationTemplate.content.firstElementChild.cloneNode(true);
-        const nameEl = row.querySelector('[data-admin-verification-name]');
-        const metaEl = row.querySelector('[data-admin-verification-meta]');
-        const linkEl = row.querySelector('[data-admin-verification-link]');
-        const link = item.link || '—';
-        const createdAt = item.createdAt
-          ? new Date(item.createdAt).toLocaleString(getUiLocale())
-          : '—';
-        row.dataset.link = item.link || '';
-        row.dataset.name = item.name || link;
-        if (nameEl) nameEl.textContent = item.name || link;
-        if (metaEl) metaEl.textContent = createdAt;
-        if (linkEl) {
-          linkEl.href = item.link || '#';
-          linkEl.textContent = item.link || '—';
-        }
-        verificationContainer.appendChild(row);
-      });
-    };
-
-    const renderAudit = (items) => {
-      if (!auditContainer || !auditTemplate) return;
-      auditContainer.querySelectorAll('[data-admin-audit-row]').forEach((row) => row.remove());
-      if (!items || items.length === 0) {
-        if (auditEmptyEl) auditEmptyEl.hidden = false;
-        return;
-      }
-      if (auditEmptyEl) auditEmptyEl.hidden = true;
-      items.forEach((entry) => {
-        const row = auditTemplate.content.firstElementChild.cloneNode(true);
-        const titleEl = row.querySelector('[data-admin-audit-title]');
-        const metaEl = row.querySelector('[data-admin-audit-meta]');
-        const statusEl = row.querySelector('[data-admin-audit-status]');
-        const reasonEl = row.querySelector('[data-admin-audit-reason]');
-        if (titleEl) titleEl.textContent = entry.title;
-        const actor = entry.actorEmail || '—';
-        const ts = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
-        if (metaEl) metaEl.textContent = `${actor} · ${ts}`;
-        const statusKey =
-          entry.action === 'approve' ? 'admin_status_approved' : 'admin_status_rejected';
-        if (statusEl) {
-          statusEl.textContent = formatMessage(statusKey, {});
-          statusEl.classList.remove('status-pill--pending');
-          statusEl.classList.add(
-            entry.action === 'approve' ? 'status-pill--published' : 'status-pill--draft'
-          );
-        }
-        if (reasonEl) {
-          if (entry.reason) {
-            const label = formatMessage('admin_reason_label', {});
-            reasonEl.textContent = `${label}: ${entry.reason}`;
-            reasonEl.hidden = false;
-          } else {
-            reasonEl.hidden = true;
-          }
-        }
-        auditContainer.appendChild(row);
-      });
-    };
-
-    const setEmptyState = (el, isEmpty) => {
-      if (!el) return;
-      el.hidden = !isEmpty;
-    };
-
-    const getAuthHeaders = () => {
-      const token = user?.token?.access_token;
-      return token ? { Authorization: `Bearer ${token}` } : {};
-    };
-
-    const loadModerationQueue = async () => {
-      if (loadingEl) loadingEl.hidden = false;
-      if (emptyEl) emptyEl.hidden = true;
-      if (verificationEmptyEl) verificationEmptyEl.hidden = true;
-      if (rejectedEmptyEl) rejectedEmptyEl.hidden = true;
-      if (auditEmptyEl) auditEmptyEl.hidden = true;
-      try {
-        const lang = document.documentElement.lang || 'uk';
-        const response = await fetch(`/.netlify/functions/admin-events?lang=${encodeURIComponent(lang)}`, {
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders(), 'x-locale': lang }
-        });
-        if (!response.ok) {
-          throw new Error('admin events failed');
-        }
-        const result = await response.json();
-        const pending = Array.isArray(result?.pending) ? result.pending : [];
-        const rejected = Array.isArray(result?.rejected) ? result.rejected : [];
-        const audit = Array.isArray(result?.audit) ? result.audit : [];
-        const verifications = Array.isArray(result?.verifications) ? result.verifications : [];
-        pendingById.clear();
-        pending.forEach((item) => {
-          if (item?.id) pendingById.set(item.id, item);
-        });
-        renderCards(pendingContainer, pending, true);
-        renderCards(rejectedContainer, rejected, false);
-        renderVerifications(verifications);
-        setEmptyState(emptyEl, pending.length === 0);
-        setEmptyState(verificationEmptyEl, verifications.length === 0);
-        setEmptyState(rejectedEmptyEl, rejected.length === 0);
-        if (superAdmin) {
-          renderAudit(audit);
-        }
-      } catch (error) {
-        setEmptyState(emptyEl, true);
-        setEmptyState(verificationEmptyEl, true);
-        setEmptyState(rejectedEmptyEl, true);
-        if (auditEmptyEl) auditEmptyEl.hidden = false;
-      } finally {
-        if (loadingEl) loadingEl.hidden = true;
-      }
-    };
-
-    const sendModerationAction = async (eventId, action, reason, payload) => {
-      try {
-        const body = { id: eventId, action, reason };
-        if (payload && typeof payload === 'object') {
-          body.payload = payload;
-        }
-        await fetch('/.netlify/functions/admin-update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify(body)
-        });
-      } catch (error) {
-        // Ignore network errors for optimistic UI.
-      }
-    };
-
-    const sendVerificationAction = async ({ link, name, action }) => {
-      try {
-        await fetch('/.netlify/functions/admin-verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ link, name, action })
-        });
-      } catch (error) {
-        // Ignore network errors for optimistic UI.
-      }
-    };
-
-    if (pendingContainer) {
-      pendingContainer.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const card = target.closest('[data-admin-card]');
-        if (!card) return;
-        const eventId = card.dataset.eventId || '';
-        if (target.dataset.action === 'view') {
-          const item = pendingById.get(eventId);
-          if (item) {
-            openEditModal(target, item);
-          }
-          return;
-        }
-        if (target.dataset.action === 'approve') {
-          updateStatus(card, 'admin_status_approved');
-          sendModerationAction(eventId, 'approve').then(loadModerationQueue);
-        }
-        if (target.dataset.action === 'reject') {
-          openModal(target, card);
-        }
-      });
-    }
-
-    if (verificationContainer) {
-      verificationContainer.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        if (target.dataset.action !== 'approve-verification') return;
-        const card = target.closest('[data-admin-verification-row]');
-        if (!card) return;
-        const link = card.dataset.link || '';
-        const name = card.dataset.name || '';
-        sendVerificationAction({ link, name, action: 'approve' });
-        card.remove();
-        const remaining =
-          verificationContainer.querySelectorAll('[data-admin-verification-row]').length === 0;
-        setEmptyState(verificationEmptyEl, remaining);
-      });
-    }
-
-    modalCloseButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        closeModal();
-      });
-    });
-
-    if (modalConfirm) {
-      modalConfirm.addEventListener('click', () => {
-        if (!activeCard || !modalTextarea) return;
-        if (!modalTextarea.checkValidity()) {
-          modalTextarea.reportValidity();
-          return;
-        }
-        const reason = modalTextarea.value.trim();
-        updateStatus(activeCard, 'admin_status_rejected', reason);
-        sendModerationAction(activeCard.dataset.eventId || '', 'reject', reason).then(
-          loadModerationQueue
-        );
-        closeModal();
-      });
-    }
-
-    modal.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeModal();
-        return;
-      }
-      if (event.key !== 'Tab' || !modalDialog) return;
-      const focusable = Array.from(modalDialog.querySelectorAll(focusableSelector));
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    });
-
-    editCloseButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        closeEditModal();
-      });
-    });
-
-    if (editSave) {
-      editSave.addEventListener('click', () => {
-        if (!editForm || !activeEditId) return;
-        const formData = new FormData(editForm);
-        const updatedPayload = {};
-        formData.forEach((value, key) => {
-          updatedPayload[key] = String(value).trim();
-        });
-        sendModerationAction(activeEditId, 'edit', '', updatedPayload).then(loadModerationQueue);
-        closeEditModal();
-      });
-    }
-
-    if (editDialog && editModal) {
-      editModal.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          closeEditModal();
-          return;
-        }
-        if (event.key !== 'Tab') return;
-        const focusable = Array.from(editDialog.querySelectorAll(focusableSelector));
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      });
-    }
-
-    loadModerationQueue();
-  };
-
-  setupAdminAuth();
-
-  if (catalogGrid) {
-    const filtersForm = document.querySelector('.filters');
-    const resultsCount = document.querySelector('.filters__count');
-    const emptyState = document.querySelector('.catalog-empty');
-    const errorState = document.querySelector('.catalog-error');
+    if (catalogGrid) {
+      const filtersForm = document.querySelector('.filters');
+      const resultsCount = document.querySelector('.filters__count');
+      const emptyState = document.querySelector('.catalog-empty');
+      const errorState = document.querySelector('.catalog-error');
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const resetEventsButton = document.querySelector('[data-action="events-reset"]');
     const searchInput = document.querySelector('#event-search');
@@ -3197,12 +1223,90 @@
       : {};
     const emptyResetButton = document.querySelector('[data-action="reset-filters"]');
     const errorRetryButton = errorState ? errorState.querySelector('[data-action="retry-load"]') : null;
-    let events = [];
-    let filteredEvents = [];
-    let currentFormData = null;
-    let visibleCount = 0;
-    let windowOffset = 0;
-    const pageSize = 15;
+      let currentFormData = null;
+      let visibleCount = 0;
+      let windowOffset = 0;
+      const pageSize = 15;
+      const activeFilters = {
+        city: '',
+        searchQuery: '',
+        priceCategory: '',
+        audiences: new Set()
+      };
+      const AUDIENCE_KEYS = {
+        'audience-ua': 'ua',
+        'audience-family': 'family',
+        'audience-volunteer': 'volunteer'
+      };
+    const CATALOG_STATE_KEY = 'wodCatalogState';
+    let pendingCatalogState = null;
+    let catalogStateRestored = false;
+
+    const normalizeFilterString = (value) => {
+      if (!value) return '';
+      return value.startsWith('?') ? value : `?${value}`;
+    };
+
+    const loadCatalogState = () => {
+      try {
+        const raw = sessionStorage.getItem(CATALOG_STATE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (error) {
+        return null;
+      }
+    };
+
+    const applyStoredFilters = () => {
+      if (!pendingCatalogState) return;
+      const stored = normalizeFilterString(pendingCatalogState.filters || '');
+      const current = window.location.search || '';
+      if (!stored) {
+        pendingCatalogState.filters = current;
+        return;
+      }
+      if (stored === current) {
+        pendingCatalogState.filters = current;
+        return;
+      }
+      window.history.replaceState({}, '', `${window.location.pathname}${stored}`);
+      pendingCatalogState.filters = stored;
+    };
+
+    const persistCatalogState = () => {
+      try {
+        const state = {
+          scrollY: window.scrollY,
+          visibleCount,
+          filters: window.location.search || ''
+        };
+        sessionStorage.setItem(CATALOG_STATE_KEY, JSON.stringify(state));
+      } catch (error) {
+        console.warn('Unable to persist catalog state', error);
+      }
+    };
+
+    const restoreCatalogState = () => {
+      if (!pendingCatalogState || catalogStateRestored) return;
+      const targetCount = Number(pendingCatalogState.visibleCount) || 0;
+      if (targetCount > visibleCount && state.filteredEvents.length) {
+        while (visibleCount < targetCount && visibleCount < state.filteredEvents.length) {
+          const nextCount = Math.min(
+            visibleCount + pageSize,
+            state.filteredEvents.length,
+            targetCount
+          );
+          visibleCount = nextCount;
+        }
+      }
+      const scrollY = Number(pendingCatalogState.scrollY) || 0;
+      if (scrollY) {
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+      }
+      sessionStorage.removeItem(CATALOG_STATE_KEY);
+      catalogStateRestored = true;
+      pendingCatalogState = null;
+    };
     const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
     const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
     const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
@@ -3219,16 +1323,27 @@
           ...audienceFields
         ]
       : [];
-
-    const formatPrice = (event) => {
-      if (event.priceType === 'free') {
-        return { label: formatPriceLabel('free'), className: 'event-card__price--free' };
-      }
-      return {
-        label: formatPriceLabel(event.priceType, event.priceMin, event.priceMax),
-        className: 'event-card__price--paid'
-      };
-    };
+    const cityField = filtersForm?.elements ? filtersForm.elements.city : null;
+    const priceField = filtersForm?.elements ? filtersForm.elements.price : null;
+    if (cityField instanceof HTMLSelectElement) {
+      cityField.addEventListener('change', () => {
+        setCityFilter(cityField.value);
+        applyFilters();
+      });
+    }
+    if (priceField instanceof HTMLSelectElement) {
+      priceField.addEventListener('change', () => {
+        setPriceFilter(priceField.value);
+        applyFilters();
+      });
+    }
+    audienceFields.forEach((input) => {
+      if (!(input instanceof HTMLInputElement)) return;
+      input.addEventListener('change', () => {
+        setAudienceFilter(input.name, input.checked);
+        applyFilters();
+      });
+    });
 
     const normalize = (value) => String(value || '').toLowerCase();
     const getTokens = (value) =>
@@ -3237,202 +1352,202 @@
         .map((token) => token.trim())
         .filter(Boolean);
 
+    const normalizeSearchValue = (text) => String(text || '').trim().toLowerCase();
+
+    const matchesActiveFilters = (event) => {
+      if (activeFilters.city) {
+        if (normalize(event.city) !== normalize(activeFilters.city)) {
+          return false;
+        }
+      }
+      if (activeFilters.priceCategory) {
+        if (normalize(event.priceType || event.priceCategory) !== normalize(activeFilters.priceCategory)) {
+          return false;
+        }
+      }
+      if (activeFilters.searchQuery) {
+      const lang = 'uk';
+        const query = normalize(activeFilters.searchQuery);
+        const haystack = [
+        getLocalizedEventTitle(event),
+          event.description,
+        getLocalizedCity(event.city),
+          event.venue,
+        getLocalizedCategory(event.category?.label || ''),
+        getTagList(event.tags).map((tag) => getLocalizedTag(tag.label)).join(' ')
+        ]
+          .map((value) => normalize(value))
+          .join(' ');
+        if (!haystack.includes(query)) {
+          return false;
+        }
+      }
+      if (activeFilters.audiences.size) {
+        for (const audience of activeFilters.audiences) {
+          if (audience === 'ua' && !event.forUkrainians) return false;
+          if (audience === 'family' && !event.familyFriendly) return false;
+          if (audience === 'volunteer' && !event.volunteer) return false;
+        }
+      }
+      return true;
+    };
+
     const EVENT_TITLES = {
       'evt-001': {
         uk: 'Тиждень дизайну в Копенгагені: Open Studio',
-        en: 'Copenhagen Design Week: Open Studio',
-        da: 'Copenhagen Design Week: Open Studio'
       },
       'evt-002': {
         uk: 'Зимовий фестиваль їжі в Орхусі',
-        en: 'Aarhus Winter Food Fest',
-        da: 'Aarhus Vinter Madfestival'
       },
       'evt-003': {
         uk: 'Нічний забіг в Оденсе біля річки',
-        en: 'Odense Night Run by the River',
-        da: 'Odense Natløb ved åen'
       },
       'evt-004': {
         uk: 'Творчий coding jam в Ольборзі',
-        en: 'Aalborg Creative Coding Jam',
-        da: 'Aalborg Kreativ Coding Jam'
       },
       'evt-005': {
         uk: "Сімейний кіновечір в Есб'єрзі",
-        en: 'Esbjerg Family Film Night',
-        da: 'Esbjerg Familie Film Aften'
       },
       'evt-006': {
         uk: 'Спільний сніданок для новоприбулих',
-        en: 'Community Breakfast for Newcomers',
-        da: 'Fællesskabsmorgenmad for nytilkomne'
       },
       'evt-007': {
         uk: 'Концертний вечір у Копенгагені',
-        en: 'Copenhagen Concert Night',
-        da: 'København Koncertaften'
       },
       'evt-008': {
         uk: 'Показ українського фільму',
-        en: 'Ukrainian Film Screening',
-        da: 'Ukrainsk filmvisning'
       },
       'evt-009': {
         uk: 'Клуб данської мови',
-        en: 'Danish Language Club',
-        da: 'Dansk Sprogklub'
       },
       'evt-010': {
         uk: 'Нетворкінг-ланч для стартапів',
-        en: 'Startup Networking Lunch',
-        da: 'Startup Netværksfrokost'
       },
       'evt-011': {
         uk: 'Маркет ремесел та мейкерів у Колдингу',
-        en: 'Kolding Craft & Makers Market',
-        da: 'Kolding Håndværk & Makers Marked'
       },
       'evt-012': {
         uk: 'Історична прогулянка в Роскілле',
-        en: 'Roskilde History Walk',
-        da: 'Roskilde Historievandring'
       },
       'evt-013': {
         uk: 'День каякінгу на озері в Сількеборзі',
-        en: 'Silkeborg Lake Kayak Day',
-        da: 'Silkeborg Sø Kajakdag'
       },
       'evt-014': {
         uk: 'Сімейний день науки у Вайле',
-        en: 'Vejle Family Science Day',
-        da: 'Vejle Familievidenskabsdag'
       },
       'evt-015': {
         uk: 'День волонтера: прибирання міста',
-        en: 'Volunteer Day: City Clean-Up',
-        da: 'Frivillighedsdag: Byoprydning'
       },
       'evt-016': {
         uk: 'Сімейний день у музеї Копенгагена',
-        en: 'Copenhagen Museum Family Day',
-        da: 'Københavns Museum Familiedag'
       },
       'evt-017': {
         uk: "Кар'єрна консультація для новоприбулих",
-        en: 'Job Clinic for Newcomers',
-        da: 'Jobklinik for nytilkomne'
       },
       'evt-018': {
         uk: 'Вечір арт-терапії',
-        en: 'Art Therapy Evening',
-        da: 'Aften med kunstterapi'
       },
       'evt-019': {
         uk: 'День спадщини в Хельсінгёрі',
-        en: 'Helsingør Heritage Day',
-        da: 'Helsingør Kulturarvsdag'
       },
       'evt-020': {
         uk: 'Форум української спільноти',
-        en: 'Ukrainian Community Forum',
-        da: 'Ukrainsk Fællesskabsforum'
       }
     };
 
     const CITY_TRANSLATIONS = {
-      copenhagen: { uk: 'Копенгаген', en: 'Copenhagen', da: 'København' },
-      aarhus: { uk: 'Орхус', en: 'Aarhus', da: 'Aarhus' },
-      odense: { uk: 'Оденсе', en: 'Odense', da: 'Odense' },
-      aalborg: { uk: 'Ольборг', en: 'Aalborg', da: 'Aalborg' },
-      esbjerg: { uk: "Есб'єрг", en: 'Esbjerg', da: 'Esbjerg' },
-      kolding: { uk: 'Колдинг', en: 'Kolding', da: 'Kolding' },
-      roskilde: { uk: 'Роскілле', en: 'Roskilde', da: 'Roskilde' },
-      silkeborg: { uk: 'Сількеборг', en: 'Silkeborg', da: 'Silkeborg' },
-      vejle: { uk: 'Вайле', en: 'Vejle', da: 'Vejle' },
-      fredericia: { uk: 'Фредерісія', en: 'Fredericia', da: 'Fredericia' },
-      helsingør: { uk: 'Хельсінгёр', en: 'Helsingør', da: 'Helsingør' },
-      helsingor: { uk: 'Хельсінгёр', en: 'Helsingør', da: 'Helsingør' }
+    copenhagen: { uk: 'Копенгаген' },
+    aarhus: { uk: 'Орхус' },
+    odense: { uk: 'Оденсе' },
+    aalborg: { uk: 'Ольборг' },
+    esbjerg: { uk: "Есб'єрг" },
+    kolding: { uk: 'Колдинг' },
+    roskilde: { uk: 'Роскілле' },
+    silkeborg: { uk: 'Сількеборг' },
+    vejle: { uk: 'Вайле' },
+    fredericia: { uk: 'Фредерісія' },
+    helsingør: { uk: 'Хельсінгёр' },
+    helsingor: { uk: 'Хельсінгёр' }
     };
 
     const CATEGORY_TRANSLATIONS = {
-      art: { uk: 'Мистецтво', en: 'Art', da: 'Kunst' },
-      food: { uk: 'Їжа', en: 'Food', da: 'Mad' },
-      sports: { uk: 'Спорт', en: 'Sports', da: 'Sport' },
-      business: { uk: 'Бізнес', en: 'Business', da: 'Business' },
-      market: { uk: 'Маркет', en: 'Market', da: 'Marked' },
-      outdoors: { uk: 'На природі', en: 'Outdoors', da: 'Udendørs' },
-      science: { uk: 'Наука', en: 'Science', da: 'Videnskab' },
-      volunteer: { uk: 'Волонтерство', en: 'Volunteer', da: 'Frivilligt' },
-      culture: { uk: 'Культура', en: 'Culture', da: 'Kultur' },
-      career: { uk: "Кар'єра", en: 'Career', da: 'Karriere' },
-      wellbeing: { uk: 'Добробут', en: 'Wellbeing', da: 'Trivsel' },
-      history: { uk: 'Історія', en: 'History', da: 'Historie' },
-      education: { uk: 'Освіта', en: 'Education', da: 'Uddannelse' },
-      music: { uk: 'Музика', en: 'Music', da: 'Musik' },
-      networking: { uk: 'Нетворкінг', en: 'Networking', da: 'Networking' },
-      cinema: { uk: 'Кіно', en: 'Cinema', da: 'Film' },
-      kids: { uk: 'Для дітей', en: 'For kids', da: 'For børn' },
-      community: { uk: 'Спільнота', en: 'Community', da: 'Fællesskab' }
+    art: { uk: 'Мистецтво' },
+    food: { uk: 'Їжа' },
+    sports: { uk: 'Спорт' },
+    business: { uk: 'Бізнес' },
+    market: { uk: 'Маркет' },
+    outdoors: { uk: 'На природі' },
+    science: { uk: 'Наука' },
+    volunteer: { uk: 'Волонтерство' },
+    culture: { uk: 'Культура' },
+    career: { uk: "Кар'єра" },
+    wellbeing: { uk: 'Добробут' },
+    history: { uk: 'Історія' },
+    education: { uk: 'Освіта' },
+    music: { uk: 'Музика' },
+    networking: { uk: 'Нетворкінг' },
+    cinema: { uk: 'Кіно' },
+    kids: { uk: 'Для дітей' },
+    community: { uk: 'Спільнота' }
     };
 
     const TAG_TRANSLATIONS = {
-      adventure: { uk: 'пригоди', en: 'adventure', da: 'eventyr' },
-      art: { uk: 'мистецтво', en: 'art', da: 'kunst' },
-      career: { uk: "кар'єра", en: 'career', da: 'karriere' },
-      castle: { uk: 'замок', en: 'castle', da: 'slot' },
-      cinema: { uk: 'кіно', en: 'cinema', da: 'film' },
-      coding: { uk: 'кодинг', en: 'coding', da: 'kodning' },
-      community: { uk: 'спільнота', en: 'community', da: 'fællesskab' },
-      craft: { uk: 'ремесла', en: 'craft', da: 'håndværk' },
-      creative: { uk: 'креатив', en: 'creative', da: 'kreativ' },
-      culture: { uk: 'культура', en: 'culture', da: 'kultur' },
-      danish: { uk: 'данська', en: 'danish', da: 'dansk' },
-      design: { uk: 'дизайн', en: 'design', da: 'design' },
-      discussion: { uk: 'обговорення', en: 'discussion', da: 'diskussion' },
-      family: { uk: 'родина', en: 'family', da: 'familie' },
-      festival: { uk: 'фестиваль', en: 'festival', da: 'festival' },
-      food: { uk: 'їжа', en: 'food', da: 'mad' },
-      heritage: { uk: 'спадщина', en: 'heritage', da: 'kulturarv' },
-      history: { uk: 'історія', en: 'history', da: 'historie' },
-      indie: { uk: 'інді', en: 'indie', da: 'indie' },
-      kayak: { uk: 'каяк', en: 'kayak', da: 'kajak' },
-      kids: { uk: 'діти', en: 'kids', da: 'børn' },
-      language: { uk: 'мова', en: 'language', da: 'sprog' },
-      live: { uk: 'лайв', en: 'live', da: 'live' },
-      lunch: { uk: 'обід', en: 'lunch', da: 'frokost' },
-      market: { uk: 'маркет', en: 'market', da: 'marked' },
-      museum: { uk: 'музей', en: 'museum', da: 'museum' },
-      music: { uk: 'музика', en: 'music', da: 'musik' },
-      networking: { uk: 'нетворкінг', en: 'networking', da: 'netværk' },
-      night: { uk: 'ніч', en: 'night', da: 'nat' },
-      outdoors: { uk: 'на природі', en: 'outdoors', da: 'udendørs' },
-      science: { uk: 'наука', en: 'science', da: 'videnskab' },
-      sports: { uk: 'спорт', en: 'sports', da: 'sport' },
-      startup: { uk: 'стартап', en: 'startup', da: 'startup' },
-      studio: { uk: 'студія', en: 'studio', da: 'studie' },
-      support: { uk: 'підтримка', en: 'support', da: 'støtte' },
-      talk: { uk: 'розмова', en: 'talk', da: 'samtale' },
-      ua: { uk: 'UA', en: 'UA', da: 'UA' },
-      volunteer: { uk: 'волонтерство', en: 'volunteer', da: 'frivilligt' },
-      volunteers: { uk: 'волонтери', en: 'volunteers', da: 'frivillige' },
-      walking: { uk: 'пішохідна', en: 'walking', da: 'vandring' },
-      welcome: { uk: 'вітання', en: 'welcome', da: 'velkomst' },
-      wellbeing: { uk: 'добробут', en: 'wellbeing', da: 'trivsel' },
-      workshop: { uk: 'воркшоп', en: 'workshop', da: 'workshop' }
+    adventure: { uk: 'пригоди' },
+    art: { uk: 'мистецтво' },
+    career: { uk: "кар'єра" },
+    castle: { uk: 'замок' },
+    cinema: { uk: 'кіно' },
+    coding: { uk: 'кодинг' },
+    community: { uk: 'спільнота' },
+    craft: { uk: 'ремесла' },
+    creative: { uk: 'креатив' },
+    culture: { uk: 'культура' },
+    danish: { uk: 'данська' },
+    design: { uk: 'дизайн' },
+    discussion: { uk: 'обговорення' },
+    family: { uk: 'родина' },
+    festival: { uk: 'фестиваль' },
+    food: { uk: 'їжа' },
+    heritage: { uk: 'спадщина' },
+    history: { uk: 'історія' },
+    indie: { uk: 'інді' },
+    kayak: { uk: 'каяк' },
+    kids: { uk: 'діти' },
+    language: { uk: 'мова' },
+    live: { uk: 'лайв' },
+    lunch: { uk: 'обід' },
+    market: { uk: 'маркет' },
+    museum: { uk: 'музей' },
+    music: { uk: 'музика' },
+    networking: { uk: 'нетворкінг' },
+    night: { uk: 'ніч' },
+    outdoors: { uk: 'на природі' },
+    science: { uk: 'наука' },
+    sports: { uk: 'спорт' },
+    startup: { uk: 'стартап' },
+    studio: { uk: 'студія' },
+    support: { uk: 'підтримка' },
+    talk: { uk: 'розмова' },
+    ua: { uk: 'UA' },
+    volunteer: { uk: 'волонтерство' },
+    volunteers: { uk: 'волонтери' },
+    walking: { uk: 'пішохідна' },
+    welcome: { uk: 'вітання' },
+    wellbeing: { uk: 'добробут' },
+    workshop: { uk: 'воркшоп' }
     };
 
-    const getLocalizedEventTitle = (event, lang) =>
-      EVENT_TITLES[event.id]?.[lang] || EVENT_TITLES[event.id]?.en || event.title;
+  const getLocalizedEventTitle = (event) =>
+    EVENT_TITLES[event.id]?.uk || event.title;
 
-    const localizeByMap = (value, map, lang) => {
+  const localizeByMap = (value, map) => {
       const key = normalize(value);
       const record = map[key];
       if (!record) return value;
-      return record[lang] || record.en || value;
+    return record.uk || value;
     };
 
-    const getLocalizedCity = (value, lang) => {
+  const getLocalizedCity = (value) => {
       if (!value) return value;
       const normalized = normalize(value);
       const keyMap = {
@@ -3447,13 +1562,13 @@
         const translated = formatMessage(key, {});
         return translated || value;
       }
-      return localizeByMap(value, CITY_TRANSLATIONS, lang);
+    return localizeByMap(value, CITY_TRANSLATIONS);
     };
 
-    const getLocalizedCategory = (value, lang) =>
-      localizeByMap(value, CATEGORY_TRANSLATIONS, lang);
+  const getLocalizedCategory = (value) =>
+    localizeByMap(value, CATEGORY_TRANSLATIONS);
 
-    const getLocalizedTag = (value, lang) => localizeByMap(value, TAG_TRANSLATIONS, lang);
+  const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
 
     const getTagLabel = (tag) => (typeof tag === 'string' ? tag : tag?.label || '');
     const getTagStatus = (tag) => (typeof tag === 'string' ? 'approved' : tag?.status || 'approved');
@@ -3476,19 +1591,6 @@
         [copy[i], copy[j]] = [copy[j], copy[i]];
       }
       return copy;
-    };
-
-    const buildHighlightCard = (event) => {
-      const lang = document.documentElement.lang || 'uk';
-      const title = getLocalizedEventTitle(event, lang);
-      const city = getLocalizedCity(event.city, lang);
-      const dateLabel = formatShortDate(event.start);
-      const detailUrl = `event.html?id=${encodeURIComponent(event.id)}`;
-      const image = event.images && event.images.length ? event.images[0] : '';
-      const imageMarkup = image
-        ? `<img class="highlights__image" src="${image}" alt="${title}" loading="lazy" width="360" height="220" />`
-        : '<div class="highlights__image highlights__image--placeholder"></div>';
-      return `\n        <a class=\"highlights__card\" href=\"${detailUrl}\">\n          <div class=\"highlights__media\">\n            ${imageMarkup}\n            <div class=\"highlights__overlay\">\n              <span class=\"highlights__date\">${dateLabel}</span>\n              <h3>${title}</h3>\n              <span class=\"highlights__city\">${city}</span>\n            </div>\n          </div>\n        </a>\n      `;
     };
 
     const selectHighlights = (list, limit) => {
@@ -3523,6 +1625,25 @@
       return selected;
     };
 
+    const eventCardHelpers = {
+      formatPriceLabel,
+      formatMessage,
+      getTagList,
+      getLocalizedTag,
+      getLocalizedCategory,
+      getLocalizedEventTitle,
+      getLocalizedCity,
+      formatDateRange,
+      isPast,
+      isArchived: isArchivedEvent
+    };
+
+    const highlightCardHelpers = {
+      formatShortDate,
+      getLocalizedEventTitle,
+      getLocalizedCity
+    };
+
     const renderHighlights = (list) => {
       if (!highlightsTrack) return;
       const now = new Date();
@@ -3530,6 +1651,7 @@
       weekEnd.setDate(weekEnd.getDate() + 7);
       const upcomingWeek = list.filter((event) => {
         if (event.status !== 'published') return false;
+        if (isArchivedEvent(event)) return false;
         if (isPast(event)) return false;
         const startDate = new Date(event.start);
         if (Number.isNaN(startDate.getTime())) return false;
@@ -3547,13 +1669,14 @@
       }
 
       const selection = selectHighlights(upcomingWeek, 6);
-      highlightsTrack.innerHTML = selection.map(buildHighlightCard).join('');
+      highlightsTrack.innerHTML = selection.map((event) => HighlightCard(event, highlightCardHelpers)).join('');
     };
 
     const getNextUpcomingEvent = (formData) => {
       if (!formData) return null;
-      const upcoming = events
+      const upcoming = state.events
         .filter((event) => matchesFilters(event, formData, { ignorePastToggle: true }))
+        .filter((event) => !isArchivedEvent(event))
         .filter((event) => {
           const start = new Date(event.start);
           return !Number.isNaN(start.getTime()) && start >= new Date();
@@ -3570,87 +1693,38 @@
         heroTags.innerHTML = '';
         heroTags.hidden = true;
         if (heroLink) {
-          heroLink.setAttribute('href', './index.html#events');
+          heroLink.setAttribute('href', './main-page.html#events');
           heroLink.setAttribute('aria-disabled', 'true');
         }
         return;
       }
-      const lang = document.documentElement.lang || 'uk';
-      const title = getLocalizedEventTitle(event, lang);
-      const city = getLocalizedCity(event.city, lang);
+    const title = getLocalizedEventTitle(event);
+    const city = getLocalizedCity(event.city);
       const timeLabel = formatDateRange(event.start, event.end);
       heroTitle.textContent = title;
       heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
       const tagLabels = [];
       if (event.category?.label) {
-        tagLabels.push(getLocalizedCategory(event.category.label, lang));
+      tagLabels.push(getLocalizedCategory(event.category.label));
       }
       const firstTag = getTagList(event.tags)[0];
       if (firstTag) {
-        tagLabels.push(getLocalizedTag(firstTag.label, lang));
+      tagLabels.push(getLocalizedTag(firstTag.label));
       }
       heroTags.innerHTML = tagLabels.map((label) => `<span>${label}</span>`).join('');
       heroTags.hidden = tagLabels.length === 0;
       if (heroLink) {
-        heroLink.setAttribute('href', `event.html?id=${encodeURIComponent(event.id)}`);
+        heroLink.setAttribute('href', `event-card.html?id=${encodeURIComponent(event.id)}`);
         heroLink.removeAttribute('aria-disabled');
       }
     };
 
-    const buildCard = (event) => {
-      const lang = document.documentElement.lang || 'uk';
-      const image = event.images && event.images.length ? event.images[0] : '';
-      const priceInfo = formatPrice(event);
-      const isFree = event.priceType === 'free';
-      const pastEvent = isPast(event);
-      const title = getLocalizedEventTitle(event, lang);
-      const imageMarkup = image
-        ? `<img class="event-card__image" src="${image}" alt="${title}" loading="lazy" width="800" height="540" />`
-        : '<div class="event-card__image event-card__image--placeholder" aria-hidden="true"></div>';
-      const cardClass = `event-card ${isFree ? 'event-card--free' : 'event-card--paid'}${
-        pastEvent ? ' event-card--archived' : ''
-      }`;
-      const badgeMarkup = '';
-      const archivedLabel = formatMessage('archived_label', {});
-      const archivedMarkup = pastEvent
-        ? `<span class="event-card__status" aria-label="${archivedLabel}">${archivedLabel}</span>`
-        : '';
-      const pendingLabel = formatMessage('pending_label', {});
-      const pendingTooltip = formatMessage('pending_tooltip', {});
-      const buildTag = (tag, type = 'tag') => {
-        const isPending = tag.status === 'pending';
-        const pendingClass = isPending ? ' event-card__tag--pending' : '';
-        const localizedLabel =
-          type === 'category'
-            ? getLocalizedCategory(tag.label, lang)
-            : getLocalizedTag(tag.label, lang);
-        const ariaKey =
-          type === 'category'
-            ? isPending
-              ? 'category_pending_aria'
-              : 'category_aria'
-            : isPending
-              ? 'tag_pending_aria'
-              : 'tag_aria';
-        const ariaLabel = formatMessage(ariaKey, { label: localizedLabel });
-        const pendingAttrs = isPending ? ` title="${pendingTooltip}"` : '';
-        return `<span class="event-card__tag${pendingClass}" aria-label="${ariaLabel}" data-tag-label="${localizedLabel}" data-tag-type="${type}"${pendingAttrs}>${localizedLabel}</span>`;
-      };
-      const baseTags = getTagList(event.tags);
-      const categoryTag = event.category?.label
-        ? { label: event.category.label, status: event.category.status || 'approved' }
-        : null;
-      const tags = [
-        ...(categoryTag ? [buildTag(categoryTag, 'category')] : []),
-        ...baseTags.map((tag) => buildTag(tag, 'tag'))
-      ].join('');
-      const ticketKey = event.priceType === 'free' ? 'register_cta' : 'ticket_cta';
-      const ticketLabel = formatMessage(ticketKey, {});
-      const ticketUrl = event.ticketUrl || '#';
-      const detailUrl = `event.html?id=${encodeURIComponent(event.id)}`;
-      const cityLabel = getLocalizedCity(event.city, lang);
-      const location = `${cityLabel} · ${event.venue}`;
-      return `\n        <article class=\"${cardClass}\" data-event-id=\"${event.id}\" data-status=\"${pastEvent ? 'archived' : 'active'}\" data-testid=\"event-card\">\n          ${archivedMarkup}\n          ${imageMarkup}\n          <div class=\"event-card__body\">\n            <div class=\"event-card__meta\">\n              <span class=\"event-card__datetime\">${formatDateRange(event.start, event.end)}</span>\n              <span class=\"event-card__price ${priceInfo.className}\">${priceInfo.label}</span>\n            </div>\n            <h3 class=\"event-card__title\">\n              <a class=\"event-card__link\" href=\"${detailUrl}\">${title}</a>\n            </h3>\n            <p class=\"event-card__location\">${location}</p>\n            <div class=\"event-card__tags\">\n              ${tags}\n            </div>\n            <div class=\"event-card__actions\">\n              <a class=\"event-card__cta event-card__cta--ticket\" href=\"${ticketUrl}\" rel=\"noopener\" data-testid=\"ticket-cta\" data-i18n=\"${ticketKey}\">${ticketLabel}</a>\n              <a class=\"event-card__cta event-card__cta--details\" href=\"${detailUrl}\" data-i18n=\"cta_details\">${formatMessage('cta_details', {})}</a>\n            </div>\n          </div>\n        </article>\n      `;
+    const renderApp = () => {
+      const payload = currentFormData || (filtersForm ? new FormData(filtersForm) : null);
+      const list = state.filteredEvents.slice(0, visibleCount);
+      renderEvents(list);
+      renderHighlights(state.events);
+      renderNextUp(getNextUpcomingEvent(payload));
     };
 
     const updateCount = (count) => {
@@ -3712,9 +1786,7 @@
     };
 
     updateCatalogI18n = () => {
-      renderEvents(filteredEvents.slice(0, visibleCount));
-      renderHighlights(events);
-      renderNextUp(getNextUpcomingEvent(currentFormData || (filtersForm ? new FormData(filtersForm) : null)));
+      renderApp();
     };
 
     const seenCards = new Set();
@@ -3751,7 +1823,7 @@
     };
 
     const renderEvents = (list) => {
-      catalogGrid.innerHTML = list.map(buildCard).join('');
+      catalogGrid.innerHTML = list.map((event) => EventCard(event, eventCardHelpers)).join('');
       const hasResults = list.length > 0;
       if (emptyState) {
         emptyState.hidden = hasResults;
@@ -3770,7 +1842,8 @@
         if (event.target.closest('a, button, input, select, textarea')) return;
         const eventId = card.dataset.eventId;
         if (eventId) {
-          window.location.href = `event.html?id=${encodeURIComponent(eventId)}`;
+          persistCatalogState();
+          window.location.href = `event-card.html?id=${encodeURIComponent(eventId)}`;
         }
       });
     }
@@ -3796,7 +1869,10 @@
 
     const matchesFilters = (event, formData, options = {}) => {
       const ignorePastToggle = options.ignorePastToggle;
-      if (event.status !== 'published') return false;
+      const includeArchived = options.includeArchived === true;
+      const archivedEvent = isArchivedEvent(event);
+      if (archivedEvent && !includeArchived) return false;
+      if (!archivedEvent && event.status !== 'published') return false;
       if (!filtersForm || !formData) return true;
       const lang = document.documentElement.lang || 'uk';
       const dateFrom = formData.get('date-from');
@@ -3893,38 +1969,72 @@
       return true;
     };
 
+    const setCityFilter = (value) => {
+      activeFilters.city = normalize(value);
+    };
+
+    const setPriceFilter = (value) => {
+      activeFilters.priceCategory = normalize(value);
+    };
+
+    const setSearchFilter = (value) => {
+      activeFilters.searchQuery = normalizeSearchValue(value);
+    };
+
+    const setAudienceFilter = (name, checked) => {
+      const key = AUDIENCE_KEYS[name];
+      if (!key) return;
+      if (checked) {
+        activeFilters.audiences.add(key);
+      } else {
+        activeFilters.audiences.delete(key);
+      }
+    };
+
+    const resetActiveFilters = () => {
+      activeFilters.city = '';
+      activeFilters.searchQuery = '';
+      activeFilters.priceCategory = '';
+      activeFilters.audiences.clear();
+    };
+
     const applyFilters = () => {
       syncPastFilterState(false);
       setErrorState(false);
+      updateCatalogQueryParams();
       const formData = filtersForm ? new FormData(filtersForm) : null;
       currentFormData = formData;
-      const baseList = events.filter((event) => matchesFilters(event, formData));
+      const includeArchived = isAdminSession();
+      const baseList = state.events.filter((event) =>
+        matchesFilters(event, formData, { includeArchived })
+      );
       const showPast = formData?.get('show-past');
       const hasDateFilter = Boolean(formData?.get('date-from') || formData?.get('date-to'));
       const range = hasDateFilter ? null : getWindowRange(Boolean(showPast));
-      filteredEvents = range
+      const nextFilteredEvents = range
         ? baseList.filter((event) => {
             const startDate = new Date(event.start);
             return startDate >= range.start && startDate < range.end;
           })
-        : baseList;
+        : baseList.slice();
       if (showPast) {
-        filteredEvents.sort((a, b) => {
+        nextFilteredEvents.sort((a, b) => {
           const aDate = new Date(a.end || a.start || 0).getTime();
           const bDate = new Date(b.end || b.start || 0).getTime();
           return bDate - aDate;
         });
       } else {
-        filteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
-      visibleCount = Math.min(pageSize, filteredEvents.length);
-      renderEvents(filteredEvents.slice(0, visibleCount));
-      renderNextUp(getNextUpcomingEvent(formData));
+      setFilteredEvents(nextFilteredEvents);
+      visibleCount = Math.min(pageSize, nextFilteredEvents.length);
       if (range) {
         updateWindowButtons(baseList, range);
       } else if (resetEventsButton) {
         resetEventsButton.hidden = true;
       }
+      restoreCatalogState();
+      renderApp();
     };
 
     const stepWindow = (direction) => {
@@ -3995,6 +2105,11 @@
         if (tokens.includes(value) || tokens.includes(label)) {
           if (select.value !== option.value) {
             select.value = option.value;
+            if (select.name === 'city') {
+              setCityFilter(select.value);
+            } else if (select.name === 'price') {
+              setPriceFilter(select.value);
+            }
             return true;
           }
           return false;
@@ -4066,6 +2181,39 @@
 
     const readQueryParams = () => {
       const params = new URLSearchParams(window.location.search);
+      const cityParam = params.get('city') || '';
+      const priceParam = params.get('price') || '';
+      const searchParam = params.get('q') || '';
+      const audienceParam = params.get('audience') || '';
+      if (filtersForm) {
+        if (cityField instanceof HTMLSelectElement) {
+          cityField.value = cityParam;
+        }
+        if (priceField instanceof HTMLSelectElement) {
+          priceField.value = priceParam;
+        }
+      }
+      activeFilters.city = normalize(cityParam);
+      activeFilters.priceCategory = normalize(priceParam);
+      activeFilters.searchQuery = normalizeSearchValue(searchParam);
+      activeFilters.audiences.clear();
+      if (audienceParam) {
+        audienceParam.split(',').forEach((value) => {
+          const normalized = normalize(value);
+          if (normalized) {
+            activeFilters.audiences.add(normalized);
+          }
+        });
+      }
+      audienceFields.forEach((input) => {
+        if (!(input instanceof HTMLInputElement)) return;
+        const key = AUDIENCE_KEYS[input.name];
+        if (!key) return;
+        input.checked = activeFilters.audiences.has(key);
+      });
+      if (searchInput) {
+        searchInput.value = activeFilters.searchQuery;
+      }
       if (filtersForm) {
         const setValue = (name, value) => {
           const field = filtersForm.elements[name];
@@ -4130,7 +2278,7 @@
       }
     };
 
-    const updateQueryParams = () => {
+    const updateCatalogQueryParams = () => {
       const params = new URLSearchParams();
       if (searchInput && searchInput.value.trim()) {
         params.set('q', searchInput.value.trim());
@@ -4172,35 +2320,36 @@
       window.history.pushState({}, '', nextUrl);
     };
 
+    const setAdvancedPanelOpen = (isOpen) => {
+      if (!advancedToggle || !advancedPanel) return;
+      advancedPanel.hidden = !isOpen;
+      advancedToggle.setAttribute('aria-expanded', String(isOpen));
+      advancedToggle.classList.toggle('is-active', isOpen);
+    };
+
     const syncAdvancedPanel = (force) => {
       if (!advancedToggle || !advancedPanel) return;
-      const hasValue = advancedFields.some((field) => {
-        if (!field) return false;
-        if (field instanceof HTMLInputElement && field.type === 'checkbox') {
-          return field.checked;
-        }
-        return Boolean(field.value);
-      });
-      if (force !== undefined) {
-        advancedPanel.hidden = !force;
-        advancedToggle.setAttribute('aria-expanded', String(force));
+      if (force === true || force === false) {
+        setAdvancedPanelOpen(force);
         return;
       }
-      if (hasValue) {
-        advancedPanel.hidden = false;
-        advancedToggle.setAttribute('aria-expanded', 'true');
-      }
+      const isOpen = !advancedPanel.hidden;
+      advancedToggle.setAttribute('aria-expanded', String(isOpen));
+      advancedToggle.classList.toggle('is-active', isOpen);
     };
 
     const loadEvents = async () => {
+      setLoading(true);
       try {
-        events = await fetchMergedEvents();
+        const fetchedEvents = await fetchMergedEvents();
+        setEvents(fetchedEvents);
+        setLoading(false);
         setErrorState(false);
         readQueryParams();
         applyFilters();
-        renderHighlights(events);
         syncAdvancedPanel();
       } catch (error) {
+        setLoading(false);
         setErrorState(true);
       }
     };
@@ -4209,8 +2358,7 @@
       if (advancedToggle && advancedPanel) {
         advancedToggle.addEventListener('click', () => {
           const isOpen = !advancedPanel.hidden;
-          advancedPanel.hidden = isOpen;
-          advancedToggle.setAttribute('aria-expanded', String(!isOpen));
+          setAdvancedPanelOpen(!isOpen);
         });
       }
       presetButtons.forEach((button) => {
@@ -4233,13 +2381,17 @@
             }
           }
           syncPresetButtons();
-          updateQueryParams();
+          updateCatalogQueryParams();
           applyFilters();
         });
       });
 
       filtersForm.addEventListener('input', (event) => {
         const target = event.target;
+        const skipFields = ['city', 'price', ...Object.keys(AUDIENCE_KEYS)];
+        if (target instanceof HTMLElement && skipFields.includes(target.getAttribute('name') || '')) {
+          return;
+        }
         if (target instanceof HTMLInputElement && target.type === 'checkbox') {
           const today = filtersForm.elements['quick-today'];
           const tomorrow = filtersForm.elements['quick-tomorrow'];
@@ -4279,13 +2431,13 @@
           }
           syncPresetButtons();
         }
-        updateQueryParams();
+        updateCatalogQueryParams();
         applyFilters();
         syncAdvancedPanel();
       });
       filtersForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        updateQueryParams();
+        updateCatalogQueryParams();
         applyFilters();
       });
       filtersForm.addEventListener('reset', () => {
@@ -4295,26 +2447,35 @@
           }
           syncPastFilterState(true);
           syncPresetButtons();
-          updateQueryParams();
+          updateCatalogQueryParams();
           applyFilters();
           syncAdvancedPanel(false);
+          if (filtersForm) {
+            filtersForm.elements.city.value = '';
+            filtersForm.elements.price.value = '';
+          }
+          resetActiveFilters();
         }, 0);
       });
     }
 
+    const handleSearchInput = () => {
+      setSearchFilter(searchInput.value);
+      applyFilters();
+    };
+
     if (searchInput) {
       searchInput.addEventListener('input', () => {
-        updateQueryParams();
-        applyFilters();
+        handleSearchInput();
       });
       const searchForm = searchInput.closest('form');
       if (searchForm) {
         searchForm.addEventListener('submit', (event) => {
           event.preventDefault();
+          setSearchFilter(searchInput.value);
           if (applySearchFilters(searchInput.value)) {
             syncAdvancedPanel();
           }
-          updateQueryParams();
           applyFilters();
           searchInput.focus({ preventScroll: true });
           const catalogSection = document.querySelector('#events');
@@ -4328,6 +2489,12 @@
     if (nextEventsButton) {
       nextEventsButton.addEventListener('click', () => {
         stepWindow(1);
+        const catalogSection = document.querySelector('#events');
+        if (catalogSection) {
+          requestAnimationFrame(() => {
+            catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
       });
     }
 
@@ -4359,7 +2526,12 @@
       });
     }
 
-    loadEvents();
+    pendingCatalogState = loadCatalogState();
+    if (pendingCatalogState) {
+      applyStoredFilters();
+    }
+
+    queueMicrotask(loadEvents);
   }
 
   const eventMeta = document.querySelector('.event-article__meta[data-event-start]');
@@ -4524,9 +2696,12 @@
       fetchMergedEvents()
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
-          if (eventData) {
-            renderEventDetail(eventData);
+          if (!eventData) return;
+          if (isArchivedEvent(eventData) && !isAdminSession()) {
+            window.location.replace('./404.html');
+            return;
           }
+          renderEventDetail(eventData);
         })
         .catch(() => {
           updateEventMeta();

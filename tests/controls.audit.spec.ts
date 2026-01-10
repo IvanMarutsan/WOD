@@ -14,7 +14,7 @@ test('all visible buttons/links are clickable without runtime errors', async ({ 
     if (m.type() === 'error') errors.push(`console: ${m.text()}`);
   });
 
-  await page.goto('/');
+  await page.goto('/main-page.html');
 
   const handles = await page.$$(':is(button,a,[role="button"])');
   for (const h of handles) {

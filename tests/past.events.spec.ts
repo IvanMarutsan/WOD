@@ -4,7 +4,7 @@ import { waitForEventsRendered } from './helpers';
 
 test('past events hidden by default and banner on detail', async ({ page }) => {
   await setupPage(page);
-  await page.goto('/');
+  await page.goto('/main-page.html');
   await waitForEventsRendered(page);
 
   // Ensure there is a toggle to show past events and it is off
@@ -16,16 +16,16 @@ test('past events hidden by default and banner on detail', async ({ page }) => {
   await expect(page).toHaveURL(/past=1/);
 
   // If there are no past events in fixtures, empty state should be visible
-  const archivedCards = page.locator('[data-status="archived"]');
-  if ((await archivedCards.count()) === 0) {
+  const pastCards = page.locator('[data-status="past"]');
+  if ((await pastCards.count()) === 0) {
     await expect(page.getByText(/Немає подій|No events/i)).toBeVisible();
   } else {
-    await archivedCards.first().locator('.event-card__title a').click();
+    await pastCards.first().locator('.event-card__title a').click();
   }
 
   // Past event detail shows banner and swaps CTA
   await setupPage(page);
-  await page.goto('/event.html');
+  await page.goto('/event-card.html');
   await expect(page.getByTestId('event-detail-banner-past')).toBeVisible();
   // Ticket CTA replaced
   await expect(page.getByTestId('ticket-cta')).toBeHidden();

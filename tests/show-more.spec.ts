@@ -3,7 +3,7 @@ import { freezeTime } from './setup.freeze-time';
 
 test('show more loads next batch without reload', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/');
+  await page.goto('/main-page.html');
   await page.waitForSelector('[data-testid="event-card"]', { state: 'visible' });
   await page.locator('select[name="city"]').selectOption({ index: 0 });
 

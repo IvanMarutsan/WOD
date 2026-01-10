@@ -3,7 +3,7 @@ import { watchConsole } from './utils/console';
 import { freezeTime } from './setup.freeze-time';
 import { createEventToPreview } from './helpers';
 
-const routes = ['/', '/index.html', '/event.html'];
+const routes = ['/main-page.html', '/event-card.html'];
 
 for (const r of routes) {
   test(`smoke: ${r} renders without console errors`, async ({ page }) => {

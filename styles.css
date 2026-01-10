@@ -667,6 +667,13 @@ button:disabled,
   align-self: flex-end;
 }
 
+.filters__advanced-toggle.is-active,
+.filters__advanced-toggle[aria-expanded='true'] {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  background: rgba(0, 87, 183, 0.08);
+}
+
 .filters__advanced {
   display: grid;
   gap: 12px;
@@ -995,14 +1002,14 @@ button:disabled,
 
 .event-card__cta:hover,
 .event-card__cta:focus-visible {
-  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
-  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
-  color: var(--accent);
-  box-shadow: none;
+  background: rgba(0, 87, 183, 0.08);
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  box-shadow: var(--focus-ring);
 }
 
 .event-card__cta:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline: none;
   outline-offset: 2px;
 }
 

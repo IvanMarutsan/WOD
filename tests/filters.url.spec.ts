@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { waitForEventsRendered } from './helpers';
 
 test('filters update URL and back/forward restores state', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/main-page.html');
   await waitForEventsRendered(page);
   await page.getByTestId('search-input').fill('music');
   await page.keyboard.press('Enter');

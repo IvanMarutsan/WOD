@@ -10,18 +10,18 @@
     <meta property="og:type" content="website" />
     <!-- TODO: Replace OG image URL -->
     <meta property="og:image" content="static/og-placeholder-white.png" />
-    <meta property="og:url" content="https://whatsondk.netlify.app/dashboard-new.html" />
+    <meta property="og:url" content="https://whatsondk.netlify.app/new-event.html" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Створення події — What's on DK?" />
     <meta name="twitter:description" content="Покрокове створення події для українців у Данії." />
     <meta name="twitter:image" content="static/og-placeholder-white.png" />
-    <link rel="alternate" hreflang="uk" href="./dashboard-new.html?lang=uk" />
-    <link rel="alternate" hreflang="en" href="./dashboard-new.html?lang=en" />
-    <link rel="alternate" hreflang="da" href="./dashboard-new.html?lang=da" />
+    <link rel="alternate" hreflang="uk" href="./new-event.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="./new-event.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="./new-event.html?lang=da" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body class="dashboard-page">
-    <a class="skip-link" href="./dashboard-new.html#content" data-i18n="skip_link">Перейти до вмісту</a>
+  <body class="dashboard-page new-event-page">
+    <a class="skip-link" href="./new-event.html#content" data-i18n="skip_link">Перейти до вмісту</a>
 
     <header class="site-header" role="banner">
       <div class="container header__inner">
@@ -34,17 +34,13 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="./index.html#events" data-i18n="nav_events">Події</a>
+          <a href="./main-page.html#events" data-i18n="nav_events">Події</a>
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="header-utils">
-          <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
-            <option value="uk">UA</option>
-            <option value="en">EN</option>
-            <option value="da">DK</option>
-          </select>
+          <!-- Add event CTA disabled (admin-only for now). -->
+          <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
     </header>
@@ -56,7 +52,7 @@
             <p class="eyebrow" data-i18n="create_event_eyebrow">Створення події</p>
             <h1>Нова подія</h1>
           </div>
-          <a class="btn ghost" href="./dashboard.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
+          <a class="btn ghost" href="./main-page.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
         </header>
 
         <ol class="stepper" aria-label="Кроки створення події" data-i18n-aria="stepper_aria">
@@ -429,6 +425,6 @@
 
 
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="./script.js" defer></script>
+    <script type="module" src="./script.js" defer></script>
   </body>
 </html>

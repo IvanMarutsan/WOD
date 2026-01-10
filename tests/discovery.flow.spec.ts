@@ -11,7 +11,7 @@ async function gotoAndWaitForEvents(page, url) {
 
 test('search + weekend preset filters results and keeps URL in sync', async ({ page }) => {
   await freezeTime(page);
-  await gotoAndWaitForEvents(page, '/');
+  await gotoAndWaitForEvents(page, '/main-page.html');
 
   const input = page.getByTestId('search-input');
   await input.fill('music');
@@ -27,7 +27,7 @@ test('search + weekend preset filters results and keeps URL in sync', async ({ p
 
 test('go to event detail and show proper CTA for future/past', async ({ page }) => {
   await freezeTime(page);
-  await gotoAndWaitForEvents(page, '/');
+  await gotoAndWaitForEvents(page, '/main-page.html');
 
   const first = page.getByTestId('event-card').first();
   await first.locator('a').first().click();

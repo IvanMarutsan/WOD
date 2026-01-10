@@ -1,13 +1,20 @@
 export async function gotoHome(page) {
-  await page.goto('/');
+  await page.goto('/main-page.html');
 }
 
 export async function waitForEventsRendered(page) {
   await page.waitForSelector('[data-testid="event-card"]', { state: 'visible' });
 }
 
+export async function enableAdminSession(page) {
+  await page.addInitScript(() => {
+    localStorage.setItem('wodAdminSession', '1');
+  });
+}
+
 export async function createEventToPreview(page) {
-  await page.goto('/dashboard-new.html');
+  await enableAdminSession(page);
+  await page.goto('/new-event.html');
 
   // Step 1: basics
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');

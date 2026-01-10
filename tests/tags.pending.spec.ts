@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { enableAdminSession } from './helpers';
 
 test('organizer can propose new tag/category with pending label', async ({ page }) => {
-  await page.goto('/dashboard-new.html');
+  await enableAdminSession(page);
+  await page.goto('/new-event.html');
   // Add tag via chips input
   await page.getByLabel(/Додати тег|Add tag|Tilføj tag/i).fill('NewCoolTag');
   await page.keyboard.press('Enter');

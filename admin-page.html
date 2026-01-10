@@ -10,18 +10,18 @@
     <meta property="og:type" content="website" />
     <!-- TODO: Replace OG image URL -->
     <meta property="og:image" content="static/og-placeholder-white.png" />
-    <meta property="og:url" content="https://whatsondk.netlify.app/admin.html" />
+    <meta property="og:url" content="https://whatsondk.netlify.app/admin-page.html" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Модерація — What's on DK?" />
     <meta name="twitter:description" content="Модерація подій: схвалення, відхилення та причини рішень." />
     <meta name="twitter:image" content="static/og-placeholder-white.png" />
-    <link rel="alternate" hreflang="uk" href="./admin.html?lang=uk" />
-    <link rel="alternate" hreflang="en" href="./admin.html?lang=en" />
-    <link rel="alternate" hreflang="da" href="./admin.html?lang=da" />
+    <link rel="alternate" hreflang="uk" href="./admin-page.html?lang=uk" />
+    <link rel="alternate" hreflang="en" href="./admin-page.html?lang=en" />
+    <link rel="alternate" hreflang="da" href="./admin-page.html?lang=da" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body class="dashboard-page admin-page" data-admin-auth="checking">
-    <a class="skip-link" href="./admin.html#content" data-i18n="skip_link">Перейти до вмісту</a>
+    <a class="skip-link" href="./admin-page.html#content" data-i18n="skip_link">Перейти до вмісту</a>
 
     <header class="site-header" role="banner">
       <div class="container header__inner">
@@ -34,17 +34,13 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="./index.html#events" data-i18n="nav_events">Події</a>
+          <a href="./main-page.html#events" data-i18n="nav_events">Події</a>
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="header-utils">
-          <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
-            <option value="uk">UA</option>
-            <option value="en">EN</option>
-            <option value="da">DK</option>
-          </select>
+          <!-- Add event CTA disabled (admin-only for now). -->
+          <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
     </header>
@@ -69,7 +65,7 @@
               <p class="eyebrow" data-i18n="admin_eyebrow">Робочий простір адміністратора</p>
               <h1 data-i18n="admin_title">Черга модерації</h1>
             </div>
-            <a class="btn ghost" href="./dashboard.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
+            <a class="btn ghost" href="./main-page.html" data-i18n="back_to_dashboard">Назад до дашборду</a>
           </header>
 
           <section class="moderation" aria-labelledby="moderation-title">
@@ -362,6 +358,6 @@
     </footer>
 
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="./script.js" defer></script>
+    <script type="module" src="./script.js" defer></script>
   </body>
 </html>

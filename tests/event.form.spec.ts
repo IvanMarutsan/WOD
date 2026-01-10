@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { enableAdminSession } from './helpers';
 
 test('create event without end time', async ({ page }) => {
-  await page.goto('/dashboard-new.html');
+  await enableAdminSession(page);
+  await page.goto('/new-event.html');
   // Step 1
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
   await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description.');

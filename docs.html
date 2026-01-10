@@ -35,17 +35,13 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="./index.html#events" data-i18n="nav_events">Події</a>
+          <a href="./main-page.html#events" data-i18n="nav_events">Події</a>
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="header-utils">
-          <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
-            <option value="uk">UA</option>
-            <option value="en">EN</option>
-            <option value="da">DK</option>
-          </select>
+          <!-- Add event CTA disabled (admin-only for now). -->
+          <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
     </header>
@@ -61,9 +57,9 @@
 
         <nav class="docs-nav" aria-label="Зміст" data-i18n-aria="docs_nav_aria">
           <a href="./docs.html#naming" data-i18n="docs_nav_naming">Правила назв подій</a>
-          <a href="./docs.html#tags" data-i18n="docs_nav_tags">Теги та категорії (як створювати)</a>
+          <!-- Tags guidance disabled (admin-only for now). -->
           <a href="./docs.html#past" data-i18n="docs_nav_past">Що вважати минулою подією</a>
-          <a href="./docs.html#verification" data-i18n="docs_nav_verification">Верифікація організаторів</a>
+          <!-- Organizer verification disabled (admin-only for now). -->
         </nav>
 
         <section id="naming" class="docs-section" aria-labelledby="naming-title">
@@ -73,14 +69,7 @@
           </p>
           <p data-i18n="docs_naming_body_2">Приклад: “Кінопоказ у Копенгагені: Docu UA Night”.</p>
         </section>
-
-        <section id="tags" class="docs-section" aria-labelledby="tags-title">
-          <h2 id="tags-title" data-i18n="docs_tags_title">Теги та категорії (як створювати)</h2>
-          <p data-i18n="docs_tags_body_1">
-            Обирайте найрелевантнішу категорію та 2–5 тегів. Для нової категорії натисніть “Додати категорію”.
-          </p>
-          <p data-i18n="docs_tags_body_2">Нові теги потрапляють на модерацію та будуть позначені як “на розгляді”.</p>
-        </section>
+        <!-- Tags section disabled (admin-only for now). -->
 
         <section id="past" class="docs-section" aria-labelledby="past-title">
           <h2 id="past-title" data-i18n="docs_past_title">Що вважати минулою подією</h2>
@@ -89,14 +78,7 @@
           </p>
           <p data-i18n="docs_past_body_2">За потреби увімкніть фільтр “Показати минулі”, щоб переглянути архів.</p>
         </section>
-
-        <section id="verification" class="docs-section" aria-labelledby="verification-title">
-          <h2 id="verification-title" data-i18n="docs_verification_title">Верифікація організаторів</h2>
-          <p data-i18n="docs_verification_body_1">
-            Верифікація потрібна для публікації подій. Ви можете підтвердити email або надати сайт/соцмережі.
-          </p>
-          <p data-i18n="docs_verification_body_2">Після перевірки статус організатора змінюється на “Верифіковано”.</p>
-        </section>
+        <!-- Verification section disabled (admin-only for now). -->
       </div>
     </main>
 
@@ -172,6 +154,6 @@
       </div>
     </footer>
 
-    <script src="./script.js" defer></script>
+    <script type="module" src="./script.js" defer></script>
   </body>
 </html>

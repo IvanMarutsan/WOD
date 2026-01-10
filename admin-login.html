@@ -33,17 +33,13 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
-          <a href="./index.html#events" data-i18n="nav_events">Події</a>
+          <a href="./main-page.html#events" data-i18n="nav_events">Події</a>
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="header-utils">
-          <a class="btn primary header__cta" href="./dashboard-new.html" data-i18n="cta_add_event">Додати подію</a>
-          <select class="lang-select" data-testid="lang-select" aria-label="Мова" data-i18n-aria="switch_lang">
-            <option value="uk">UA</option>
-            <option value="en">EN</option>
-            <option value="da">DK</option>
-          </select>
+          <!-- Add event CTA disabled (admin-only for now). -->
+          <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
     </header>
@@ -136,6 +132,6 @@
     </footer>
 
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="./script.js" defer></script>
+    <script type="module" src="./script.js" defer></script>
   </body>
 </html>

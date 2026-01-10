@@ -30,7 +30,7 @@ test('admin login page renders login action', async ({ page }) => {
 test('admin page redirects to login when unauthenticated', async ({ page }) => {
   await freezeTime(page);
   await stubIdentity(page);
-  await page.goto('/admin.html');
+  await page.goto('/admin-page.html');
   await expect(page).toHaveURL(/admin-login/);
   await expect(page.locator('[data-admin-status]')).toContainText(/вхід адміністратора|login required/i);
 });

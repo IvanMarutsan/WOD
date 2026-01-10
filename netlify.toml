@@ -13,17 +13,27 @@
     Cache-Control = "public, max-age=60"
 
 [[headers]]
-  for = "/index.html"
+  for = "/main-page.html"
   [headers.values]
     Cache-Control = "no-store"
 
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://identity.netlify.com; connect-src 'self' https://identity.netlify.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: blob: https://*.netlify.app; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; script-src 'self' https://identity.netlify.com; connect-src 'self' https://identity.netlify.com https://*.netlify.app; font-src 'self' https://fonts.gstatic.com data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     Cache-Control = "public, max-age=300"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "SAMEORIGIN"
+
+[[redirects]]
+  from = "/"
+  to = "/main-page.html"
+  status = 302
+
+[[redirects]]
+  from = "/index.html"
+  to = "/main-page.html"
+  status = 301
