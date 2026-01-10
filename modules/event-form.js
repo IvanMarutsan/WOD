@@ -502,16 +502,17 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   setStep(currentStep);
   renderTagChips();
   publishState.update = () => {
+    const isAdmin = isAdminBypass();
     const verified = getEffectiveOrganizerStatus() !== 'none';
     const hasTags = pendingTags.size > 0;
     if (publishButton) {
-      publishButton.disabled = !verified || !hasTags;
+      publishButton.disabled = isAdmin ? !hasTags : !verified || !hasTags;
     }
     if (verificationWarning) {
-      verificationWarning.hidden = verified;
+      verificationWarning.hidden = isAdmin || verified;
     }
     if (verificationBanner) {
-      verificationBanner.hidden = verified;
+      verificationBanner.hidden = isAdmin || verified;
     }
   };
   publishState.update();
