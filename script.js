@@ -1584,46 +1584,10 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       return `${clean.slice(0, maxLength - 3).trimEnd()}...`;
     };
 
-    const shuffleList = (list) => {
-      const copy = [...list];
-      for (let i = copy.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    };
-
-    const selectHighlights = (list, limit) => {
-      const byCity = new Map();
-      list.forEach((event) => {
-        if (!event.city) return;
-        const key = normalize(event.city);
-        if (!byCity.has(key)) {
-          byCity.set(key, []);
-        }
-        byCity.get(key).push(event);
-      });
-
-      const selected = [];
-      const selectedIds = new Set();
-      const cityKeys = shuffleList([...byCity.keys()]);
-      cityKeys.forEach((city) => {
-        if (selected.length >= limit) return;
-        const pool = byCity.get(city);
-        if (!pool || pool.length === 0) return;
-        const pick = pool[Math.floor(Math.random() * pool.length)];
-        if (pick && !selectedIds.has(pick.id)) {
-          selected.push(pick);
-          selectedIds.add(pick.id);
-        }
-      });
-
-      if (selected.length < limit) {
-        const remaining = shuffleList(list.filter((event) => !selectedIds.has(event.id)));
-        remaining.slice(0, limit - selected.length).forEach((event) => selected.push(event));
-      }
-      return selected;
-    };
+    const selectHighlights = (list, limit) =>
+      [...list]
+        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+        .slice(0, limit);
 
     const eventCardHelpers = {
       formatPriceLabel,
@@ -2368,10 +2332,10 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
           if (!input) return;
           const nextState = !input.checked;
           input.checked = nextState;
-          if (key === 'online' && nextState) {
+          if (key === 'online') {
             const formatField = filtersForm.elements.format;
             if (formatField) {
-              formatField.value = 'online';
+              formatField.value = nextState ? 'online' : '';
             }
           }
           if (['today', 'tomorrow', 'weekend'].includes(key)) {

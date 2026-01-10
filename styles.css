@@ -831,7 +831,7 @@ button:disabled,
 .catalog-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .event-card {
@@ -1736,6 +1736,13 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   font-size: clamp(2rem, 4vw, 2.6rem);
 }
 
+.dashboard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
 .dashboard-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -2331,7 +2338,7 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 
 @media (min-width: 600px) {
   .catalog-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
@@ -2411,7 +2418,7 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   }
 
   .catalog-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
   .header__inner {

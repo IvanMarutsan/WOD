@@ -9,6 +9,9 @@ for (const route of routes) {
     await page.addInitScript(() => {
       Math.random = () => 0.42;
     });
+    await page.addInitScript(() => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    });
     if (route.includes('new-event')) {
       await page.addInitScript(() => {
         localStorage.setItem('wodAdminSession', '1');
@@ -19,6 +22,10 @@ for (const route of routes) {
     const hasCatalog = await page.locator('.catalog-grid').count();
     if (hasCatalog) {
       await page.waitForSelector('[data-testid="event-card"]', { timeout: 10000 });
+    }
+    if (route.includes('#events')) {
+      const catalog = page.locator('#events');
+      await catalog.scrollIntoViewIfNeeded();
     }
     expect(await page.screenshot({ fullPage: true })).toMatchSnapshot(
       `${route.replace(/[\/.]/g, '_')}.png`,

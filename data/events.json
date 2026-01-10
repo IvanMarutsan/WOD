@@ -1038,5 +1038,161 @@
       "email": "community@whatsondk.test",
       "phone": "+45 33 22 19 04"
     }
+  },
+  {
+    "id": "evt-021",
+    "slug": "copenhagen-volunteer-meetup",
+    "title": "Volunteer Meetup: Help & Connect",
+    "description": "Meet volunteers, share resources, and plan upcoming support actions.",
+    "category": {
+      "label": "community",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "volunteer",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      },
+      {
+        "label": "support",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-01-11T18:00:00+01:00",
+    "end": "2026-01-11T20:00:00+01:00",
+    "format": "offline",
+    "venue": "Community Hub",
+    "address": "Vesterbrogade 1, 1620 København",
+    "city": "Copenhagen",
+    "geo": {
+      "lat": 55.6737,
+      "lng": 12.5647
+    },
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "https://example.com/register/volunteer-meetup",
+    "organizerId": "org-001",
+    "images": [
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": true,
+    "contactPerson": {
+      "name": "Iryna P.",
+      "email": "volunteer@whatsondk.test",
+      "phone": "+45 31 22 45 10"
+    }
+  },
+  {
+    "id": "evt-022",
+    "slug": "aarhus-language-exchange",
+    "title": "Aarhus Language Exchange",
+    "description": "Practice Danish with locals and meet new friends over coffee.",
+    "category": {
+      "label": "education",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "language",
+        "status": "approved"
+      },
+      {
+        "label": "community",
+        "status": "approved"
+      },
+      {
+        "label": "practice",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-01-12T17:30:00+01:00",
+    "end": "2026-01-12T19:00:00+01:00",
+    "format": "offline",
+    "venue": "Aarhus Library Lounge",
+    "address": "Hack Kampmanns Pl. 2, 8000 Aarhus",
+    "city": "Aarhus",
+    "geo": {
+      "lat": 56.1524,
+      "lng": 10.2059
+    },
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "https://example.com/register/aarhus-language-exchange",
+    "organizerId": "org-003",
+    "images": [
+      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "en",
+    "forUkrainians": true,
+    "familyFriendly": true,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Sofiia L.",
+      "email": "language@whatsondk.test",
+      "phone": "+45 26 33 58 71"
+    }
+  },
+  {
+    "id": "evt-023",
+    "slug": "odense-career-qa",
+    "title": "Career Q&A for Newcomers",
+    "description": "Ask recruiters and get quick tips on CVs and interviews.",
+    "category": {
+      "label": "career",
+      "status": "approved"
+    },
+    "tags": [
+      {
+        "label": "career",
+        "status": "approved"
+      },
+      {
+        "label": "support",
+        "status": "approved"
+      },
+      {
+        "label": "workshop",
+        "status": "approved"
+      }
+    ],
+    "start": "2026-01-16T19:00:00+01:00",
+    "end": "2026-01-16T20:30:00+01:00",
+    "format": "offline",
+    "venue": "Odense Business Lab",
+    "address": "Søndergade 19, 5000 Odense",
+    "city": "Odense",
+    "geo": {
+      "lat": 55.3997,
+      "lng": 10.3852
+    },
+    "priceType": "free",
+    "priceMin": 0,
+    "priceMax": 0,
+    "ticketUrl": "https://example.com/register/odense-career-qa",
+    "organizerId": "org-004",
+    "images": [
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&auto=format&fit=crop"
+    ],
+    "status": "published",
+    "language": "uk",
+    "forUkrainians": true,
+    "familyFriendly": false,
+    "volunteer": false,
+    "contactPerson": {
+      "name": "Danylo S.",
+      "email": "career@whatsondk.test",
+      "phone": "+45 22 14 09 88"
+    }
   }
 ]
