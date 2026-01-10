@@ -1,4 +1,11 @@
 import { ADMIN_SESSION_KEY, getUserRoles, hasAdminRole, isSuperAdmin } from './auth.js';
+import {
+  archiveLocalEvent,
+  deleteLocalEvent,
+  fetchMergedLocalEvents,
+  getAuditLog,
+  restoreLocalEvent
+} from './local-events.js';
 
 export const initAdmin = ({ formatMessage }) => {
   const moderationList = document.querySelector('.moderation-list');
@@ -119,12 +126,34 @@ export const initAdmin = ({ formatMessage }) => {
 
     let initTimer = null;
 
+    const hasLocalAdmin = () => {
+      try {
+        return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
+      } catch (error) {
+        return false;
+      }
+    };
+
     const handleUser = (user) => {
       if (initTimer) {
         clearTimeout(initTimer);
         initTimer = null;
       }
       if (!user) {
+        if (hasLocalAdmin()) {
+          const localUser = { email: 'admin@local', app_metadata: { roles: ['admin'] } };
+          setAuthState('granted');
+          setStatus('admin_access_granted');
+          if (loginButton) loginButton.hidden = true;
+          if (logoutButton) logoutButton.hidden = false;
+          updateMeta(localUser);
+          setSuperAdminVisibility(false);
+          setAdminSession(true);
+          if (isAdminPage) {
+            initModerationPanel(localUser, false);
+          }
+          return;
+        }
         setAuthState('denied');
         setStatus('admin_access_required');
         if (loginButton) loginButton.hidden = false;
@@ -212,14 +241,17 @@ export const initAdmin = ({ formatMessage }) => {
     const pendingContainer = document.querySelector('[data-admin-pending]');
     const verificationContainer = document.querySelector('[data-admin-verifications]');
     const rejectedContainer = document.querySelector('[data-admin-rejected]');
+    const archiveContainer = document.querySelector('[data-admin-archive]');
     const auditContainer = document.querySelector('[data-admin-audit]');
     const template = document.querySelector('#moderation-card-template');
     const verificationTemplate = document.querySelector('#verification-card-template');
     const auditTemplate = document.querySelector('#audit-row-template');
+    const archiveTemplate = document.querySelector('#archive-card-template');
     const loadingEl = pendingContainer?.querySelector('[data-admin-loading]');
     const emptyEl = pendingContainer?.querySelector('[data-admin-empty]');
     const verificationEmptyEl = verificationContainer?.querySelector('[data-admin-verifications-empty]');
     const rejectedEmptyEl = rejectedContainer?.querySelector('[data-admin-rejected-empty]');
+    const archiveEmptyEl = archiveContainer?.querySelector('[data-admin-archive-empty]');
     const auditEmptyEl = auditContainer?.querySelector('[data-admin-audit-empty]');
     const modalDialog = modal.querySelector('.modal__dialog');
     const modalTextarea = modal.querySelector('textarea[name="reject-reason"]');
@@ -238,6 +270,7 @@ export const initAdmin = ({ formatMessage }) => {
     let activeEditId = null;
     let lastEditTrigger = null;
     const pendingById = new Map();
+    const archiveById = new Map();
 
     const focusableSelector =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -555,6 +588,52 @@ export const initAdmin = ({ formatMessage }) => {
       });
     };
 
+    const renderArchive = (items) => {
+      if (!archiveContainer || !archiveTemplate) return;
+      archiveContainer
+        .querySelectorAll('[data-admin-archive-card]')
+        .forEach((card) => card.remove());
+      archiveById.clear();
+      if (!items || items.length === 0) {
+        if (archiveEmptyEl) archiveEmptyEl.hidden = false;
+        return;
+      }
+      if (archiveEmptyEl) archiveEmptyEl.hidden = true;
+      items.forEach((item) => {
+        const card = archiveTemplate.content.firstElementChild.cloneNode(true);
+        card.dataset.eventId = item.id;
+        const titleEl = card.querySelector('[data-admin-archive-title]');
+        const metaEl = card.querySelector('[data-admin-archive-meta]');
+        if (titleEl) titleEl.textContent = item.title || '—';
+        if (metaEl) metaEl.textContent = item.meta || '—';
+        if (item.id) {
+          archiveById.set(item.id, item.payload || item);
+        }
+        archiveContainer.appendChild(card);
+      });
+    };
+
+    const getAuditStatusLabel = (action) => {
+      switch (action) {
+        case 'approve':
+          return formatMessage('admin_status_approved', {});
+        case 'reject':
+          return formatMessage('admin_status_rejected', {});
+        case 'publish':
+          return formatMessage('admin_audit_action_publish', {});
+        case 'edit':
+          return formatMessage('admin_audit_action_edit', {});
+        case 'archive':
+          return formatMessage('admin_audit_action_archive', {});
+        case 'restore':
+          return formatMessage('admin_audit_action_restore', {});
+        case 'delete':
+          return formatMessage('admin_audit_action_delete', {});
+        default:
+          return formatMessage('admin_status_pending', {});
+      }
+    };
+
     const renderAudit = (items) => {
       if (!auditContainer || !auditTemplate) return;
       auditContainer.querySelectorAll('[data-admin-audit-row]').forEach((row) => row.remove());
@@ -573,14 +652,16 @@ export const initAdmin = ({ formatMessage }) => {
         const actor = entry.actorEmail || '—';
         const ts = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
         if (metaEl) metaEl.textContent = `${actor} · ${ts}`;
-        const statusKey =
-          entry.action === 'approve' ? 'admin_status_approved' : 'admin_status_rejected';
         if (statusEl) {
-          statusEl.textContent = formatMessage(statusKey, {});
-          statusEl.classList.remove('status-pill--pending');
-          statusEl.classList.add(
-            entry.action === 'approve' ? 'status-pill--published' : 'status-pill--draft'
-          );
+          statusEl.textContent = getAuditStatusLabel(entry.action);
+          statusEl.classList.remove('status-pill--pending', 'status-pill--published', 'status-pill--draft');
+          if (entry.action === 'approve' || entry.action === 'publish') {
+            statusEl.classList.add('status-pill--published');
+          } else if (entry.action === 'reject' || entry.action === 'delete' || entry.action === 'archive') {
+            statusEl.classList.add('status-pill--draft');
+          } else {
+            statusEl.classList.add('status-pill--pending');
+          }
         }
         if (reasonEl) {
           if (entry.reason) {
@@ -605,11 +686,23 @@ export const initAdmin = ({ formatMessage }) => {
       return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
+    const formatEventMeta = (event) => {
+      if (!event) return '—';
+      const dateValue = event.start ? new Date(event.start) : null;
+      const dateLabel =
+        dateValue && !Number.isNaN(dateValue.getTime())
+          ? dateValue.toLocaleDateString(getUiLocale(), { day: '2-digit', month: 'short' })
+          : '—';
+      const city = event.city || '—';
+      return `${dateLabel} · ${city}`;
+    };
+
     const loadModerationQueue = async () => {
       if (loadingEl) loadingEl.hidden = false;
       if (emptyEl) emptyEl.hidden = true;
       if (verificationEmptyEl) verificationEmptyEl.hidden = true;
       if (rejectedEmptyEl) rejectedEmptyEl.hidden = true;
+      if (archiveEmptyEl) archiveEmptyEl.hidden = true;
       if (auditEmptyEl) auditEmptyEl.hidden = true;
       try {
         const lang = 'uk';
@@ -642,6 +735,24 @@ export const initAdmin = ({ formatMessage }) => {
         setEmptyState(verificationEmptyEl, true);
         setEmptyState(rejectedEmptyEl, true);
         if (auditEmptyEl) auditEmptyEl.hidden = false;
+      }
+      try {
+        const mergedEvents = await fetchMergedLocalEvents();
+        const archived = mergedEvents
+          .filter((event) => event?.archived === true || event?.status === 'archived')
+          .map((event) => ({
+            id: event.id,
+            title: event.title,
+            meta: formatEventMeta(event),
+            payload: event
+          }));
+        renderArchive(archived);
+        const localAudit = getAuditLog();
+        if (localAudit.length) {
+          renderAudit(localAudit);
+        }
+      } catch (localError) {
+        if (archiveEmptyEl) archiveEmptyEl.hidden = false;
       } finally {
         if (loadingEl) loadingEl.hidden = true;
       }
@@ -713,6 +824,29 @@ export const initAdmin = ({ formatMessage }) => {
         const remaining =
           verificationContainer.querySelectorAll('[data-admin-verification-row]').length === 0;
         setEmptyState(verificationEmptyEl, remaining);
+      });
+    }
+
+    if (archiveContainer) {
+      archiveContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const card = target.closest('[data-admin-archive-card]');
+        if (!card) return;
+        const eventId = card.dataset.eventId || '';
+        const eventData = archiveById.get(eventId);
+        const actorEmail = user?.email || 'admin';
+        if (target.dataset.action === 'restore' && eventData) {
+          restoreLocalEvent(eventData, actorEmail);
+          loadModerationQueue();
+        }
+        if (target.dataset.action === 'delete' && eventData) {
+          if (!window.confirm(formatMessage('admin_confirm_delete', {}))) {
+            return;
+          }
+          deleteLocalEvent(eventData, actorEmail);
+          loadModerationQueue();
+        }
       });
     }
 

@@ -1,4 +1,5 @@
 import { ADMIN_SESSION_KEY, hasAdminRole } from './auth.js';
+import { buildLocalEventId, findMergedEventById, upsertLocalEvent } from './local-events.js';
 
 export const initEventForm = ({ formatMessage, getVerificationState, publishState }) => {
   const multiStepForm = document.querySelector('.multi-step');
@@ -40,6 +41,8 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   let organizerStatus = 'none';
   let previewImageUrl = null;
   let identityUser = null;
+  let editingEventId = null;
+  let editingEventData = null;
 
   const isAdminBypass = () => {
     if (identityUser && hasAdminRole(identityUser)) return true;
@@ -130,6 +133,95 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     return `${startLabel} – ${formatDateTime(end)}`;
   };
 
+  const formatInputDateTime = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const pad = (num) => String(num).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+      date.getHours()
+    )}:${pad(date.getMinutes())}`;
+  };
+
+  const guessCity = (address) => {
+    const normalized = String(address || '').toLowerCase();
+    const map = [
+      { keys: ['copenhagen', 'копенгаген'], value: 'Copenhagen' },
+      { keys: ['aarhus', 'орхус'], value: 'Aarhus' },
+      { keys: ['odense', 'оденсе'], value: 'Odense' },
+      { keys: ['aalborg', 'ольборг'], value: 'Aalborg' },
+      { keys: ['esbjerg', "есб'єрг", 'есбʼєрг'], value: 'Esbjerg' }
+    ];
+    const match = map.find((entry) => entry.keys.some((key) => normalized.includes(key)));
+    return match ? match.value : '';
+  };
+
+  const applyPreviewImage = (value, altText) => {
+    if (!previewImage) return;
+    if (!value) {
+      previewImage.hidden = true;
+      previewImage.removeAttribute('src');
+      previewImage.removeAttribute('alt');
+      previewImageUrl = null;
+      return;
+    }
+    previewImage.hidden = false;
+    previewImage.src = value;
+    previewImage.alt = altText || '';
+    previewImageUrl = value;
+  };
+
+  const populateFormFromEvent = (eventData) => {
+    if (!eventData) return;
+    const setValue = (name, value) => {
+      const field = multiStepForm.elements[name];
+      if (!field) return;
+      if (field instanceof RadioNodeList) {
+        field.value = value ?? '';
+      } else if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+        field.value = value ?? '';
+      }
+    };
+    setValue('title', eventData.title || '');
+    setValue('description', eventData.description || '');
+    const categoryValue = eventData.category?.label || '';
+    if (categorySelect && categoryValue) {
+      const hasOption = Array.from(categorySelect.options).some((option) => option.value === categoryValue);
+      if (!hasOption) {
+        const option = document.createElement('option');
+        option.value = categoryValue;
+        option.textContent = categoryValue;
+        categorySelect.appendChild(option);
+      }
+    }
+    setValue('category', categoryValue);
+    setValue('start', formatInputDateTime(eventData.start));
+    setValue('end', formatInputDateTime(eventData.end));
+    setValue('format', eventData.format || '');
+    setValue('address', eventData.address || [eventData.city, eventData.venue].filter(Boolean).join(', '));
+    setValue('ticket-type', eventData.priceType || '');
+    setValue('price-min', eventData.priceMin ?? '');
+    setValue('price-max', eventData.priceMax ?? '');
+    setValue('ticket-url', eventData.ticketUrl || '');
+    setValue('contact-name', eventData.contactPerson?.name || '');
+    setValue('contact-email', eventData.contactPerson?.email || '');
+    setValue('contact-phone', eventData.contactPerson?.phone || '');
+    setValue('contact-website', eventData.contactPerson?.website || '');
+    setValue('contact-instagram', eventData.contactPerson?.instagram || '');
+    setValue('contact-facebook', eventData.contactPerson?.facebook || '');
+    setValue('contact-telegram', eventData.contactPerson?.telegram || '');
+    pendingTags.clear();
+    (eventData.tags || []).forEach((tag) => {
+      if (tag?.label) pendingTags.add(tag.label);
+    });
+    if (tagsHidden) {
+      tagsHidden.value = Array.from(pendingTags).join(', ');
+    }
+    applyPreviewImage(eventData.images?.[0] || '', eventData.imageAlt || '');
+    renderTagChips();
+    updatePreview();
+  };
+
   const updateAdminSessionFlag = (user) => {
     try {
       if (user && hasAdminRole(user)) {
@@ -210,23 +302,30 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   const updatePreviewImage = () => {
     if (!previewImage) return;
-    const value = imageInput?.value?.trim();
-    if (!value) {
-      previewImage.hidden = true;
-      previewImage.removeAttribute('src');
-      previewImage.removeAttribute('alt');
-      previewImageUrl = null;
+    const file = imageInput?.files?.[0];
+    const altText = imageAltInput?.value?.trim() || '';
+    if (!file) {
+      if (!previewImageUrl) {
+        applyPreviewImage('', '');
+      } else {
+        applyPreviewImage(previewImageUrl, altText);
+      }
       return;
     }
-    previewImage.hidden = false;
-    previewImage.src = value;
-    previewImage.alt = imageAltInput?.value?.trim() || '';
-    previewImageUrl = value;
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      if (typeof reader.result !== 'string') return;
+      applyPreviewImage(reader.result, altText);
+    });
+    reader.readAsDataURL(file);
   };
 
   const updatePreview = () => {
     if (previewTitle) previewTitle.textContent = getFieldValue('title');
-    if (previewOrganizer) previewOrganizer.textContent = getFieldValue('organizer');
+    if (previewOrganizer) {
+      const organizerValue = getFieldValue('organizer') || getFieldValue('contact-name');
+      previewOrganizer.textContent = organizerValue;
+    }
     if (previewDescription) previewDescription.textContent = getFieldValue('description');
     if (previewCategory) {
       previewCategory.textContent = getSelectLabel(categorySelect, getFieldValue('category'));
@@ -419,6 +518,19 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   initIdentitySession();
   loadOrganizerStatus();
 
+  const params = new URLSearchParams(window.location.search);
+  const eventIdParam = params.get('id');
+  if (eventIdParam) {
+    findMergedEventById(eventIdParam)
+      .then((eventData) => {
+        if (!eventData) return;
+        editingEventId = eventData.id;
+        editingEventData = eventData;
+        populateFormFromEvent(eventData);
+      })
+      .catch(() => {});
+  }
+
   if (verificationBannerButton) {
     verificationBannerButton.addEventListener('click', () => {
       window.location.href = 'main-page.html#settings';
@@ -481,20 +593,54 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
       }
-      const response = await fetch('/.netlify/functions/submit-event', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) {
-        throw new Error('Submit failed');
-      }
-      const result = await response.json();
-      if (!result?.ok) {
-        throw new Error('Submit failed');
-      }
+      const eventId = editingEventId || buildLocalEventId();
+      const city = guessCity(payload.address);
+      const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
+      const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
+      const nextEvent = {
+        id: eventId,
+        title: payload.title || editingEventData?.title || '—',
+        slug: editingEventData?.slug || eventId,
+        description: payload.description || '',
+        category: {
+          label: payload.category || '',
+          status: 'approved'
+        },
+        tags: finalTags.map((label) => ({ label, status: 'approved' })),
+        start: payload.start || '',
+        end: payload.end || '',
+        format: payload.format || '',
+        venue: payload.address || '',
+        address: payload.address || '',
+        city: city || editingEventData?.city || '',
+        priceType: payload['ticket-type'] || '',
+        priceMin: Number.isFinite(priceMin) ? priceMin : null,
+        priceMax: Number.isFinite(priceMax) ? priceMax : null,
+        ticketUrl: payload['ticket-url'] || '',
+        organizerId,
+        images: previewImageUrl ? [previewImageUrl] : editingEventData?.images || [],
+        imageAlt: imageAltInput?.value?.trim() || editingEventData?.imageAlt || '',
+        contactPerson: {
+          name: payload['contact-name'] || '',
+          email: payload['contact-email'] || '',
+          phone: payload['contact-phone'] || '',
+          website: payload['contact-website'] || '',
+          instagram: payload['contact-instagram'] || '',
+          facebook: payload['contact-facebook'] || '',
+          telegram: payload['contact-telegram'] || ''
+        },
+        status: 'published',
+        archived: false,
+        forUkrainians: editingEventData?.forUkrainians ?? true,
+        familyFriendly: editingEventData?.familyFriendly ?? false,
+        volunteer: editingEventData?.volunteer ?? false
+      };
+      const saved = upsertLocalEvent(nextEvent, identityUser?.email || 'admin');
       if (submitStatus) {
         submitStatus.textContent = formatMessage('submit_success', {});
+      }
+      if (saved?.id) {
+        window.location.href = `./event-card.html?id=${encodeURIComponent(saved.id)}`;
       }
     } catch (error) {
       if (submitStatus) {

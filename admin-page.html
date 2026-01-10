@@ -103,7 +103,17 @@
           </div>
         </section>
 
-        <section class="moderation moderation--audit" aria-labelledby="audit-title" data-super-admin-only hidden>
+        <section class="moderation moderation--archive" aria-labelledby="archive-title">
+          <header class="section-header">
+            <h2 id="archive-title" data-i18n="admin_archive_title">Архів подій</h2>
+            <p class="section-summary" data-i18n="admin_archive_summary">Архівовані події та дії адміністратора.</p>
+          </header>
+          <div class="moderation-list" data-admin-archive>
+            <p class="moderation__state" data-admin-archive-empty data-i18n="admin_archive_empty" hidden>Архів поки порожній.</p>
+          </div>
+        </section>
+
+        <section class="moderation moderation--audit" aria-labelledby="audit-title">
           <header class="section-header">
             <h2 id="audit-title" data-i18n="admin_audit_title">Журнал рішень</h2>
             <p class="section-summary" data-i18n="admin_audit_summary">Останні рішення по модерації.</p>
@@ -160,6 +170,22 @@
         <div class="moderation-card__status">
           <span class="status-pill status-pill--pending" data-admin-audit-status></span>
           <p class="moderation-card__reason" data-admin-audit-reason hidden></p>
+        </div>
+      </article>
+    </template>
+
+    <template id="archive-card-template">
+      <article class="moderation-card moderation-card--archive" data-admin-archive-card>
+        <div class="moderation-card__meta">
+          <h3 data-admin-archive-title></h3>
+          <p data-admin-archive-meta></p>
+        </div>
+        <div class="moderation-card__status">
+          <span class="status-pill status-pill--draft" data-i18n="archived_label">Архівовано</span>
+        </div>
+        <div class="moderation-card__actions">
+          <button class="btn ghost" type="button" data-action="restore" data-i18n="admin_action_restore">Відновити</button>
+          <button class="btn ghost" type="button" data-action="delete" data-i18n="admin_action_delete">Видалити</button>
         </div>
       </article>
     </template>

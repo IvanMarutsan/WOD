@@ -2,6 +2,12 @@ import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY } from './modules/auth.js';
+import {
+  archiveLocalEvent,
+  deleteLocalEvent,
+  mergeWithLocalEvents,
+  restoreLocalEvent
+} from './modules/local-events.js';
 
 (() => {
   const header = document.querySelector('.site-header');
@@ -224,7 +230,7 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
         if (event?.id) map.set(event.id, event);
       });
     }
-    return Array.from(map.values());
+    return mergeWithLocalEvents(Array.from(map.values()));
   };
 
   const translations = {
@@ -297,6 +303,9 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       admin_action_edit: 'Редагувати',
       admin_action_approve: 'Схвалити',
       admin_action_reject: 'Відхилити',
+      admin_action_archive: 'Архівувати',
+      admin_action_restore: 'Відновити',
+      admin_action_delete: 'Видалити',
       admin_edit_title: 'Редагувати подію',
       admin_edit_help: 'Внесіть зміни та збережіть.',
       admin_edit_save: 'Зберегти зміни',
@@ -315,6 +324,9 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       admin_rejected_title: 'Відхилені події',
       admin_rejected_summary: 'Доступно лише для супер-адміністратора.',
       admin_rejected_empty: 'Немає відхилених подій.',
+      admin_archive_title: 'Архів подій',
+      admin_archive_summary: 'Архівовані події та дії адміністратора.',
+      admin_archive_empty: 'Архів поки порожній.',
       admin_loading: 'Завантаження...',
       admin_reason_label: 'Причина',
       admin_history_title: 'Історія рішень',
@@ -322,6 +334,12 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       admin_audit_title: 'Журнал рішень',
       admin_audit_summary: 'Останні рішення по модерації.',
       admin_audit_empty: 'Журнал поки порожній.',
+      admin_audit_action_publish: 'Опубліковано',
+      admin_audit_action_edit: 'Відредаговано',
+      admin_audit_action_archive: 'Архівовано',
+      admin_audit_action_restore: 'Відновлено',
+      admin_audit_action_delete: 'Видалено',
+      admin_confirm_delete: 'Видалити подію?',
       admin_access_checking: 'Перевіряємо доступ...',
       admin_access_granted: 'Доступ підтверджено.',
       admin_access_required: 'Потрібен вхід адміністратора.',
@@ -384,6 +402,7 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       preview_tickets: 'Квитки',
       preview_format: 'Формат',
       form_submit_moderation: 'Надіслати на модерацію',
+      form_submit_publish: 'Опублікувати',
       form_back: 'Назад',
       form_next: 'Далі',
       required_label: 'Обовʼязково',
@@ -2511,6 +2530,13 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
   const contactNameEl = document.querySelector('[data-event-contact-name]');
   const contactEmailEl = document.querySelector('[data-event-contact-email]');
   const contactPhoneEl = document.querySelector('[data-event-contact-phone]');
+  const adminControls = document.querySelector('[data-admin-controls]');
+  const adminArchivedBadge = document.querySelector('[data-admin-archived-badge]');
+  const adminEditLink = document.querySelector('[data-action="admin-edit"]');
+  const adminArchiveButton = document.querySelector('[data-action="admin-archive"]');
+  const adminRestoreButton = document.querySelector('[data-action="admin-restore"]');
+  const adminDeleteButton = document.querySelector('[data-action="admin-delete"]');
+  let activeEventData = null;
 
   const updateDescriptionToggle = (text) => {
     if (!eventDescriptionEl || !eventDescriptionToggle) return;
@@ -2582,6 +2608,7 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
 
   const renderEventDetail = (eventData) => {
     if (!eventData) return;
+    activeEventData = eventData;
     if (eventTitleEl) eventTitleEl.textContent = eventData.title;
     if (eventCategoryEl && eventData.category?.label) {
       eventCategoryEl.textContent = eventData.category.label;
@@ -2642,6 +2669,16 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
       contactPhoneEl.textContent = eventData.contactPerson.phone;
       contactPhoneEl.setAttribute('href', `tel:${eventData.contactPerson.phone}`);
     }
+    if (adminControls) {
+      const archived = isArchivedEvent(eventData);
+      adminControls.hidden = !isAdminSession();
+      if (adminArchivedBadge) adminArchivedBadge.hidden = !archived;
+      if (adminArchiveButton) adminArchiveButton.hidden = archived;
+      if (adminRestoreButton) adminRestoreButton.hidden = !archived;
+      if (adminEditLink) {
+        adminEditLink.href = `./new-event.html?id=${encodeURIComponent(eventData.id)}`;
+      }
+    }
     updateEventPrice();
     updateEventMeta();
   };
@@ -2652,6 +2689,34 @@ import { ADMIN_SESSION_KEY } from './modules/auth.js';
         const expanded = eventDescriptionToggle.getAttribute('aria-expanded') === 'true';
         eventDescriptionToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
         updateDescriptionToggle();
+      });
+    }
+    if (adminArchiveButton) {
+      adminArchiveButton.addEventListener('click', () => {
+        if (!activeEventData) return;
+        const updated = archiveLocalEvent(activeEventData, 'admin');
+        if (updated) {
+          renderEventDetail(updated);
+        }
+      });
+    }
+    if (adminRestoreButton) {
+      adminRestoreButton.addEventListener('click', () => {
+        if (!activeEventData) return;
+        const updated = restoreLocalEvent(activeEventData, 'admin');
+        if (updated) {
+          renderEventDetail(updated);
+        }
+      });
+    }
+    if (adminDeleteButton) {
+      adminDeleteButton.addEventListener('click', () => {
+        if (!activeEventData) return;
+        if (!window.confirm(formatMessage('admin_confirm_delete', {}))) {
+          return;
+        }
+        deleteLocalEvent(activeEventData, 'admin');
+        window.location.href = './admin-page.html#archive';
       });
     }
     const params = new URLSearchParams(window.location.search);

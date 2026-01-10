@@ -1360,6 +1360,31 @@ button:disabled,
   color: var(--muted);
 }
 
+.event-admin {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.event-admin__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(240, 166, 0, 0.15);
+  color: #a86b00;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.event-admin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .event-banner {
   margin-top: 16px;
   padding: 10px 14px;

@@ -62,6 +62,15 @@
               >
                 12.11.2024 · 19:00–21:30 · Copenhagen
               </p>
+              <div class="event-admin" data-admin-controls hidden>
+                <span class="event-admin__badge" data-admin-archived-badge data-i18n="archived_label" hidden>Архівовано</span>
+                <div class="event-admin__actions">
+                  <a class="btn ghost" href="#" data-action="admin-edit" data-i18n="admin_action_edit">Редагувати</a>
+                  <button class="btn ghost" type="button" data-action="admin-archive" data-i18n="admin_action_archive">Архівувати</button>
+                  <button class="btn ghost" type="button" data-action="admin-restore" data-i18n="admin_action_restore" hidden>Відновити</button>
+                  <button class="btn ghost" type="button" data-action="admin-delete" data-i18n="admin_action_delete">Видалити</button>
+                </div>
+              </div>
             </header>
             <div class="event-banner" data-past-banner data-testid="event-detail-banner-past" hidden>
               <p data-i18n="event_past_banner">Ця подія вже минула</p>
