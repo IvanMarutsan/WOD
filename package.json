@@ -5,7 +5,8 @@
     "dev": "http-server . -p 5173 -c-1",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "test:unit": "node --test tests/unit"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.5",

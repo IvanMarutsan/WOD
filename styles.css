@@ -2476,12 +2476,12 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 .preview-article {
   background: transparent;
   box-shadow: none;
-  padding: 0;
+  padding: 0 8px;
 }
 
 .preview-sidebar .event-sidebar__card {
   position: sticky;
-  top: 20px;
+  top: 96px;
 }
 
 .moderation-list {

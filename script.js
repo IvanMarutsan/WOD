@@ -2,6 +2,7 @@ import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY } from './modules/auth.js';
+import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
 import {
   archiveLocalEvent,
   deleteLocalEvent,
@@ -439,6 +440,7 @@ import {
       event_share_x: 'X',
       event_share_linkedin: 'LinkedIn',
       event_ticket_note: 'Купити квитки',
+      event_register_note: 'Безкоштовна реєстрація',
       ticket_panel_aria: 'Панель квитків',
       organizer_meta: 'Некомерційна спільнота зустрічей',
       organizer_contact_email: 'Email',
@@ -1707,9 +1709,10 @@ import {
 
     const renderApp = () => {
       const payload = currentFormData || (filtersForm ? new FormData(filtersForm) : null);
-      const startIndex = Math.max(0, (currentPage - 1) * pageSize);
-      const endIndex = startIndex + pageSize;
-      const list = state.filteredEvents.slice(startIndex, endIndex);
+      const pageSlice = getPageSlice(state.filteredEvents, currentPage, pageSize);
+      currentPage = pageSlice.currentPage;
+      totalPages = pageSlice.totalPages;
+      const list = pageSlice.items;
       renderEvents(list);
       renderHighlights(state.events);
       const liveEvents = getLiveEvents(state.events);
@@ -2041,10 +2044,8 @@ import {
         nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       setFilteredEvents(nextFilteredEvents);
-      totalPages = Math.max(1, Math.ceil(nextFilteredEvents.length / pageSize));
-      if (currentPage > totalPages) {
-        currentPage = totalPages;
-      }
+      totalPages = getTotalPages(nextFilteredEvents.length, pageSize);
+      currentPage = clampPage(currentPage, totalPages);
       if (nextEventsButton) {
         nextEventsButton.disabled = currentPage >= totalPages;
       }
@@ -2831,7 +2832,22 @@ import {
     const max = Number(eventPrice.dataset.priceMax);
     const minValue = Number.isNaN(min) ? null : min;
     const maxValue = Number.isNaN(max) ? null : max;
-    eventPrice.textContent = formatPriceLabel(type, minValue, maxValue);
+    const priceLabel = formatPriceLabel(type, minValue, maxValue);
+    eventPrice.textContent = priceLabel;
+    if (ticketNote && eventMeta) {
+      const start = eventMeta.dataset.eventStart;
+      const end = eventMeta.dataset.eventEnd;
+      const isPastEvent = isPast({ start, end });
+      if (!isPastEvent) {
+        if (type === 'free') {
+          ticketNote.textContent = formatMessage('event_register_note', {});
+        } else {
+          ticketNote.textContent = priceLabel
+            ? `${formatMessage('event_ticket_note', {})} (${priceLabel})`
+            : formatMessage('event_ticket_note', {});
+        }
+      }
+    }
   };
 
   const renderEventDetail = (eventData) => {
