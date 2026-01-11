@@ -36,12 +36,25 @@
           <span aria-hidden="true" class="menu-toggle__icon"></span>
         </button>
         <nav id="primary-nav" class="site-nav" aria-label="Основна навігація" data-i18n-aria="nav_primary_aria">
+          <form class="header-search" role="search">
+            <label class="sr-only" for="header-search" data-i18n="search_label">Пошук подій</label>
+            <input
+              id="header-search"
+              name="query"
+              type="search"
+              data-event-search
+              data-testid="search-input"
+              placeholder="Пошук за містом, тематикою або датою"
+              data-i18n-placeholder="search_placeholder"
+            />
+          </form>
           <a href="./main-page.html#events" aria-current="page" data-i18n="nav_events">Події</a>
           <a href="./about.html" data-i18n="nav_about">Про нас</a>
           <a href="./contacts.html" data-i18n="nav_contacts">Контакти</a>
         </nav>
         <div class="header-utils">
           <!-- Add event CTA disabled (admin-only for now). -->
+          <a class="btn ghost" href="./admin-page.html" data-admin-link data-i18n="admin_nav" hidden>Адмінка</a>
           <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
@@ -61,24 +74,6 @@
               <a class="btn primary" href="./main-page.html#events" data-i18n="cta_explore">Переглянути події</a>
               <!-- Add event CTA disabled (admin-only for now). -->
             </div>
-            <form class="hero-search" role="search" aria-describedby="search-help">
-              <label class="sr-only" for="event-search" data-i18n="search_label">Пошук подій</label>
-              <div class="hero-search__field search">
-                <input
-                  id="event-search"
-                  name="query"
-                  type="search"
-                  data-testid="search-input"
-                  placeholder="Пошук за містом, тематикою або датою"
-                  data-i18n-placeholder="search_placeholder"
-                  required
-                />
-                <button class="btn primary" type="submit" data-i18n="cta_explore">Переглянути події</button>
-              </div>
-              <p id="search-help" class="hero-search__help" data-i18n="search_help">
-                Наприклад: Копенгаген, музика або вихідні.
-              </p>
-            </form>
           </div>
           <a class="hero-card" data-hero-link href="./main-page.html#events">
             <div class="hero-card__header">

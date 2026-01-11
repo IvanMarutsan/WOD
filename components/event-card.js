@@ -71,7 +71,8 @@ export const EventCard = (event, helpers) => {
   const ticketUrl = event.ticketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
-  const location = `${cityLabel} · ${event.venue}`;
+  const locationParts = [cityLabel, event.venue].filter((part) => part && String(part).trim());
+  const location = locationParts.join(' · ');
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';
   return `
         <article class="${cardClass}" data-event-id="${event.id}" data-status="${statusLabel}" data-testid="event-card">

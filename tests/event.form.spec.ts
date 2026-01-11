@@ -13,6 +13,7 @@ test('create event without end time', async ({ page }) => {
   // Step 2: set only start, no end
   await page.getByLabel(/Початок|Start/i).fill('2030-05-01T18:00');
   await page.locator('select[name="format"]').selectOption({ value: 'offline' });
+  await page.locator('select[name="language"]').selectOption({ value: 'uk' });
   await page.getByLabel(/Адреса|Address|Adresse/i).fill('Copenhagen, Main St 10');
   // Ensure timezone selector is absent
   await expect(page.locator('[name=\"timezone\"]')).toHaveCount(0);

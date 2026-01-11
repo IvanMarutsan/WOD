@@ -41,6 +41,7 @@
         </nav>
         <div class="header-utils">
           <!-- Add event CTA disabled (admin-only for now). -->
+          <a class="btn ghost" href="./admin-page.html" data-admin-link data-i18n="admin_nav" hidden>Адмінка</a>
           <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
@@ -72,6 +73,7 @@
                 </div>
               </div>
             </header>
+            <img class="event-hero" data-event-image alt="" hidden />
             <div class="event-banner" data-past-banner data-testid="event-detail-banner-past" hidden>
               <p data-i18n="event_past_banner">Ця подія вже минула</p>
             </div>
@@ -89,31 +91,14 @@
 
             <section class="event-article__section">
               <h2 data-i18n="event_where_title">Де</h2>
-              <p class="event-article__location" data-event-location>Copenhagen · Design Hub</p>
-              <div class="event-map" aria-label="Мапа події (плейсхолдер)">
-                <p data-i18n="event_map_placeholder">Плейсхолдер мапи</p>
-              </div>
+              <p class="event-article__location">
+                <a class="event-article__location-link" data-event-location href="#" rel="noopener">Copenhagen · Design Hub</a>
+              </p>
             </section>
 
             <section class="event-article__section">
               <h2 data-i18n="event_language_title">Мова події</h2>
-              <p data-i18n="event_language_value">uk / en</p>
-            </section>
-
-            <section class="event-article__section" aria-labelledby="event-contact-title">
-              <h2 id="event-contact-title" data-i18n="event_contact_title">Контакти</h2>
-              <p>
-                <span data-i18n="event_contact_name">Імʼя</span>:
-                <span data-event-contact-name>Olena K.</span>
-              </p>
-              <p>
-                <a href="mailto:hello@whatsondk.test" data-i18n="event_contact_email_label">Email</a>:
-                <a href="mailto:hello@whatsondk.test" data-event-contact-email>hello@whatsondk.test</a>
-              </p>
-              <p>
-                <a href="tel:+4512345678" data-i18n="event_contact_phone_label">Телефон</a>:
-                <a href="tel:+4512345678" data-event-contact-phone>+45 12 34 56 78</a>
-              </p>
+              <p data-event-language data-i18n="event_language_value">uk / en</p>
             </section>
 
             <section class="event-article__section">
@@ -127,29 +112,26 @@
               </div>
             </section>
 
-            <section class="event-article__section">
+            <section class="event-article__section" data-organizer-section hidden>
               <h2 data-i18n="event_organizer_title">Організатор</h2>
               <div class="organizer">
                 <div class="organizer__info">
-                  <p class="organizer__name">
-                    Evently Community
-                    <span class="verified-badge" data-verified-badge data-i18n="verified_badge" hidden>Verified</span>
-                  </p>
-                  <p class="organizer__meta" data-i18n="organizer_meta">Некомерційна спільнота зустрічей</p>
+                  <p class="organizer__name" data-organizer-name></p>
+                  <p class="organizer__meta" data-organizer-meta hidden></p>
                 </div>
                 <div class="organizer__contacts">
-                  <a href="mailto:hello@evently.test" data-i18n="organizer_contact_email">Email</a>
-                  <a href="tel:+380441234567" data-i18n="organizer_contact_phone">Телефон</a>
-                  <a href="#" data-i18n="organizer_contact_website">Сайт</a>
+                  <a href="#" data-organizer-email hidden data-i18n="organizer_contact_email">Email</a>
+                  <a href="#" data-organizer-phone hidden data-i18n="organizer_contact_phone">Телефон</a>
+                  <a href="#" data-organizer-website hidden data-i18n="organizer_contact_website">Сайт</a>
                 </div>
-                <div class="organizer__socials" data-i18n-aria="footer_socials">
-                  <a class="social-link" href="https://instagram.com/whatsondk" aria-label="Instagram" rel="noopener">
+                <div class="organizer__socials" data-organizer-socials hidden>
+                  <a class="social-link" href="#" data-organizer-instagram aria-label="Instagram" rel="noopener">
                     <span class="social-icon" aria-hidden="true">IG</span>
                   </a>
-                  <a class="social-link" href="https://facebook.com/whatsondk" aria-label="Facebook" rel="noopener">
+                  <a class="social-link" href="#" data-organizer-facebook aria-label="Facebook" rel="noopener">
                     <span class="social-icon" aria-hidden="true">FB</span>
                   </a>
-                  <a class="social-link" href="https://t.me/whatsondk" aria-label="Telegram" rel="noopener">
+                  <a class="social-link" href="#" data-organizer-telegram aria-label="Telegram" rel="noopener">
                     <span class="social-icon" aria-hidden="true">TG</span>
                   </a>
                 </div>
@@ -166,14 +148,7 @@
               <a class="event-sidebar__cta event-sidebar__cta--ticket" href="#" rel="noopener" data-event-id="evt-001" data-i18n="ticket_cta" data-testid="ticket-cta">Квитки</a>
               <a class="event-sidebar__cta event-sidebar__cta--similar" href="./main-page.html#events" data-i18n="similar_cta" data-testid="similar-cta" hidden>Схожі події</a>
             </div>
-            <div class="event-sidebar__card">
-              <h2 data-i18n="event_share_title">Поділитися</h2>
-              <div class="event-share">
-                <a href="#" data-i18n="event_share_facebook">Facebook</a>
-                <a href="#" data-i18n="event_share_x">X</a>
-                <a href="#" data-i18n="event_share_linkedin">LinkedIn</a>
-              </div>
-            </div>
+            <!-- Share block disabled for now. -->
           </aside>
         </div>
       </div>

@@ -21,6 +21,7 @@ import {
   const ticketCtas = document.querySelectorAll('.event-sidebar__cta--ticket');
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const themeToggle = document.querySelector('.theme-toggle');
+  const adminLinks = document.querySelectorAll('[data-admin-link]');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
   const logBuffer = [];
   let debugPanel = null;
@@ -34,6 +35,14 @@ import {
       return false;
     }
   };
+
+  if (adminLinks.length) {
+    const showAdmin = isAdminSession();
+    adminLinks.forEach((link) => {
+      if (!(link instanceof HTMLElement)) return;
+      link.hidden = !showAdmin;
+    });
+  }
 
   const redirectIdentityHashToLogin = () => {
     const hash = window.location.hash || '';
@@ -243,6 +252,7 @@ import {
       nav_organizers: 'Організатори',
       nav_about: 'Про нас',
       nav_contacts: 'Контакти',
+      admin_nav: 'Адмінка',
       nav_dashboard: 'Дашборд',
       skip_link: 'Перейти до вмісту',
       nav_toggle: 'Перемкнути навігацію',
@@ -403,6 +413,13 @@ import {
       preview_format: 'Формат',
       form_submit_moderation: 'Надіслати на модерацію',
       form_submit_publish: 'Опублікувати',
+      form_language_label: 'Мова події',
+      form_language_placeholder: 'Оберіть мову',
+      form_language_uk: 'Українська',
+      form_language_en: 'Англійська',
+      form_language_da: 'Данська',
+      form_language_uk_en: 'Українська / Англійська',
+      form_language_other: 'Інша',
       form_back: 'Назад',
       form_next: 'Далі',
       required_label: 'Обовʼязково',
@@ -1223,7 +1240,8 @@ import {
       const errorState = document.querySelector('.catalog-error');
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const resetEventsButton = document.querySelector('[data-action="events-reset"]');
-    const searchInput = document.querySelector('#event-search');
+    const searchInputs = Array.from(document.querySelectorAll('[data-event-search]'));
+    const primarySearchInput = searchInputs[0] || null;
     const heroTitle = document.querySelector('[data-hero-title]');
     const heroMeta = document.querySelector('[data-hero-meta]');
     const heroTags = document.querySelector('[data-hero-tags]');
@@ -1872,7 +1890,7 @@ import {
       const audienceUa = formData.get('audience-ua');
       const audienceFamily = formData.get('audience-family');
       const audienceVolunteer = formData.get('audience-volunteer');
-      const searchValue = normalize(searchInput ? searchInput.value : '');
+      const searchValue = normalize(activeFilters.searchQuery || '');
 
       if (!ignorePastToggle) {
         if (showPast) {
@@ -2162,6 +2180,21 @@ import {
       return changed;
     };
 
+    const syncSearchInputs = (value, source) => {
+      searchInputs.forEach((input) => {
+        if (input === source) return;
+        if (input.value !== value) {
+          input.value = value;
+        }
+      });
+    };
+
+    const getSearchValue = () => {
+      const active = searchInputs.find((input) => input.value.trim());
+      if (active) return active.value.trim();
+      return primarySearchInput ? primarySearchInput.value.trim() : '';
+    };
+
     const readQueryParams = () => {
       const params = new URLSearchParams(window.location.search);
       const cityParam = params.get('city') || '';
@@ -2194,8 +2227,8 @@ import {
         if (!key) return;
         input.checked = activeFilters.audiences.has(key);
       });
-      if (searchInput) {
-        searchInput.value = activeFilters.searchQuery;
+      if (searchInputs.length) {
+        syncSearchInputs(activeFilters.searchQuery);
       }
       if (filtersForm) {
         const setValue = (name, value) => {
@@ -2256,15 +2289,16 @@ import {
         }
         syncPresetButtons();
       }
-      if (searchInput) {
-        searchInput.value = params.get('q') || '';
+      if (searchInputs.length) {
+        syncSearchInputs(params.get('q') || '');
       }
     };
 
     const updateCatalogQueryParams = () => {
       const params = new URLSearchParams();
-      if (searchInput && searchInput.value.trim()) {
-        params.set('q', searchInput.value.trim());
+      const searchValue = getSearchValue();
+      if (searchValue) {
+        params.set('q', searchValue);
       }
       if (filtersForm) {
         const formData = new FormData(filtersForm);
@@ -2425,8 +2459,8 @@ import {
       });
       filtersForm.addEventListener('reset', () => {
         setTimeout(() => {
-          if (searchInput) {
-            searchInput.value = '';
+          if (searchInputs.length) {
+            syncSearchInputs('');
           }
           syncPastFilterState(true);
           syncPresetButtons();
@@ -2442,31 +2476,38 @@ import {
       });
     }
 
-    const handleSearchInput = () => {
-      setSearchFilter(searchInput.value);
+    const handleSearchInput = (value) => {
+      setSearchFilter(value);
       applyFilters();
     };
 
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        handleSearchInput();
-      });
-      const searchForm = searchInput.closest('form');
-      if (searchForm) {
+    if (searchInputs.length) {
+      const searchForms = new Set();
+      searchInputs.forEach((input) => {
+        input.addEventListener('input', () => {
+          syncSearchInputs(input.value, input);
+          handleSearchInput(input.value);
+        });
+        const searchForm = input.closest('form');
+        if (!searchForm || searchForms.has(searchForm)) return;
+        searchForms.add(searchForm);
         searchForm.addEventListener('submit', (event) => {
           event.preventDefault();
-          setSearchFilter(searchInput.value);
-          if (applySearchFilters(searchInput.value)) {
+          const formInput = searchForm.querySelector('[data-event-search]');
+          const value = formInput ? formInput.value : '';
+          syncSearchInputs(value);
+          setSearchFilter(value);
+          if (applySearchFilters(value)) {
             syncAdvancedPanel();
           }
           applyFilters();
-          searchInput.focus({ preventScroll: true });
+          formInput?.focus({ preventScroll: true });
           const catalogSection = document.querySelector('#events');
           if (catalogSection) {
             catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         });
-      }
+      });
     }
 
     if (nextEventsButton) {
@@ -2526,10 +2567,19 @@ import {
   const eventDescriptionEl = document.querySelector('[data-event-description]');
   const eventDescriptionToggle = document.querySelector('[data-event-description-toggle]');
   const eventLocationEl = document.querySelector('[data-event-location]');
+  const eventImageEl = document.querySelector('[data-event-image]');
+  const eventLanguageEl = document.querySelector('[data-event-language]');
   const eventTagsEl = document.querySelector('[data-event-tags]');
-  const contactNameEl = document.querySelector('[data-event-contact-name]');
-  const contactEmailEl = document.querySelector('[data-event-contact-email]');
-  const contactPhoneEl = document.querySelector('[data-event-contact-phone]');
+  const organizerSection = document.querySelector('[data-organizer-section]');
+  const organizerNameEl = document.querySelector('[data-organizer-name]');
+  const organizerMetaEl = document.querySelector('[data-organizer-meta]');
+  const organizerEmailEl = document.querySelector('[data-organizer-email]');
+  const organizerPhoneEl = document.querySelector('[data-organizer-phone]');
+  const organizerWebsiteEl = document.querySelector('[data-organizer-website]');
+  const organizerSocials = document.querySelector('[data-organizer-socials]');
+  const organizerInstagramEl = document.querySelector('[data-organizer-instagram]');
+  const organizerFacebookEl = document.querySelector('[data-organizer-facebook]');
+  const organizerTelegramEl = document.querySelector('[data-organizer-telegram]');
   const adminControls = document.querySelector('[data-admin-controls]');
   const adminArchivedBadge = document.querySelector('[data-admin-archived-badge]');
   const adminEditLink = document.querySelector('[data-action="admin-edit"]');
@@ -2621,8 +2671,31 @@ import {
       updateDescriptionToggle(eventData.description);
     }
     if (eventLocationEl) {
-      const location = `${eventData.city} · ${eventData.venue}`;
-      eventLocationEl.textContent = location;
+      const parts = [eventData.venue, eventData.address, eventData.city].filter(Boolean);
+      const location = parts.length ? parts.join(', ') : '';
+      eventLocationEl.textContent = location || '—';
+      const mapQuery = encodeURIComponent(location || eventData.city || '');
+      if (mapQuery) {
+        eventLocationEl.setAttribute('href', `https://www.google.com/maps/search/?api=1&query=${mapQuery}`);
+        eventLocationEl.setAttribute('target', '_blank');
+        eventLocationEl.setAttribute('rel', 'noopener');
+      } else {
+        eventLocationEl.removeAttribute('href');
+      }
+    }
+    if (eventImageEl) {
+      const imageUrl = eventData.images && eventData.images.length ? eventData.images[0] : '';
+      if (imageUrl) {
+        eventImageEl.hidden = false;
+        eventImageEl.src = imageUrl;
+        eventImageEl.alt = eventData.imageAlt || eventData.title || '';
+      } else {
+        eventImageEl.hidden = true;
+      }
+    }
+    if (eventLanguageEl) {
+      eventLanguageEl.textContent = eventData.language || '';
+      eventLanguageEl.hidden = !eventData.language;
     }
     if (eventMeta) {
       eventMeta.dataset.eventStart = eventData.start || '';
@@ -2658,16 +2731,81 @@ import {
         cta.dataset.eventId = eventData.id || '';
       });
     }
-    if (contactNameEl && eventData.contactPerson?.name) {
-      contactNameEl.textContent = eventData.contactPerson.name;
+    const hasOrganizer =
+      Boolean(eventData.contactPerson?.name) ||
+      Boolean(eventData.contactPerson?.email) ||
+      Boolean(eventData.contactPerson?.phone) ||
+      Boolean(eventData.contactPerson?.website) ||
+      Boolean(eventData.contactPerson?.instagram) ||
+      Boolean(eventData.contactPerson?.facebook) ||
+      Boolean(eventData.contactPerson?.telegram);
+    if (organizerSection) {
+      organizerSection.hidden = !hasOrganizer;
     }
-    if (contactEmailEl && eventData.contactPerson?.email) {
-      contactEmailEl.textContent = eventData.contactPerson.email;
-      contactEmailEl.setAttribute('href', `mailto:${eventData.contactPerson.email}`);
+    if (organizerNameEl) {
+      organizerNameEl.textContent = eventData.contactPerson?.name || '';
     }
-    if (contactPhoneEl && eventData.contactPerson?.phone) {
-      contactPhoneEl.textContent = eventData.contactPerson.phone;
-      contactPhoneEl.setAttribute('href', `tel:${eventData.contactPerson.phone}`);
+    if (organizerMetaEl) {
+      organizerMetaEl.textContent = eventData.contactPerson?.meta || '';
+      organizerMetaEl.hidden = !eventData.contactPerson?.meta;
+    }
+    if (organizerEmailEl) {
+      if (eventData.contactPerson?.email) {
+        organizerEmailEl.hidden = false;
+        organizerEmailEl.textContent = eventData.contactPerson.email;
+        organizerEmailEl.setAttribute('href', `mailto:${eventData.contactPerson.email}`);
+      } else {
+        organizerEmailEl.hidden = true;
+      }
+    }
+    if (organizerPhoneEl) {
+      if (eventData.contactPerson?.phone) {
+        organizerPhoneEl.hidden = false;
+        organizerPhoneEl.textContent = eventData.contactPerson.phone;
+        organizerPhoneEl.setAttribute('href', `tel:${eventData.contactPerson.phone}`);
+      } else {
+        organizerPhoneEl.hidden = true;
+      }
+    }
+    if (organizerWebsiteEl) {
+      if (eventData.contactPerson?.website) {
+        organizerWebsiteEl.hidden = false;
+        organizerWebsiteEl.textContent = eventData.contactPerson.website;
+        organizerWebsiteEl.setAttribute('href', eventData.contactPerson.website);
+      } else {
+        organizerWebsiteEl.hidden = true;
+      }
+    }
+    const hasSocial =
+      Boolean(eventData.contactPerson?.instagram) ||
+      Boolean(eventData.contactPerson?.facebook) ||
+      Boolean(eventData.contactPerson?.telegram);
+    if (organizerSocials) {
+      organizerSocials.hidden = !hasSocial;
+    }
+    if (organizerInstagramEl) {
+      if (eventData.contactPerson?.instagram) {
+        organizerInstagramEl.hidden = false;
+        organizerInstagramEl.setAttribute('href', eventData.contactPerson.instagram);
+      } else {
+        organizerInstagramEl.hidden = true;
+      }
+    }
+    if (organizerFacebookEl) {
+      if (eventData.contactPerson?.facebook) {
+        organizerFacebookEl.hidden = false;
+        organizerFacebookEl.setAttribute('href', eventData.contactPerson.facebook);
+      } else {
+        organizerFacebookEl.hidden = true;
+      }
+    }
+    if (organizerTelegramEl) {
+      if (eventData.contactPerson?.telegram) {
+        organizerTelegramEl.hidden = false;
+        organizerTelegramEl.setAttribute('href', eventData.contactPerson.telegram);
+      } else {
+        organizerTelegramEl.hidden = true;
+      }
     }
     if (adminControls) {
       const archived = isArchivedEvent(eventData);

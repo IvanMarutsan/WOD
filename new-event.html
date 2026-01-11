@@ -40,6 +40,7 @@
         </nav>
         <div class="header-utils">
           <!-- Add event CTA disabled (admin-only for now). -->
+          <a class="btn ghost" href="./admin-page.html" data-admin-link data-i18n="admin_nav" hidden>Адмінка</a>
           <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
@@ -161,6 +162,21 @@
                   <option value="" data-i18n="form_format_placeholder">Оберіть формат</option>
                   <option value="offline" data-i18n="form_format_offline">Офлайн</option>
                   <option value="online" data-i18n="form_format_online">Онлайн</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span class="form-field__label">
+                  <span data-i18n="form_language_label">Мова події</span>
+                  <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only" data-i18n="required_label">Обовʼязково</span>
+                </span>
+                <select name="language" required>
+                  <option value="" data-i18n="form_language_placeholder">Оберіть мову</option>
+                  <option value="uk" data-i18n="form_language_uk">Українська</option>
+                  <option value="en" data-i18n="form_language_en">Англійська</option>
+                  <option value="da" data-i18n="form_language_da">Данська</option>
+                  <option value="uk/en" data-i18n="form_language_uk_en">Українська / Англійська</option>
+                  <option value="other" data-i18n="form_language_other">Інша</option>
                 </select>
               </label>
               <label class="form-field form-field--full">
@@ -302,6 +318,10 @@
                   <section class="event-article__section">
                     <h2 data-i18n="preview_location">Місце</h2>
                     <p class="event-article__location" id="preview-location">—</p>
+                  </section>
+                  <section class="event-article__section">
+                    <h2 data-i18n="event_language_title">Мова події</h2>
+                    <p id="preview-language">—</p>
                   </section>
                   <section class="event-article__section">
                     <h2 data-i18n="preview_tags">Теги</h2>

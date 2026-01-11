@@ -18,6 +18,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const previewLocation = document.querySelector('#preview-location');
   const previewTickets = document.querySelector('#preview-tickets');
   const previewFormat = document.querySelector('#preview-format');
+  const previewLanguage = document.querySelector('#preview-language');
   const previewImage = document.querySelector('#preview-image');
   const categorySelect = multiStepForm.querySelector('select[name="category"]');
   const formatSelect = multiStepForm.querySelector('select[name="format"]');
@@ -198,6 +199,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('start', formatInputDateTime(eventData.start));
     setValue('end', formatInputDateTime(eventData.end));
     setValue('format', eventData.format || '');
+    setValue('language', eventData.language || '');
     setValue('address', eventData.address || [eventData.city, eventData.venue].filter(Boolean).join(', '));
     setValue('ticket-type', eventData.priceType || '');
     setValue('price-min', eventData.priceMin ?? '');
@@ -366,6 +368,10 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     }
     if (previewFormat) {
       previewFormat.textContent = getSelectLabel(formatSelect, getFieldValue('format'));
+    }
+    if (previewLanguage) {
+      const languageSelect = multiStepForm.querySelector('select[name="language"]');
+      previewLanguage.textContent = getSelectLabel(languageSelect, getFieldValue('language'));
     }
     updatePreviewImage();
   };
@@ -596,8 +602,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       const formData = new FormData(multiStepForm);
       const payload = Object.fromEntries(formData.entries());
       const tagsForPayload = Array.from(pendingTags);
-      const finalTags = tagsForPayload.length ? tagsForPayload : ['General'];
-      const tagsPayload = finalTags.join(', ');
+      const tagsPayload = tagsForPayload.join(', ');
       payload.tags = tagsPayload;
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
@@ -615,10 +620,11 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
           label: payload.category || '',
           status: 'approved'
         },
-        tags: finalTags.map((label) => ({ label, status: 'approved' })),
+        tags: tagsForPayload.map((label) => ({ label, status: 'approved' })),
         start: payload.start || '',
         end: payload.end || '',
         format: payload.format || '',
+        language: payload.language || '',
         venue: payload.address || '',
         address: payload.address || '',
         city: city || editingEventData?.city || '',

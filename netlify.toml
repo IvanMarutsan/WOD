@@ -20,7 +20,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: blob: https://*.netlify.app; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; script-src 'self' https://identity.netlify.com; connect-src 'self' https://identity.netlify.com https://*.netlify.app; font-src 'self' https://fonts.gstatic.com data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: blob: https://*.netlify.app https://images.unsplash.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; script-src 'self' https://identity.netlify.com; connect-src 'self' https://identity.netlify.com https://*.netlify.app; font-src 'self' https://fonts.gstatic.com data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     Cache-Control = "public, max-age=300"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Referrer-Policy = "strict-origin-when-cross-origin"
