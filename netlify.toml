@@ -27,13 +27,3 @@
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "SAMEORIGIN"
-
-[[redirects]]
-  from = "/"
-  to = "/main-page.html"
-  status = 302
-
-[[redirects]]
-  from = "/index.html"
-  to = "/main-page.html"
-  status = 301
