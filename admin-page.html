@@ -165,7 +165,10 @@
     <template id="audit-row-template">
       <article class="moderation-card moderation-card--audit" data-admin-audit-row>
         <div class="moderation-card__meta">
-          <h3 data-admin-audit-title></h3>
+          <h3>
+            <a class="moderation-card__title-link" data-admin-audit-link href="#"></a>
+          </h3>
+          <span class="moderation-card__title-text" data-admin-audit-title hidden></span>
           <p data-admin-audit-meta></p>
         </div>
         <div class="moderation-card__status">
@@ -178,7 +181,9 @@
     <template id="archive-card-template">
       <article class="moderation-card moderation-card--archive" data-admin-archive-card>
         <div class="moderation-card__meta">
-          <h3 data-admin-archive-title></h3>
+          <h3>
+            <a class="moderation-card__title-link" data-admin-archive-link href="#"></a>
+          </h3>
           <p data-admin-archive-meta></p>
         </div>
         <div class="moderation-card__status">

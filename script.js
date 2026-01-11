@@ -439,7 +439,7 @@ import {
       event_share_facebook: 'Facebook',
       event_share_x: 'X',
       event_share_linkedin: 'LinkedIn',
-      event_ticket_note: 'Купити квитки (DKK 350–520)',
+      event_ticket_note: 'Купити квитки',
       ticket_panel_aria: 'Панель квитків',
       organizer_meta: 'Некомерційна спільнота зустрічей',
       organizer_contact_email: 'Email',

@@ -615,7 +615,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         id: eventId,
         title: payload.title || editingEventData?.title || '—',
         slug: editingEventData?.slug || eventId,
-        description: payload.description || '',
+        description: payload.description || editingEventData?.description || '',
         category: {
           label: payload.category || '',
           status: 'approved'

@@ -22,7 +22,7 @@ export const initAdmin = ({ formatMessage }) => {
 
   const setupAdminAuth = () => {
     const path = window.location.pathname;
-    const isAdminPage = path.includes('admin-page.html');
+    const isAdminPage = path.includes('admin-page');
     const isLoginPage = path.includes('admin-login');
     if (!isAdminPage && !isLoginPage) return;
 
@@ -603,8 +603,22 @@ export const initAdmin = ({ formatMessage }) => {
         const card = archiveTemplate.content.firstElementChild.cloneNode(true);
         card.dataset.eventId = item.id;
         const titleEl = card.querySelector('[data-admin-archive-title]');
+        const linkEl = card.querySelector('[data-admin-archive-link]');
         const metaEl = card.querySelector('[data-admin-archive-meta]');
-        if (titleEl) titleEl.textContent = item.title || '—';
+        if (titleEl) {
+          titleEl.hidden = true;
+        }
+        if (linkEl) {
+          linkEl.textContent = item.title || '—';
+          if (item.id) {
+            linkEl.href = `./event-card.html?id=${encodeURIComponent(item.id)}`;
+          } else {
+            linkEl.removeAttribute('href');
+            linkEl.setAttribute('aria-disabled', 'true');
+          }
+        } else if (titleEl) {
+          titleEl.textContent = item.title || '—';
+        }
         if (metaEl) metaEl.textContent = item.meta || '—';
         if (item.id) {
           archiveById.set(item.id, item.payload || item);
@@ -645,10 +659,29 @@ export const initAdmin = ({ formatMessage }) => {
       items.forEach((entry) => {
         const row = auditTemplate.content.firstElementChild.cloneNode(true);
         const titleEl = row.querySelector('[data-admin-audit-title]');
+        const linkEl = row.querySelector('[data-admin-audit-link]');
         const metaEl = row.querySelector('[data-admin-audit-meta]');
         const statusEl = row.querySelector('[data-admin-audit-status]');
         const reasonEl = row.querySelector('[data-admin-audit-reason]');
-        if (titleEl) titleEl.textContent = entry.title;
+        if (titleEl) {
+          titleEl.hidden = true;
+        }
+        if (linkEl) {
+          linkEl.textContent = entry.title;
+          if (entry.id && entry.action !== 'delete') {
+            linkEl.href = `./event-card.html?id=${encodeURIComponent(entry.id)}`;
+          } else {
+            linkEl.removeAttribute('href');
+            linkEl.setAttribute('aria-disabled', 'true');
+            if (titleEl) {
+              titleEl.textContent = entry.title;
+              titleEl.hidden = false;
+            }
+            linkEl.hidden = true;
+          }
+        } else if (titleEl) {
+          titleEl.textContent = entry.title;
+        }
         const actor = entry.actorEmail || '—';
         const ts = entry.ts ? new Date(entry.ts).toLocaleString(getUiLocale()) : '—';
         if (metaEl) metaEl.textContent = `${actor} · ${ts}`;
