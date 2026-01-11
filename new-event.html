@@ -286,46 +286,40 @@
 
           <section class="form-step" data-step="5" aria-labelledby="step-title-5" hidden>
             <h2 id="step-title-5" data-i18n="step_preview">Прев’ю</h2>
-            <div class="preview" data-testid="preview">
-              <img class="preview__image" id="preview-image" alt="" hidden />
-              <dl class="preview__list">
-                <div>
-                  <dt data-i18n="preview_title">Назва</dt>
-                  <dd id="preview-title">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_organizer">Організатор</dt>
-                  <dd id="preview-organizer">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_description">Опис</dt>
-                  <dd id="preview-description">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_category">Категорія</dt>
-                  <dd id="preview-category">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_tags">Теги</dt>
-                  <dd id="preview-tags">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_time">Час</dt>
-                  <dd id="preview-time">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_location">Місце</dt>
-                  <dd id="preview-location">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_tickets">Квитки</dt>
-                  <dd id="preview-tickets">—</dd>
-                </div>
-                <div>
-                  <dt data-i18n="preview_format">Формат</dt>
-                  <dd id="preview-format">—</dd>
-                </div>
-              </dl>
+            <div class="preview preview--detail" data-testid="preview">
+              <div class="event-layout preview-layout">
+                <article class="event-article preview-article">
+                  <header class="event-article__header">
+                    <p class="eyebrow" id="preview-category">—</p>
+                    <h1 id="preview-title">—</h1>
+                    <p class="event-article__meta" id="preview-time">—</p>
+                  </header>
+                  <img class="preview__image" id="preview-image" alt="" hidden />
+                  <section class="event-article__section">
+                    <h2 data-i18n="preview_description">Опис</h2>
+                    <p id="preview-description">—</p>
+                  </section>
+                  <section class="event-article__section">
+                    <h2 data-i18n="preview_location">Місце</h2>
+                    <p class="event-article__location" id="preview-location">—</p>
+                  </section>
+                  <section class="event-article__section">
+                    <h2 data-i18n="preview_tags">Теги</h2>
+                    <div class="event-tags" id="preview-tags"></div>
+                  </section>
+                  <section class="event-article__section">
+                    <h2 data-i18n="preview_organizer">Організатор</h2>
+                    <p id="preview-organizer">—</p>
+                  </section>
+                </article>
+                <aside class="event-sidebar preview-sidebar" aria-label="Панель квитків">
+                  <div class="event-sidebar__card">
+                    <p class="event-sidebar__price" id="preview-tickets">—</p>
+                    <p class="event-sidebar__note" id="preview-format">—</p>
+                    <button class="event-sidebar__cta" type="button" disabled data-i18n="ticket_cta">Квитки</button>
+                  </div>
+                </aside>
+              </div>
             </div>
             <input type="hidden" name="status" value="draft" />
             <div class="info-banner" data-verification-banner hidden>

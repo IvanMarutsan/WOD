@@ -2233,6 +2233,25 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   margin: 0;
 }
 
+.preview--detail {
+  padding: 20px;
+}
+
+.preview-layout {
+  gap: 24px;
+}
+
+.preview-article {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.preview-sidebar .event-sidebar__card {
+  position: sticky;
+  top: 20px;
+}
+
 .moderation-list {
   display: grid;
   gap: 16px;

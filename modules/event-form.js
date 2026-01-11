@@ -331,7 +331,14 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       previewCategory.textContent = getSelectLabel(categorySelect, getFieldValue('category'));
     }
     if (previewTags) {
-      previewTags.textContent = Array.from(pendingTags).join(', ');
+      const tags = Array.from(pendingTags);
+      if (previewTags.classList.contains('event-tags')) {
+        previewTags.innerHTML = tags
+          .map((tag) => `<span class="event-tag" data-tag-label="${tag}">${tag}</span>`)
+          .join('');
+      } else {
+        previewTags.textContent = tags.join(', ');
+      }
     }
     if (previewTime) {
       const start = getFieldValue('start');
@@ -507,7 +514,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     const verified = getEffectiveOrganizerStatus() !== 'none';
     const hasTags = pendingTags.size > 0;
     if (publishButton) {
-      publishButton.disabled = isAdmin ? !hasTags : !verified || !hasTags;
+      publishButton.disabled = isAdmin ? false : !verified || !hasTags;
     }
     if (verificationWarning) {
       verificationWarning.hidden = isAdmin || verified;
