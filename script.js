@@ -10,7 +10,7 @@ import {
   restoreLocalEvent
 } from './modules/local-events.js';
 
-(() => {
+(async () => {
   const header = document.querySelector('.site-header');
   const menuToggle = document.querySelector('.menu-toggle');
   const primaryNav = document.querySelector('#primary-nav');
@@ -245,448 +245,20 @@ import {
     return mergeWithLocalEvents(Array.from(map.values()));
   };
 
-  const translations = {
-    uk: {
-      title_home: 'Події для українців у Данії',
-      tagline: 'Концерти, зустрічі, освітні події — у містах Данії та онлайн.',
-      hero_eyebrow: 'Найближчі події',
-      next_up_empty: 'Немає майбутніх подій за цим запитом.',
-      hero_next_up: 'Next up',
-      hero_live_kicker: 'Наживо зараз',
-      live_label: 'Наживо',
-      nav_events: 'Події',
-      nav_organizers: 'Організатори',
-      nav_about: 'Про нас',
-      nav_contacts: 'Контакти',
-      admin_nav: 'Адмінка',
-      nav_dashboard: 'Дашборд',
-      skip_link: 'Перейти до вмісту',
-      nav_toggle: 'Перемкнути навігацію',
-      nav_primary_aria: 'Основна навігація',
-      brand_aria: 'Бренд платформи',
-      lang_switch_aria: 'Мова',
-      theme_toggle_aria: 'Перемкнути тему',
-      theme_light: 'Світла',
-      theme_dark: 'Темна',
-      back_to_catalog: 'До каталогу',
-      back_to_dashboard: 'Назад до дашборду',
-      search_placeholder: 'Пошук за містом, тематикою або датою',
-      presets: {
-        today: 'Сьогодні',
-        tomorrow: 'Завтра',
-        weekend: 'Вихідні',
-        online: 'Онлайн'
-      },
-      search_label: 'Пошук подій',
-      search_help: 'Наприклад: Копенгаген, музика або вихідні.',
-      cta_explore: 'Переглянути події',
-      cta_add_event: 'Додати подію',
-      home_link: 'Домівка',
-      cta_details: 'Детальніше',
-      ticket_cta: 'Квитки',
-      register_cta: 'Реєстрація',
-      dashboard_create_cta: 'Створити подію',
-      dashboard_tab_events: 'Мої події',
-      dashboard_tab_create: 'Створити подію',
-      dashboard_tab_settings: 'Налаштування',
-      dashboard_eyebrow: 'Робочий простір організатора',
-      dashboard_title: 'Дашборд',
-      dashboard_tabs_aria: 'Розділи дашборду',
-      dashboard_events_summary: 'Керуйте чернетками та опублікованими подіями.',
-      dashboard_table_aria: 'Статуси подій',
-      dashboard_table_event: 'Подія',
-      dashboard_table_date: 'Дата',
-      dashboard_table_status: 'Статус',
-      dashboard_table_actions: 'Дії',
-      dashboard_status_published: 'Опубліковано',
-      dashboard_status_pending: 'На модерації',
-      dashboard_status_draft: 'Чернетка',
-      dashboard_action_view: 'Переглянути',
-      dashboard_action_edit: 'Редагувати',
-      dashboard_action_continue: 'Продовжити',
-      dashboard_empty_eyebrow: 'Немає майбутніх подій',
-      dashboard_empty_title: 'Почніть планувати наступну подію.',
-      dashboard_empty_summary: 'Створіть чернетку, щоб зафіксувати ідеї.',
-      dashboard_settings_summary: 'Налаштуйте профіль та верифікацію організатора.',
-      admin_eyebrow: 'Робочий простір адміністратора',
-      admin_title: 'Черга модерації',
-      admin_pending_title: 'Події на розгляді',
-      admin_pending_summary: 'Перевіряйте нові заявки та публікуйте їх.',
-      admin_status_pending: 'На розгляді',
-      admin_status_approved: 'Схвалено',
-      admin_status_rejected: 'Відхилено',
-      admin_action_view: 'Переглянути',
-      admin_action_edit: 'Редагувати',
-      admin_action_approve: 'Схвалити',
-      admin_action_reject: 'Відхилити',
-      admin_action_archive: 'Архівувати',
-      admin_action_restore: 'Відновити',
-      admin_action_delete: 'Видалити',
-      admin_edit_title: 'Редагувати подію',
-      admin_edit_help: 'Внесіть зміни та збережіть.',
-      admin_edit_save: 'Зберегти зміни',
-      admin_edit_cancel: 'Скасувати',
-      admin_edit_links: 'Посилання організатора',
-      admin_modal_title: 'Відхилити подію',
-      admin_modal_help: 'Вкажіть коротку причину відхилення.',
-      admin_modal_reason_label: 'Причина',
-      admin_modal_cancel: 'Скасувати',
-      admin_modal_reject: 'Відхилити',
-      admin_pending_empty: 'Наразі немає подій на модерації.',
-      admin_verification_title: 'Запити на верифікацію',
-      admin_verification_summary: 'Перевірте посилання та підтвердіть організаторів.',
-      admin_verification_empty: 'Наразі немає запитів на верифікацію.',
-      admin_verification_approve: 'Підтвердити',
-      admin_rejected_title: 'Відхилені події',
-      admin_rejected_summary: 'Доступно лише для супер-адміністратора.',
-      admin_rejected_empty: 'Немає відхилених подій.',
-      admin_archive_title: 'Архів подій',
-      admin_archive_summary: 'Архівовані події та дії адміністратора.',
-      admin_archive_empty: 'Архів поки порожній.',
-      admin_loading: 'Завантаження...',
-      admin_reason_label: 'Причина',
-      admin_history_title: 'Історія рішень',
-      admin_history_entry: '{action} · {actor} · {ts}',
-      admin_audit_title: 'Журнал рішень',
-      admin_audit_summary: 'Останні рішення по модерації.',
-      admin_audit_empty: 'Журнал поки порожній.',
-      admin_audit_action_publish: 'Опубліковано',
-      admin_audit_action_edit: 'Відредаговано',
-      admin_audit_action_archive: 'Архівовано',
-      admin_audit_action_restore: 'Відновлено',
-      admin_audit_action_delete: 'Видалено',
-      admin_confirm_delete: 'Видалити подію?',
-      admin_access_checking: 'Перевіряємо доступ...',
-      admin_access_granted: 'Доступ підтверджено.',
-      admin_access_required: 'Потрібен вхід адміністратора.',
-      admin_access_denied: 'У вас немає доступу до адмінки.',
-      admin_access_login: 'Увійти',
-      admin_access_logout: 'Вийти',
-      admin_access_user: 'Увійшли як',
-      admin_access_role_admin: 'Роль: адміністратор',
-      admin_access_role_super: 'Роль: супер-адмін',
-      admin_login_title: 'Вхід для адміністраторів',
-      admin_login_summary: 'Доступ лише для команди модерації.',
-      admin_login_button: 'Увійти',
-      admin_login_back: 'Повернутись на головну',
-      admin_login_error: 'Потрібна роль адміністратора.',
-      create_event_eyebrow: 'Створення події',
-      stepper_aria: 'Кроки створення події',
-      step_basic: '1. Основне',
-      step_time: '2. Час/місце',
-      step_tickets: '3. Квитки',
-      step_media: '4. Медіа',
-      step_preview: '5. Прев’ю',
-      form_title_label: 'Назва події',
-      form_title_help: 'Мінімум 3 символи.',
-      form_description_label: 'Опис події',
-      form_description_placeholder: 'Коротко опишіть подію',
-      form_description_help: 'До 400 символів, без спаму.',
-      form_tags_placeholder: 'дизайн',
-      form_start_label: 'Початок',
-      form_start_help: 'Вкажіть локальний час.',
-      form_format_label: 'Формат',
-      form_format_placeholder: 'Оберіть формат',
-      form_format_offline: 'Офлайн',
-      form_format_online: 'Онлайн',
-      form_address_label: 'Адреса',
-      form_address_placeholder: 'Копенгаген, Main St 10',
-      form_address_help: 'Для онлайн-подій вкажіть платформу.',
-      form_ticket_type_label: 'Тип події',
-      form_ticket_free: 'Безкоштовно',
-      form_ticket_paid: 'Платно',
-      form_price_min: 'Мінімальна ціна',
-      form_price_max: 'Максимальна ціна',
-      form_ticket_url: 'Зовнішній лінк на квитки',
-      form_ticket_help: 'Необов’язково.',
-      form_image_label: 'Зображення події',
-      form_image_alt_label: 'Alt текст',
-      form_image_alt_placeholder: 'Опис зображення',
-      form_image_alt_help: 'Наприклад: сцена з освітленням.',
-      preview_title: 'Назва',
-      preview_organizer: 'Організатор',
-      preview_description: 'Опис',
-      preview_tags: 'Теги',
-      preview_time: 'Час',
-      preview_location: 'Місце',
-      preview_tickets: 'Квитки',
-      preview_format: 'Формат',
-      form_submit_moderation: 'Надіслати на модерацію',
-      form_submit_publish: 'Опублікувати',
-      form_language_label: 'Мова події',
-      form_language_placeholder: 'Оберіть мову',
-      form_language_uk: 'Українська',
-      form_language_en: 'Англійська',
-      form_language_da: 'Данська',
-      form_language_uk_en: 'Українська / Англійська',
-      form_language_other: 'Інша',
-      form_back: 'Назад',
-      form_next: 'Далі',
-      required_label: 'Обовʼязково',
-      event_eyebrow: 'Подія',
-      event_description_title: 'Опис',
-      event_description_body:
-        'Зустріч спільноти про масштабовані дизайн-системи. Обговоримо кейси, проведемо воркшоп і познайомимося ближче.',
-      event_description_more: 'Показати більше',
-      event_description_less: 'Згорнути опис',
-      event_where_title: 'Де',
-      event_map_placeholder: 'Плейсхолдер мапи',
-      event_language_title: 'Мова події',
-      event_language_value: 'uk / en',
-      event_tags_title: 'Теги',
-      event_organizer_title: 'Організатор',
-      event_share_title: 'Поділитися',
-      event_share_facebook: 'Facebook',
-      event_share_x: 'X',
-      event_share_linkedin: 'LinkedIn',
-      event_ticket_note: 'Купити квитки',
-      event_register_note: 'Безкоштовна реєстрація',
-      ticket_panel_aria: 'Панель квитків',
-      organizer_meta: 'Некомерційна спільнота зустрічей',
-      organizer_contact_email: 'Email',
-      organizer_contact_phone: 'Телефон',
-      organizer_contact_website: 'Сайт',
-      organizer_logo_placeholder: 'Лого',
-      organizer_description:
-        'Некомерційна спільнота, що проводить події для дизайнерів, креаторів і лідерів спільнот.',
-      organizer_events_title: 'Події',
-      organizer_events_summary: 'Останні події цього організатора.',
-      docs_title: 'Допомога та правила',
-      docs_summary: 'Короткі відповіді на найчастіші питання про модерацію та оформлення подій.',
-      docs_nav_aria: 'Зміст',
-      docs_nav_naming: 'Правила назв подій',
-      docs_nav_tags: 'Теги (як створювати)',
-      docs_nav_past: 'Що вважати минулою подією',
-      docs_nav_verification: 'Верифікація організаторів',
-      docs_naming_title: 'Правила назв подій',
-      docs_naming_body_1:
-        'Назва має бути короткою, без капслоку та зайвих символів. Додавайте місто лише якщо це важливо.',
-      docs_naming_body_2: 'Приклад: “Кінопоказ у Копенгагені: Docu UA Night”.',
-      docs_tags_title: 'Теги (як створювати)',
-      docs_tags_body_1:
-        'Додавайте 2–5 тегів, які найточніше описують подію.',
-      docs_tags_body_2: 'Нові теги потрапляють на модерацію та будуть позначені як “на розгляді”.',
-      docs_past_title: 'Що вважати минулою подією',
-      docs_past_body_1:
-        'Якщо подія завершилася або дата початку вже минула (і кінцеву дату не вказано), вона вважається минулою.',
-      docs_past_body_2: 'За потреби увімкніть фільтр “Показати минулі”, щоб переглянути архів.',
-      docs_verification_title: 'Верифікація організаторів',
-      docs_verification_body_1:
-        'Верифікація потрібна для публікації подій. Додайте сайт або соцмережу для перевірки.',
-      docs_verification_body_2: 'Після перевірки статус організатора змінюється на “Верифіковано”.',
-      privacy_title: 'Політика конфіденційності',
-      privacy_summary: 'Ми збираємо мінімум даних, потрібних для роботи платформи, і не використовуємо сторонні трекери.',
-      privacy_nav_data: 'Які дані збираємо',
-      privacy_nav_usage: 'Як використовуємо',
-      privacy_nav_storage: 'Зберігання',
-      privacy_nav_contact: 'Контакти',
-      privacy_data_title: 'Які дані збираємо',
-      privacy_data_body:
-        'Ми зберігаємо лише базові дані подій і контактів організаторів, які ви добровільно надаєте у формах.',
-      privacy_usage_title: 'Як використовуємо',
-      privacy_usage_body:
-        'Дані потрібні для публікації подій, модерації та зв’язку з організаторами. Ми не показуємо їх третім сторонам.',
-      privacy_storage_title: 'Зберігання',
-      privacy_storage_body:
-        'Дані зберігаються лише стільки, скільки потрібно для роботи сервісу. Після цього їх можна видалити за запитом.',
-      privacy_contact_title: 'Контакти',
-      privacy_contact_body:
-        'Якщо маєте питання щодо конфіденційності, напишіть нам на email, вказаний у розділі контактів.',
-      terms_title: 'Умови користування',
-      terms_summary: 'Ці умови описують правила використання платформи та відповідальність організаторів і відвідувачів.',
-      legal_nav_aria: 'Зміст',
-      terms_nav_rules: 'Основні правила',
-      terms_nav_content: 'Контент і модерація',
-      terms_nav_liability: 'Відповідальність',
-      terms_nav_contact: 'Контакти',
-      terms_rules_title: 'Основні правила',
-      terms_rules_body:
-        'Публікуйте лише достовірні події та поважайте спільноту. Заборонені спам, дискримінація та небезпечний контент.',
-      terms_content_title: 'Контент і модерація',
-      terms_content_body:
-        'Ми перевіряємо події перед публікацією. Модератори можуть відхилити подію, якщо вона не відповідає правилам.',
-      terms_liability_title: 'Відповідальність',
-      terms_liability_body:
-        'Організатори відповідають за точність інформації та проведення подій. Платформа не є стороною угод між учасниками.',
-      terms_contact_title: 'Контакти',
-      terms_contact_body:
-        'Для запитань щодо умов користування звертайтесь через форму зворотного зв’язку або email.',
-      filter_title: 'Каталог',
-      catalog_summary: 'Додавайте фільтри та переглядайте події у зручному списку.',
-      highlights_title: 'Тижневі добірки',
-      highlights_prev: 'Назад',
-      highlights_next: 'Далі',
-      highlights_prev_aria: 'Попередні добірки',
-      highlights_next_aria: 'Наступні добірки',
-      highlights_list_aria: 'Список тижневих добірок',
-      filters_date: 'Дата',
-      filters_from: 'Від',
-      filters_to: 'До',
-      filters_today: 'Сьогодні',
-      filters_tomorrow: 'Завтра',
-      filters_weekend: 'Вихідні',
-      filters_online: 'Онлайн',
-      filters_location: 'Місце та теги',
-      filters_aria: 'Фільтри каталогу',
-      filters_advanced: 'Розширені фільтри',
-      filters_city: 'Місто',
-      filters_all_cities: 'Усі міста',
-      filters_city_copenhagen: 'Копенгаген',
-      filters_city_aarhus: 'Орхус',
-      filters_city_odense: 'Оденсе',
-      filters_city_aalborg: 'Ольборг',
-      filters_city_esbjerg: "Есб'єрг",
-      events_next: 'Показати наступні події',
-      events_reset: 'Повернутися до актуальних подій',
-      filters_tags: 'Теги',
-      filters_tags_empty: 'Теги з’являться після публікації подій.',
-      filters_tags_more: 'Показати всі теги',
-      filters_tags_all: 'Усі теги',
-      filters_preferences: 'Параметри',
-      filters_price: 'Ціна',
-      filters_any_price: 'Будь-яка',
-      filters_free: 'Безкоштовно',
-      filters_paid: 'Платно',
-      price_free: 'Безкоштовно',
-      filters_format: 'Формат',
-      filters_any_format: 'Будь-який',
-      filters_offline: 'Офлайн',
-      filters_past: 'Показати минулі',
-      filters_past_hint: 'Показати минулі події має пріоритет над датами, діапазон очищено.',
-      reset_filters: 'Скинути фільтри',
-      empty_state: 'Немає подій за цим запитом.',
-      similar_cta: 'Схожі події',
-      error_eyebrow: 'Помилка',
-      error_title: 'Не вдалося завантажити події.',
-      error_summary: "Перевірте з'єднання та спробуйте ще раз.",
-      error_retry: 'Повторити',
-      home_about_title: 'Про нас',
-      home_about_summary: 'Коротко про платформу та принципи модерації подій.',
-      home_contact_title: 'Контакти',
-      home_contact_summary: 'Напишіть нам, якщо маєте питання або хочете додати подію.',
-      found_count: 'Знайдено {count}',
-      footer_rights: '© 2024 What’s on DK?. Всі права захищено.',
-      footer_help: 'Допомога',
-      footer_privacy: 'Політика конфіденційності',
-      footer_terms: 'Умови користування',
-      footer_socials: 'Соцмережі',
-      not_found_title: 'Сторінку не знайдено',
-      not_found_summary: 'Перевірте адресу або скористайтеся пошуком — можливо, потрібна подія вже тут.',
-      not_found_search_label: 'Пошук подій',
-      not_found_search_placeholder: 'Пошук за містом або темою',
-      not_found_search_action: 'Пошук',
-      not_found_help: 'Якщо помилка повторюється, напишіть нам — ми допоможемо знайти потрібну інформацію.',
-      not_found_back: 'Повернутися на головну',
-      switch_lang: 'Мова',
-      meta_index_title: 'What’s on DK? — Події для українців у Данії',
-      meta_index_desc: 'Актуальні події для українців у Данії: концерти, зустрічі, освіта та онлайн-івенти.',
-      meta_event_title: 'Design Systems Meetup — What’s on DK?',
-      meta_event_desc: 'Деталі події, квитки та локація для Design Systems Meetup.',
-      meta_org_title: 'Evently Community — What’s on DK?',
-      meta_org_desc: 'Профіль організатора та добірка подій у Данії.',
-      meta_about_title: 'Про нас — What’s on DK?',
-      meta_about_desc: 'Місія платформи та правила модерації подій для українців у Данії.',
-      meta_contacts_title: 'Контакти — What’s on DK?',
-      meta_contacts_desc: 'Контакти та відповіді на часті питання щодо подій у Данії.',
-      meta_docs_title: 'Допомога — What’s on DK?',
-      meta_docs_desc: 'Короткі правила для назв подій, тегів, архіву та верифікації.',
-      meta_privacy_title: 'Політика конфіденційності — What’s on DK?',
-      meta_privacy_desc: 'Мінімальний збір даних і відсутність трекерів.',
-      meta_terms_title: 'Умови користування — What’s on DK?',
-      meta_terms_desc: 'Правила використання платформи та відповідальність організаторів.',
-      meta_dashboard_title: 'Дашборд — What’s on DK?',
-      meta_dashboard_desc: 'Керування подіями, статусами та верифікацією організатора.',
-      meta_dashboard_new_title: 'Створити подію — What’s on DK?',
-      meta_dashboard_new_desc: 'Покрокова форма створення події.',
-      meta_admin_title: 'Модерація — What’s on DK?',
-      meta_admin_desc: 'Перевірка нових заявок на події.',
-      meta_admin_login_title: 'Вхід адміністратора — What’s on DK?',
-      meta_admin_login_desc: 'Вхід для доступу до панелі модерації.',
-      meta_not_found_title: '404 — What’s on DK?',
-      meta_not_found_desc: 'Сторінку не знайдено. Перейдіть на головну або скористайтеся пошуком.',
-      organizer_location: 'Організатор у Данії',
-      verified_badge: 'Верифіковано',
-      verification_email_title: 'Верифікація через email',
-      verification_email_label: 'Email для верифікації',
-      verification_email_help: 'Ми надішлемо 6-значний код.',
-      verification_send_code: 'Надіслати код',
-      verification_code_label: 'Код підтвердження',
-      verification_code_help: 'Введіть 6 цифр із листа.',
-      verification_verify_code: 'Підтвердити код',
-      verification_link_title: 'Сайт або соцмережа',
-      verification_link_label: 'Посилання',
-      verification_link_help: 'Обовʼязково. Ми перевіримо вручну.',
-      verification_link_submit: 'Перевіримо вручну',
-      verification_pending: 'Запит на верифікацію надіслано.',
-      verification_note: 'Для публікації подій потрібна верифікація через сайт або соцмережу.',
-      verification_code_sent: 'Запит на верифікацію надіслано.',
-      verification_success: 'Запит на верифікацію надіслано.',
-      verification_invalid_code: 'Невірний код. Спробуйте ще раз.',
-      verification_error: 'Не вдалося виконати дію. Спробуйте пізніше.',
-      verification_blocked: 'Щоб опублікувати подію, додайте сайт або соцмережу для верифікації.',
-      verification_banner_text: 'Для публікації подій потрібна верифікація через сайт або соцмережу.',
-      verification_banner_action: 'Перейти до верифікації',
-      submit_success: 'Подію надіслано на модерацію.',
-      submit_error: 'Не вдалося надіслати подію. Спробуйте ще раз.',
-      spam_blocked: 'Запит відхилено. Спробуйте ще раз.',
-      verification_spam: 'Запит відхилено. Спробуйте ще раз.',
-      archived_label: 'Архівовано',
-      event_past_banner: 'Ця подія вже минула',
-      tag_aria: 'Тег: {label}',
-      tag_pending_aria: 'Тег: {label}, очікує підтвердження',
-      about_title: 'Про проєкт',
-      about_tagline: 'Платформа для української спільноти в Данії, що об’єднує події та ініціативи.',
-      about_mission_title: 'Наша місія',
-      about_mission_body: 'Ми допомагаємо українцям у Данії знаходити події, підтримку та нові знайомства.',
-      about_submit_title: 'Як додати подію',
-      about_submit_body: 'Надішліть подію через форму або на email. Ми перевіряємо події перед публікацією.',
-      about_moderation_title: 'Модерація',
-      about_moderation_body: 'Ми модеруюємо події, щоб вони відповідали правилам спільноти та були безпечними.',
-      contacts_title: 'Контакти',
-      contacts_tagline: 'Напишіть нам, якщо маєте питання або хочете додати подію.',
-      contacts_email_title: 'Email',
-      contacts_email_body: 'hello@whatsondk.test',
-      contacts_faq_title: 'FAQ',
-      contacts_faq_q1: 'Як додати подію?',
-      contacts_faq_a1: 'Надішліть подію через форму або на email, і ми її перевіримо.',
-      contacts_faq_q2: 'Які мови підтримуються?',
-      contacts_faq_a2: 'Публікуємо події українською, данською або англійською.',
-      contacts_faq_q3: 'Які міста охоплюємо?',
-      contacts_faq_a3: 'Копенгаген, Орхус, Оденсе, Ольборг, Есб\'єрг та онлайн.',
-      form_end_label: 'Завершення',
-      form_optional_hint: '(необов\'язково)',
-      form_contact_legend: 'Організатор / Контакт',
-      form_contact_name: 'Організація або контакт',
-      form_contact_name_help: 'Наприклад: NGO “HelpHub” або Olena K.',
-      form_contact_email: 'Email',
-      form_contact_email_help: 'Необов’язково. Наприклад: name@example.com.',
-      form_contact_phone: 'Телефон',
-      form_contact_phone_help: 'Необов’язково. Формат: +45 12 34 56 78.',
-      form_contact_website: 'Вебсайт',
-      form_contact_website_help: 'Необов’язково.',
-      form_contact_website_placeholder: 'https://',
-      form_contact_instagram: 'Instagram',
-      form_contact_instagram_placeholder: 'https://instagram.com/',
-      form_contact_facebook: 'Facebook',
-      form_contact_facebook_placeholder: 'https://facebook.com/',
-      form_contact_telegram: 'Telegram',
-      form_contact_telegram_placeholder: 'https://t.me/',
-      form_contact_social_help: 'Необов’язково.',
-      event_contact_title: 'Контакти',
-      event_contact_name: 'Імʼя',
-      event_contact_email_label: 'Email',
-      event_contact_phone_label: 'Телефон',
-      form_tags_label: 'Теги',
-      form_tags_help: 'Натисніть Enter, щоб додати тег.',
-      form_tags_required: 'Додайте хоча б один тег.',
-      form_tags_input_label: 'Додати тег',
-      pending_label: '(на розгляді)',
-      pending_tooltip: 'Очікує підтвердження',
-      remove_tag_label: 'Видалити тег {tag}'
+  let translations = { uk: {} };
+
+  const loadTranslations = async () => {
+    try {
+      const data = await fetchJson('./data/translations.json');
+      if (data && typeof data === 'object') {
+        translations = data;
+      }
+    } catch (error) {
+      translations = { uk: {} };
     }
   };
 
-  const getDictionary = () => translations.uk;
+  const getDictionary = () => translations.uk || {};
 
   let refreshVerificationUI = () => {};
   const publishState = { update: () => {} };
@@ -728,6 +300,12 @@ import {
       if (dictionary[key]) {
         element.setAttribute('title', dictionary[key]);
       }
+    });
+    document.querySelectorAll('[data-i18n-rich]').forEach((element) => {
+      const key = element.dataset.i18nRich;
+      const value = dictionary[key];
+      if (!value || typeof value !== 'string') return;
+      element.innerHTML = renderRichText(value);
     });
 
     const locale = 'uk_UA';
@@ -789,6 +367,73 @@ import {
         ? formatMessage('theme_dark', {})
         : formatMessage('theme_light', {});
     }
+  };
+
+  const renderRichText = (text) => {
+    const escapeHtml = (value) =>
+      value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    const escapeAttr = (value) =>
+      value
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    const renderInline = (value) => {
+      const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+      let output = '';
+      let lastIndex = 0;
+      value.replace(linkPattern, (match, label, href, offset) => {
+        output += escapeHtml(value.slice(lastIndex, offset));
+        output += `<a href="${escapeAttr(href)}">${escapeHtml(label)}</a>`;
+        lastIndex = offset + match.length;
+        return match;
+      });
+      output += escapeHtml(value.slice(lastIndex));
+      return output;
+    };
+    const lines = text.split('\n');
+    const parts = [];
+    let listItems = [];
+    let paragraph = [];
+
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      parts.push(`<p>${renderInline(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    };
+    const flushList = () => {
+      if (!listItems.length) return;
+      const items = listItems.map((item) => `<li>${renderInline(item)}</li>`).join('');
+      parts.push(`<ul>${items}</ul>`);
+      listItems = [];
+    };
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+        return;
+      }
+      if (trimmed.startsWith('- ')) {
+        flushParagraph();
+        listItems.push(trimmed.slice(2).trim());
+        return;
+      }
+      if (listItems.length) {
+        flushList();
+      }
+      paragraph.push(trimmed);
+    });
+
+    flushParagraph();
+    flushList();
+
+    return parts.join('');
   };
 
   const formatMessage = (key, replacements) => {
@@ -965,6 +610,7 @@ import {
     return 'DKK';
   };
 
+  await loadTranslations();
   applyTranslations();
   injectEventJsonLd();
 

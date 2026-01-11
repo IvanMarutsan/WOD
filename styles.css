@@ -610,6 +610,113 @@ button:disabled,
   padding: calc(var(--space) * 3) 0;
 }
 
+.contacts__section {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.contacts__section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.contacts__email {
+  display: inline-block;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.contacts__email:hover {
+  opacity: 0.75;
+}
+
+.contacts__faq article {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.contacts__faq article:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.contacts__hint {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.contacts__social-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.contacts__social-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--bg);
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.contacts__social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  background: var(--surface);
+  width: fit-content;
+}
+
+.contacts__social-link:hover {
+  border-color: var(--text);
+}
+
+.contacts__social-handle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.contacts__social-qr {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.contacts__social-qr--placeholder {
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.contacts__faq h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.contacts__faq p {
+  margin: 0;
+  color: var(--muted);
+}
+
+
 .docs-nav {
   display: flex;
   flex-wrap: wrap;
@@ -649,6 +756,19 @@ button:disabled,
 
 .docs-section h2 {
   margin: 0 0 8px;
+}
+
+.terms-content p {
+  margin: 0 0 12px;
+}
+
+.terms-content ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.terms-content li {
+  margin-bottom: 6px;
 }
 
 .filters {
