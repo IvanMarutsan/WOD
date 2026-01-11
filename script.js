@@ -1015,7 +1015,7 @@ import {
 
     const matchesActiveFilters = (event) => {
       if (activeFilters.city) {
-        if (normalize(event.city) !== normalize(activeFilters.city)) {
+        if (getCitySlug(event.city) !== activeFilters.city) {
           return false;
         }
       }
@@ -1127,6 +1127,14 @@ import {
     helsingor: { uk: 'Хельсінгёр' }
     };
 
+    const CITY_ALIASES = Object.entries(CITY_TRANSLATIONS).reduce((acc, [slug, labels]) => {
+      acc[slug] = slug;
+      if (labels?.uk) {
+        acc[normalize(labels.uk)] = slug;
+      }
+      return acc;
+    }, {});
+
     const TAG_TRANSLATIONS = {
     adventure: { uk: 'пригоди' },
     art: { uk: 'мистецтво' },
@@ -1199,6 +1207,12 @@ import {
         return translated || value;
       }
     return localizeByMap(value, CITY_TRANSLATIONS);
+    };
+
+    const getCitySlug = (value) => {
+      const normalized = normalize(value);
+      if (!normalized) return '';
+      return CITY_ALIASES[normalized] || normalized;
     };
 
   const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
@@ -1586,7 +1600,7 @@ import {
       if (quickOnline && normalize(event.format) !== 'online') {
         return false;
       }
-      if (city && normalize(event.city) !== city) return false;
+      if (city && getCitySlug(event.city) !== city) return false;
       if (price && normalize(event.priceType) !== price) return false;
       if (format && normalize(event.format) !== format) return false;
       if (selectedTags.length) {
@@ -1656,6 +1670,41 @@ import {
       activeFilters.tags = new Set(selectedTagOrder);
     };
 
+    const updateCityOptions = (events) => {
+      if (!(cityField instanceof HTMLSelectElement)) return;
+      const currentValue = normalize(cityField.value);
+      const cityMap = new Map();
+      (events || []).forEach((event) => {
+        if (!event || event.status !== 'published') return;
+        if (isArchivedEvent(event)) return;
+        if (!event.city) return;
+        const slug = getCitySlug(event.city);
+        if (!slug) return;
+        if (!cityMap.has(slug)) {
+          cityMap.set(slug, getLocalizedCity(event.city) || event.city);
+        }
+      });
+      const allLabel = formatMessage('filters_all_cities', {}) || 'Усі міста';
+      cityField.innerHTML = '';
+      const allOption = document.createElement('option');
+      allOption.value = '';
+      allOption.textContent = allLabel;
+      cityField.appendChild(allOption);
+      const sorted = [...cityMap.entries()].sort((a, b) => a[1].localeCompare(b[1], 'uk'));
+      sorted.forEach(([value, label]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        cityField.appendChild(option);
+      });
+      if (currentValue && !cityMap.has(currentValue)) {
+        cityField.value = '';
+        setCityFilter('');
+      } else if (currentValue) {
+        cityField.value = currentValue;
+      }
+    };
+
     const resetActiveFilters = () => {
       activeFilters.city = '';
       activeFilters.searchQuery = '';
@@ -1671,9 +1720,10 @@ import {
       }
       syncPastFilterState(false);
       setErrorState(false);
-      updateCatalogQueryParams();
+      updateCityOptions(state.events);
       const formData = filtersForm ? new FormData(filtersForm) : null;
       currentFormData = formData;
+      updateCatalogQueryParams();
       const includeArchived = isAdminSession();
       const baseList = state.events.filter((event) =>
         matchesFilters(event, formData, { includeArchived })
@@ -2123,6 +2173,7 @@ import {
         setEvents(fetchedEvents);
         setLoading(false);
         setErrorState(false);
+        updateCityOptions(fetchedEvents);
         readQueryParams();
         renderTagFilters(fetchedEvents);
         applyFilters({ preservePage: true });
