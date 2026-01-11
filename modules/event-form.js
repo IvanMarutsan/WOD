@@ -157,19 +157,33 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     return match ? match.value : '';
   };
 
+  const formImagePreview = multiStepForm.querySelector('[data-image-preview]');
+
   const applyPreviewImage = (value, altText) => {
-    if (!previewImage) return;
-    if (!value) {
-      previewImage.hidden = true;
-      previewImage.removeAttribute('src');
-      previewImage.removeAttribute('alt');
-      previewImageUrl = null;
-      return;
+    const hasValue = Boolean(value);
+    if (previewImage) {
+      if (!hasValue) {
+        previewImage.hidden = true;
+        previewImage.removeAttribute('src');
+        previewImage.removeAttribute('alt');
+      } else {
+        previewImage.hidden = false;
+        previewImage.src = value;
+        previewImage.alt = altText || '';
+      }
     }
-    previewImage.hidden = false;
-    previewImage.src = value;
-    previewImage.alt = altText || '';
-    previewImageUrl = value;
+    if (formImagePreview) {
+      if (!hasValue) {
+        formImagePreview.hidden = true;
+        formImagePreview.removeAttribute('src');
+        formImagePreview.removeAttribute('alt');
+      } else {
+        formImagePreview.hidden = false;
+        formImagePreview.src = value;
+        formImagePreview.alt = altText || '';
+      }
+    }
+    previewImageUrl = hasValue ? value : null;
   };
 
   const populateFormFromEvent = (eventData) => {
@@ -179,7 +193,11 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (!field) return;
       if (field instanceof RadioNodeList) {
         field.value = value ?? '';
-      } else if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+      } else if (
+        field instanceof HTMLInputElement ||
+        field instanceof HTMLSelectElement ||
+        field instanceof HTMLTextAreaElement
+      ) {
         field.value = value ?? '';
       }
     };
@@ -219,7 +237,11 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     if (tagsHidden) {
       tagsHidden.value = Array.from(pendingTags).join(', ');
     }
-    applyPreviewImage(eventData.images?.[0] || '', eventData.imageAlt || '');
+    const existingImage = eventData.images?.[0] || '';
+    applyPreviewImage(existingImage, eventData.imageAlt || '');
+    if (imageInput && existingImage) {
+      imageInput.required = false;
+    }
     renderTagChips();
     updatePreview();
   };

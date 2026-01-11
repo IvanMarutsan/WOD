@@ -864,6 +864,7 @@ export const initAdmin = ({ formatMessage }) => {
       archiveContainer.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
+        if (target.closest('a')) return;
         const card = target.closest('[data-admin-archive-card]');
         if (!card) return;
         const eventId = card.dataset.eventId || '';
