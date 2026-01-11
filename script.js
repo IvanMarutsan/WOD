@@ -1042,9 +1042,8 @@ import {
       }
       if (activeFilters.tags.size) {
         const eventTags = getTagList(event.tags).map((tag) => normalize(tag.label));
-        for (const tag of activeFilters.tags) {
-          if (!eventTags.includes(tag)) return false;
-        }
+        const hasAnyTag = Array.from(activeFilters.tags).some((tag) => eventTags.includes(tag));
+        if (!hasAnyTag) return false;
       }
       return true;
     };
@@ -1605,10 +1604,8 @@ import {
       if (format && normalize(event.format) !== format) return false;
       if (selectedTags.length) {
         const eventTags = getTagList(event.tags).map((tag) => normalize(tag.label));
-        for (const tag of selectedTags) {
-          if (!tag) continue;
-          if (!eventTags.includes(tag)) return false;
-        }
+        const hasAnyTag = selectedTags.some((tag) => tag && eventTags.includes(tag));
+        if (!hasAnyTag) return false;
       }
       if (searchValue) {
         const localizedTitle = getLocalizedEventTitle(event, lang);
