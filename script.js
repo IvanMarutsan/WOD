@@ -2183,6 +2183,7 @@ import {
       if (!total) return;
       tagsGroup.style.height = `${total}px`;
       tagsGroup.style.maxHeight = `${total}px`;
+      updateTagOverflow();
     };
 
     const renderTagFilters = (events) => {
@@ -2580,15 +2581,13 @@ import {
         applyFilters();
       });
       filtersForm.addEventListener('reset', () => {
+        const wasOpen = advancedPanel ? !advancedPanel.hidden : false;
         setTimeout(() => {
           if (searchInputs.length) {
             syncSearchInputs('');
           }
           syncPastFilterState(true);
           syncPresetButtons();
-          updateCatalogQueryParams();
-          applyFilters();
-          syncAdvancedPanel(false);
           if (filtersForm) {
             filtersForm.elements.city.value = '';
             filtersForm.elements.price.value = '';
@@ -2596,6 +2595,9 @@ import {
           resetActiveFilters();
           syncTagCheckboxes();
           renderTagFilters(state.events);
+          updateCatalogQueryParams();
+          applyFilters();
+          setAdvancedPanelOpen(wasOpen);
         }, 0);
       });
     }

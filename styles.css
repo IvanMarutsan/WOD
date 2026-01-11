@@ -2685,6 +2685,7 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   .filters__group--tags {
     grid-row: 1 / span 2;
     height: auto;
+    grid-column: 2;
   }
   .catalog-grid {
     grid-template-columns: repeat(4, minmax(180px, 1fr));

@@ -91,6 +91,58 @@ test('filters update URL and reset clears selections', async ({ page }) => {
   await expect(page).not.toHaveURL(/city=|weekend=|past=1/);
 });
 
+test('reset filters clears selected tags and keeps advanced panel open', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const advancedToggle = page.locator('[data-action="filters-advanced"]');
+  const advancedPanel = page.locator('#filters-advanced');
+
+  await advancedToggle.click();
+  await expect(advancedPanel).toBeVisible();
+
+  const tag = page.locator('[data-filters-tags-list] .filters__tag').first();
+  const tagText = await tag.locator('span').innerText();
+  await tag.click();
+
+  await expect(page).toHaveURL(/tags=/);
+  await expect(page.locator('[data-filters-tags-list] .filters__tag--selected')).toHaveCount(1);
+
+  await page.getByTestId('filters-reset').click();
+
+  await expect(page).not.toHaveURL(/tags=/);
+  await expect(page.locator('[data-filters-tags-list] .filters__tag--selected')).toHaveCount(0);
+  await expect(page.locator('[data-filters-tags-list] .filters__tag', { hasText: tagText })).toBeVisible();
+  await expect(advancedPanel).toBeVisible();
+  await expect(advancedToggle).toHaveAttribute('aria-expanded', 'true');
+});
+
+test('reset filters keeps advanced panel closed when collapsed', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const advancedToggle = page.locator('[data-action="filters-advanced"]');
+  const advancedPanel = page.locator('#filters-advanced');
+
+  await advancedToggle.click();
+  await expect(advancedPanel).toBeVisible();
+
+  await page.locator('[data-filters-tags-list] .filters__tag').first().click();
+  await expect(page).toHaveURL(/tags=/);
+
+  await advancedToggle.click();
+  await expect(advancedPanel).toBeHidden();
+  await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
+
+  await page.getByTestId('filters-reset').click();
+
+  await expect(page).not.toHaveURL(/tags=/);
+  await expect(advancedPanel).toBeHidden();
+  await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
+});
+
 test('show more scrolls back to catalog start', async ({ page }) => {
   await freezeTime(page);
   await page.goto('/main-page.html');
@@ -116,4 +168,58 @@ test('event card actions link to details', async ({ page }) => {
   await expect(details).toHaveAttribute('href', /event-card\.html\?id=/);
   await details.click();
   await expect(page).toHaveURL(/event-card\.html\?id=/);
+});
+
+test('tag filters reorder on selection and keep URL in sync', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const advancedToggle = page.locator('[data-action="filters-advanced"]');
+  await advancedToggle.click();
+
+  const tagsList = page.locator('[data-filters-tags-list] .filters__tag');
+  await expect(tagsList.first()).toBeVisible();
+
+  const firstLabel = await tagsList.nth(0).locator('span').innerText();
+  const secondLabel = await tagsList.nth(1).locator('span').innerText();
+
+  await page.locator('[data-filters-tags-list] .filters__tag', { hasText: secondLabel }).click();
+  await expect(page).toHaveURL(/tags=/);
+  await page.locator('[data-filters-tags-list] .filters__tag', { hasText: firstLabel }).click();
+
+  const firstTagText = await tagsList.nth(0).locator('span').innerText();
+  const secondTagText = await tagsList.nth(1).locator('span').innerText();
+  expect(firstTagText).toBe(firstLabel);
+  expect(secondTagText).toBe(secondLabel);
+
+  await expect(
+    page.locator('[data-filters-tags-list] .filters__tag--selected', { hasText: firstLabel })
+  ).toHaveCount(1);
+  await expect(
+    page.locator('[data-filters-tags-list] .filters__tag--selected', { hasText: secondLabel })
+  ).toHaveCount(1);
+});
+
+test('tags overflow reveals modal trigger and opens modal', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const advancedToggle = page.locator('[data-action="filters-advanced"]');
+  await advancedToggle.click();
+
+  await page.evaluate(() => {
+    const date = document.querySelector('[data-filters-date-group]');
+    const params = document.querySelector('[data-filters-params-group]');
+    if (date instanceof HTMLElement) date.style.height = '40px';
+    if (params instanceof HTMLElement) params.style.height = '40px';
+  });
+
+  const moreButton = page.locator('[data-filters-tags-more]');
+  await expect(moreButton).toBeVisible();
+  await moreButton.click();
+
+  const modal = page.locator('[data-tags-modal]');
+  await expect(modal).toBeVisible();
 });

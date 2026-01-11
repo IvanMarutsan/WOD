@@ -216,9 +216,10 @@ test('random filter clicks match rendered data', async ({ page }) => {
   ];
 
   for (let i = 0; i < 6; i += 1) {
+    const wasOpen = (await advancedToggle.getAttribute('aria-expanded')) === 'true';
     await resetButton.click();
     await expect(page.locator('input[name="show-past"]')).not.toBeChecked();
-    await expect(advancedToggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(advancedToggle).toHaveAttribute('aria-expanded', wasOpen ? 'true' : 'false');
     await searchInput.fill('');
 
     if ((await advancedToggle.getAttribute('aria-expanded')) !== 'true') {
