@@ -600,8 +600,11 @@ export const initAdmin = ({ formatMessage }) => {
       }
       if (archiveEmptyEl) archiveEmptyEl.hidden = true;
       items.forEach((item) => {
+        const resolvedId = item?.id || item?.payload?.id || '';
         const card = archiveTemplate.content.firstElementChild.cloneNode(true);
-        card.dataset.eventId = item.id;
+        if (resolvedId) {
+          card.dataset.eventId = resolvedId;
+        }
         const titleEl = card.querySelector('[data-admin-archive-title]');
         const linkEl = card.querySelector('[data-admin-archive-link]');
         const metaEl = card.querySelector('[data-admin-archive-meta]');
@@ -610,8 +613,8 @@ export const initAdmin = ({ formatMessage }) => {
         }
         if (linkEl) {
           linkEl.textContent = item.title || '—';
-          if (item.id) {
-            linkEl.href = `./event-card.html?id=${encodeURIComponent(item.id)}`;
+          if (resolvedId) {
+            linkEl.href = `./event-card.html?id=${encodeURIComponent(resolvedId)}`;
           } else {
             linkEl.removeAttribute('href');
             linkEl.setAttribute('aria-disabled', 'true');
@@ -620,8 +623,8 @@ export const initAdmin = ({ formatMessage }) => {
           titleEl.textContent = item.title || '—';
         }
         if (metaEl) metaEl.textContent = item.meta || '—';
-        if (item.id) {
-          archiveById.set(item.id, item.payload || item);
+        if (resolvedId) {
+          archiveById.set(resolvedId, item.payload || item);
         }
         archiveContainer.appendChild(card);
       });
@@ -648,6 +651,15 @@ export const initAdmin = ({ formatMessage }) => {
       }
     };
 
+    const resolveAuditEventId = (entry) => {
+      if (!entry) return '';
+      if (entry.eventId) return entry.eventId;
+      if (entry.id && !String(entry.id).startsWith('audit_')) {
+        return entry.id;
+      }
+      return '';
+    };
+
     const renderAudit = (items) => {
       if (!auditContainer || !auditTemplate) return;
       auditContainer.querySelectorAll('[data-admin-audit-row]').forEach((row) => row.remove());
@@ -658,8 +670,9 @@ export const initAdmin = ({ formatMessage }) => {
       if (auditEmptyEl) auditEmptyEl.hidden = true;
       items.forEach((entry) => {
         const row = auditTemplate.content.firstElementChild.cloneNode(true);
-        if (entry.id) {
-          row.dataset.eventId = entry.id;
+        const resolvedEventId = resolveAuditEventId(entry);
+        if (resolvedEventId) {
+          row.dataset.eventId = resolvedEventId;
         }
         row.dataset.action = entry.action || '';
         const titleEl = row.querySelector('[data-admin-audit-title]');
@@ -672,8 +685,8 @@ export const initAdmin = ({ formatMessage }) => {
         }
         if (linkEl) {
           linkEl.textContent = entry.title;
-          if (entry.id && entry.action !== 'delete') {
-            linkEl.href = `./event-card.html?id=${encodeURIComponent(entry.id)}`;
+          if (resolvedEventId && entry.action !== 'delete') {
+            linkEl.href = `./event-card.html?id=${encodeURIComponent(resolvedEventId)}`;
           } else {
             linkEl.removeAttribute('href');
             linkEl.setAttribute('aria-disabled', 'true');
