@@ -21,7 +21,6 @@ test('smoke: create event flow reaches preview', async ({ page }) => {
 
   // Step 5: preview
   await expect(page.locator('#preview-title')).toContainText('Test meetup');
-  await expect(page.locator('#preview-category')).toContainText(/music|музика|musik/i);
   await expect(page.locator('#preview-tags')).toContainText(/Community/i);
   await expect(page.locator('#preview-time')).toContainText(/01\.05\.2030/);
   await expect(page.locator('#preview-time')).toContainText('18:00');

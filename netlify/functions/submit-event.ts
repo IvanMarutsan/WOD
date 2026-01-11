@@ -81,7 +81,6 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
     const errors: string[] = [];
     if (!isNonEmptyString(payload.title)) errors.push('title');
-    if (!isNonEmptyString(payload.category)) errors.push('category');
     if (!isValidDate(payload.start)) errors.push('start');
     if (!['offline', 'online'].includes(String(payload.format || ''))) errors.push('format');
     if (!isNonEmptyString(payload.address)) errors.push('address');

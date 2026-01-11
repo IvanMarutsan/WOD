@@ -19,7 +19,6 @@ export async function createEventToPreview(page) {
   // Step 1: basics
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
   await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description for preview.');
-  await page.getByLabel(/Категорія|Category|Kategori/i).selectOption({ value: 'music' });
   const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
   await tagsInput.fill('Community');
   await page.keyboard.press('Enter');

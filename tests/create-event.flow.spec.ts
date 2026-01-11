@@ -8,7 +8,6 @@ test('create event flow reaches preview with expected data', async ({ page }) =>
 
   // Step 5: preview
   await expect(page.locator('#preview-title')).toContainText('Test meetup');
-  await expect(page.locator('#preview-category')).toContainText(/music|музика|musik/i);
   await expect(page.locator('#preview-tags')).toContainText(/Community/i);
   await expect(page.locator('#preview-time')).toContainText(/01\.05\.2030/);
   await expect(page.locator('#preview-time')).toContainText('18:00');
@@ -29,7 +28,6 @@ test('preview shows all fields after event creation', async ({ page }) => {
     '#preview-title',
     '#preview-organizer',
     '#preview-description',
-    '#preview-category',
     '#preview-tags',
     '#preview-time',
     '#preview-location',

@@ -1,23 +1,13 @@
-const buildTagMarkup = (tag, type, helpers) => {
-  const { formatMessage, getLocalizedTag, getLocalizedCategory } = helpers;
+const buildTagMarkup = (tag, helpers) => {
+  const { formatMessage, getLocalizedTag } = helpers;
   const isPending = tag.status === 'pending';
   const pendingClass = isPending ? ' event-card__tag--pending' : '';
-  const localizedLabel =
-    type === 'category'
-      ? getLocalizedCategory(tag.label)
-      : getLocalizedTag(tag.label);
-  const ariaKey =
-    type === 'category'
-      ? isPending
-        ? 'category_pending_aria'
-        : 'category_aria'
-      : isPending
-        ? 'tag_pending_aria'
-        : 'tag_aria';
+  const localizedLabel = getLocalizedTag(tag.label);
+  const ariaKey = isPending ? 'tag_pending_aria' : 'tag_aria';
   const ariaLabel = formatMessage(ariaKey, { label: localizedLabel });
   const pendingTooltip = isPending ? formatMessage('pending_tooltip', {}) : '';
   const pendingAttrs = pendingTooltip ? ` title="${pendingTooltip}"` : '';
-  return `<span class="event-card__tag${pendingClass}" aria-label="${ariaLabel}" data-tag-label="${localizedLabel}" data-tag-type="${type}"${pendingAttrs}>${localizedLabel}</span>`;
+  return `<span class="event-card__tag${pendingClass}" aria-label="${ariaLabel}" data-tag-label="${localizedLabel}"${pendingAttrs}>${localizedLabel}</span>`;
 };
 
 export const EventCard = (event, helpers) => {
@@ -26,7 +16,6 @@ export const EventCard = (event, helpers) => {
     formatMessage,
     getTagList,
     getLocalizedTag,
-    getLocalizedCategory,
     getLocalizedEventTitle,
     getLocalizedCity,
     formatDateRange,
@@ -59,13 +48,7 @@ export const EventCard = (event, helpers) => {
     ? `<span class="event-card__status" aria-label="${archivedLabel}">${archivedLabel}</span>`
     : '';
   const baseTags = getTagList(event.tags);
-  const categoryTag = event.category?.label
-    ? { label: event.category.label, status: event.category.status || 'approved' }
-    : null;
-  const tags = [
-    ...(categoryTag ? [buildTagMarkup(categoryTag, 'category', helpers)] : []),
-    ...baseTags.map((tag) => buildTagMarkup(tag, 'tag', helpers))
-  ].join('');
+  const tags = baseTags.map((tag) => buildTagMarkup(tag, helpers)).join('');
   const ticketKey = event.priceType === 'free' ? 'register_cta' : 'ticket_cta';
   const ticketLabel = formatMessage(ticketKey, {});
   const ticketUrl = event.ticketUrl || '#';

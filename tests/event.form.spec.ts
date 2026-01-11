@@ -7,7 +7,9 @@ test('create event without end time', async ({ page }) => {
   // Step 1
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
   await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description.');
-  await page.getByLabel(/Категорія|Category|Kategori/i).selectOption({ index: 1 });
+  const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
+  await tagsInput.fill('Community');
+  await page.keyboard.press('Enter');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 2: set only start, no end

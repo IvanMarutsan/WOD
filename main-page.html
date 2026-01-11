@@ -150,7 +150,15 @@
             </div>
 
             <div class="filters__advanced" id="filters-advanced" hidden>
-              <div class="filters__group">
+              <div class="filters__group filters__group--tags" data-filters-tags-group>
+                <p class="filters__label" data-i18n="filters_tags">Теги</p>
+                <div class="filters__row filters__tag-list" data-filters-tags-list></div>
+                <button class="filters__tags-more" type="button" data-filters-tags-more hidden data-i18n="filters_tags_more">Показати всі теги</button>
+                <p class="filters__hint" data-filters-tags-empty data-i18n="filters_tags_empty" hidden>
+                  Теги з’являться після публікації подій.
+                </p>
+              </div>
+              <div class="filters__group" data-filters-date-group>
                 <p class="filters__label" data-i18n="filters_date">Дата</p>
                 <div class="filters__row">
                   <label class="filters__field">
@@ -163,24 +171,7 @@
                   </label>
                 </div>
               </div>
-              <div class="filters__group">
-                <p class="filters__label" data-i18n="filters_category">Категорія</p>
-                <div class="filters__row">
-                  <label class="filters__field">
-                    <span data-i18n="filters_category">Категорія</span>
-                    <select name="category">
-                      <option value="" data-i18n="filters_all_categories">Усі категорії</option>
-                      <option value="music" data-i18n="category_music">Музика</option>
-                      <option value="networking" data-i18n="category_networking">Networking</option>
-                      <option value="cinema" data-i18n="category_cinema">Кіно</option>
-                      <option value="education" data-i18n="category_education">Освіта</option>
-                      <option value="kids" data-i18n="category_kids">Для дітей</option>
-                      <option value="community" data-i18n="category_community">Спільнота</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-              <div class="filters__group">
+              <div class="filters__group" data-filters-params-group>
                 <p class="filters__label" data-i18n="filters_preferences">Параметри</p>
                 <div class="filters__row">
                   <label class="filters__field">
@@ -198,23 +189,6 @@
                       <option value="online" data-i18n="filters_online">Онлайн</option>
                       <option value="offline" data-i18n="filters_offline">Офлайн</option>
                     </select>
-                  </label>
-                </div>
-              </div>
-              <div class="filters__group">
-                <p class="filters__label" data-i18n="filters_audience">Аудиторія</p>
-                <div class="filters__row">
-                  <label class="filters__toggle">
-                    <input type="checkbox" name="audience-ua" />
-                    <span data-i18n="filters_ua">UA</span>
-                  </label>
-                  <label class="filters__toggle">
-                    <input type="checkbox" name="audience-family" />
-                    <span data-i18n="filters_family">Сім'ям</span>
-                  </label>
-                  <label class="filters__toggle">
-                    <input type="checkbox" name="audience-volunteer" />
-                    <span data-i18n="filters_volunteer">Волонтерам</span>
                   </label>
                 </div>
               </div>
@@ -264,7 +238,18 @@
       </section>
 
 
-    </main>
+  </main>
+
+  <div class="tag-modal" data-tags-modal hidden>
+    <div class="tag-modal__overlay" data-tags-modal-close></div>
+    <div class="tag-modal__panel" role="dialog" aria-modal="true" aria-labelledby="tags-modal-title">
+      <div class="tag-modal__header">
+        <h3 id="tags-modal-title" data-i18n="filters_tags_all">Усі теги</h3>
+        <button class="tag-modal__close" type="button" data-tags-modal-close aria-label="Close">×</button>
+      </div>
+      <div class="tag-modal__list" data-tags-modal-list></div>
+    </div>
+  </div>
 
     <footer class="site-footer">
       <div class="container">

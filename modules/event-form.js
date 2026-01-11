@@ -12,7 +12,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const previewTitle = document.querySelector('#preview-title');
   const previewOrganizer = document.querySelector('#preview-organizer');
   const previewDescription = document.querySelector('#preview-description');
-  const previewCategory = document.querySelector('#preview-category');
   const previewTags = document.querySelector('#preview-tags');
   const previewTime = document.querySelector('#preview-time');
   const previewLocation = document.querySelector('#preview-location');
@@ -20,7 +19,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const previewFormat = document.querySelector('#preview-format');
   const previewLanguage = document.querySelector('#preview-language');
   const previewImage = document.querySelector('#preview-image');
-  const categorySelect = multiStepForm.querySelector('select[name="category"]');
   const formatSelect = multiStepForm.querySelector('select[name="format"]');
   const imageInput = multiStepForm.querySelector('input[name="image"]');
   const imageAltInput = multiStepForm.querySelector('input[name="image-alt"]');
@@ -32,7 +30,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const verificationBanner = multiStepForm.querySelector('[data-verification-banner]');
   const verificationBannerButton = multiStepForm.querySelector('[data-action="open-verification"]');
   const honeypotField = multiStepForm.querySelector('input[name="website"]');
-  const pendingCategories = new Set();
   const pendingTags = new Set();
   let currentStep = 0;
   const publishButton = multiStepForm.querySelector('button[type="submit"]');
@@ -203,17 +200,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     };
     setValue('title', eventData.title || '');
     setValue('description', eventData.description || '');
-    const categoryValue = eventData.category?.label || '';
-    if (categorySelect && categoryValue) {
-      const hasOption = Array.from(categorySelect.options).some((option) => option.value === categoryValue);
-      if (!hasOption) {
-        const option = document.createElement('option');
-        option.value = categoryValue;
-        option.textContent = categoryValue;
-        categorySelect.appendChild(option);
-      }
-    }
-    setValue('category', categoryValue);
     setValue('start', formatInputDateTime(eventData.start));
     setValue('end', formatInputDateTime(eventData.end));
     setValue('format', eventData.format || '');
@@ -351,9 +337,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       previewOrganizer.textContent = organizerValue;
     }
     if (previewDescription) previewDescription.textContent = getFieldValue('description');
-    if (previewCategory) {
-      previewCategory.textContent = getSelectLabel(categorySelect, getFieldValue('category'));
-    }
     if (previewTags) {
       const tags = Array.from(pendingTags);
       if (previewTags.classList.contains('event-tags')) {
@@ -437,23 +420,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     ensureTagsSelected();
     publishState.update();
   };
-
-  const updatePendingCategory = () => {
-    if (!categorySelect) return;
-    const value = categorySelect.value.trim();
-    pendingCategories.clear();
-    if (value && value === 'pending') {
-      pendingCategories.add(value);
-    }
-  };
-
-  if (categorySelect) {
-    categorySelect.addEventListener('change', () => {
-      updatePendingCategory();
-      updatePreview();
-      publishState.update();
-    });
-  }
 
   if (formatSelect) {
     formatSelect.addEventListener('change', () => {
@@ -638,10 +604,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         title: payload.title || editingEventData?.title || '—',
         slug: editingEventData?.slug || eventId,
         description: payload.description || editingEventData?.description || '',
-        category: {
-          label: payload.category || '',
-          status: 'approved'
-        },
         tags: tagsForPayload.map((label) => ({ label, status: 'approved' })),
         start: payload.start || '',
         end: payload.end || '',

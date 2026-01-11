@@ -381,11 +381,6 @@ import {
       form_description_label: 'Опис події',
       form_description_placeholder: 'Коротко опишіть подію',
       form_description_help: 'До 400 символів, без спаму.',
-      form_category_placeholder: 'Оберіть категорію',
-      form_category_music: 'Музика',
-      form_category_food: 'Їжа',
-      form_category_sport: 'Спорт',
-      form_category_tech: 'Tech',
       form_tags_placeholder: 'дизайн',
       form_start_label: 'Початок',
       form_start_help: 'Вкажіть локальний час.',
@@ -410,7 +405,6 @@ import {
       preview_title: 'Назва',
       preview_organizer: 'Організатор',
       preview_description: 'Опис',
-      preview_category: 'Категорія',
       preview_tags: 'Теги',
       preview_time: 'Час',
       preview_location: 'Місце',
@@ -428,7 +422,7 @@ import {
       form_back: 'Назад',
       form_next: 'Далі',
       required_label: 'Обовʼязково',
-      event_eyebrow: 'Дизайн і продукт',
+      event_eyebrow: 'Подія',
       event_description_title: 'Опис',
       event_description_body:
         'Зустріч спільноти про масштабовані дизайн-системи. Обговоримо кейси, проведемо воркшоп і познайомимося ближче.',
@@ -459,16 +453,16 @@ import {
       docs_summary: 'Короткі відповіді на найчастіші питання про модерацію та оформлення подій.',
       docs_nav_aria: 'Зміст',
       docs_nav_naming: 'Правила назв подій',
-      docs_nav_tags: 'Теги та категорії (як створювати)',
+      docs_nav_tags: 'Теги (як створювати)',
       docs_nav_past: 'Що вважати минулою подією',
       docs_nav_verification: 'Верифікація організаторів',
       docs_naming_title: 'Правила назв подій',
       docs_naming_body_1:
         'Назва має бути короткою, без капслоку та зайвих символів. Додавайте місто лише якщо це важливо.',
       docs_naming_body_2: 'Приклад: “Кінопоказ у Копенгагені: Docu UA Night”.',
-      docs_tags_title: 'Теги та категорії (як створювати)',
+      docs_tags_title: 'Теги (як створювати)',
       docs_tags_body_1:
-        'Обирайте найрелевантнішу категорію та 2–5 тегів. Для нової категорії натисніть “Додати категорію”.',
+        'Додавайте 2–5 тегів, які найточніше описують подію.',
       docs_tags_body_2: 'Нові теги потрапляють на модерацію та будуть позначені як “на розгляді”.',
       docs_past_title: 'Що вважати минулою подією',
       docs_past_body_1:
@@ -530,7 +524,7 @@ import {
       filters_tomorrow: 'Завтра',
       filters_weekend: 'Вихідні',
       filters_online: 'Онлайн',
-      filters_location: 'Місце та категорія',
+      filters_location: 'Місце та теги',
       filters_aria: 'Фільтри каталогу',
       filters_advanced: 'Розширені фільтри',
       filters_city: 'Місто',
@@ -542,14 +536,10 @@ import {
       filters_city_esbjerg: "Есб'єрг",
       events_next: 'Показати наступні події',
       events_reset: 'Повернутися до актуальних подій',
-      filters_category: 'Категорія',
-      filters_all_categories: 'Усі категорії',
-      category_music: 'Музика',
-      category_networking: 'Networking',
-      category_cinema: 'Кіно',
-      category_education: 'Освіта',
-      category_kids: 'Для дітей',
-      category_community: 'Спільнота',
+      filters_tags: 'Теги',
+      filters_tags_empty: 'Теги з’являться після публікації подій.',
+      filters_tags_more: 'Показати всі теги',
+      filters_tags_all: 'Усі теги',
       filters_preferences: 'Параметри',
       filters_price: 'Ціна',
       filters_any_price: 'Будь-яка',
@@ -559,10 +549,6 @@ import {
       filters_format: 'Формат',
       filters_any_format: 'Будь-який',
       filters_offline: 'Офлайн',
-      filters_audience: 'Аудиторія',
-      filters_ua: 'UA',
-      filters_family: 'Сім\'ям',
-      filters_volunteer: 'Волонтерам',
       filters_past: 'Показати минулі',
       filters_past_hint: 'Показати минулі події має пріоритет над датами, діапазон очищено.',
       reset_filters: 'Скинути фільтри',
@@ -646,8 +632,6 @@ import {
       event_past_banner: 'Ця подія вже минула',
       tag_aria: 'Тег: {label}',
       tag_pending_aria: 'Тег: {label}, очікує підтвердження',
-      category_aria: 'Категорія: {label}',
-      category_pending_aria: 'Категорія: {label}, очікує підтвердження',
       about_title: 'Про проєкт',
       about_tagline: 'Платформа для української спільноти в Данії, що об’єднує події та ініціативи.',
       about_mission_title: 'Наша місія',
@@ -690,13 +674,6 @@ import {
       event_contact_name: 'Імʼя',
       event_contact_email_label: 'Email',
       event_contact_phone_label: 'Телефон',
-      form_category_label: 'Категорія',
-      form_add_category: 'Додати категорію',
-      form_category_modal_title: 'Нова категорія',
-      form_category_input_label: 'Назва категорії',
-      form_category_help: 'Категорію перевірить модератор.',
-      form_category_cancel: 'Скасувати',
-      form_category_submit: 'Надіслати на затвердження',
       form_tags_label: 'Теги',
       form_tags_help: 'Натисніть Enter, щоб додати тег.',
       form_tags_required: 'Додайте хоча б один тег.',
@@ -829,13 +806,7 @@ import {
       const isPending =
         tag.classList.contains('event-tag--pending') ||
         tag.classList.contains('event-card__tag--pending');
-      const key = tag.dataset.tagType === 'category'
-        ? isPending
-          ? 'category_pending_aria'
-          : 'category_aria'
-        : isPending
-          ? 'tag_pending_aria'
-          : 'tag_aria';
+      const key = isPending ? 'tag_pending_aria' : 'tag_aria';
       tag.setAttribute('aria-label', formatMessage(key, { label }));
     });
   };
@@ -1273,12 +1244,7 @@ import {
         city: '',
         searchQuery: '',
         priceCategory: '',
-        audiences: new Set()
-      };
-      const AUDIENCE_KEYS = {
-        'audience-ua': 'ua',
-        'audience-family': 'family',
-        'audience-volunteer': 'volunteer'
+        tags: new Set()
       };
     const CATALOG_STATE_KEY = 'wodCatalogState';
     let pendingCatalogState = null;
@@ -1352,19 +1318,19 @@ import {
     const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
     const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
     const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
-    const audienceFields = filtersForm
-      ? ['audience-ua', 'audience-family', 'audience-volunteer'].map((name) => filtersForm.elements[name])
-      : [];
     const advancedFields = filtersForm
-      ? [
-          filtersForm.elements.category,
-          filtersForm.elements.price,
-          filtersForm.elements.format,
-          dateFromField,
-          dateToField,
-          ...audienceFields
-        ]
+      ? [filtersForm.elements.price, filtersForm.elements.format, dateFromField, dateToField]
       : [];
+    const tagsFilterList = document.querySelector('[data-filters-tags-list]');
+    const tagsFilterEmpty = document.querySelector('[data-filters-tags-empty]');
+    const tagsFilterMoreButton = document.querySelector('[data-filters-tags-more]');
+    const tagsModal = document.querySelector('[data-tags-modal]');
+    const tagsModalList = document.querySelector('[data-tags-modal-list]');
+    const tagsModalCloseButtons = document.querySelectorAll('[data-tags-modal-close]');
+    const tagsGroup = document.querySelector('[data-filters-tags-group]');
+    const dateGroup = document.querySelector('[data-filters-date-group]');
+    const paramsGroup = document.querySelector('[data-filters-params-group]');
+    const advancedFilters = document.querySelector('#filters-advanced');
     const cityField = filtersForm?.elements ? filtersForm.elements.city : null;
     const priceField = filtersForm?.elements ? filtersForm.elements.price : null;
     if (cityField instanceof HTMLSelectElement) {
@@ -1379,13 +1345,16 @@ import {
         applyFilters();
       });
     }
-    audienceFields.forEach((input) => {
-      if (!(input instanceof HTMLInputElement)) return;
-      input.addEventListener('change', () => {
-        setAudienceFilter(input.name, input.checked);
+    if (tagsFilterList && filtersForm) {
+      tagsFilterList.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        if (target.name !== 'tags') return;
+        setSelectedTag(target.value, target.checked);
+        renderTagFilters(state.events);
         applyFilters();
       });
-    });
+    }
 
     const normalize = (value) => String(value || '').toLowerCase();
     const getTokens = (value) =>
@@ -1395,6 +1364,12 @@ import {
         .filter(Boolean);
 
     const normalizeSearchValue = (text) => String(text || '').trim().toLowerCase();
+    const escapeHtml = (value) =>
+      String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 
     const matchesActiveFilters = (event) => {
       if (activeFilters.city) {
@@ -1415,7 +1390,6 @@ import {
           event.description,
         getLocalizedCity(event.city),
           event.venue,
-        getLocalizedCategory(event.category?.label || ''),
         getTagList(event.tags).map((tag) => getLocalizedTag(tag.label)).join(' ')
         ]
           .map((value) => normalize(value))
@@ -1424,11 +1398,10 @@ import {
           return false;
         }
       }
-      if (activeFilters.audiences.size) {
-        for (const audience of activeFilters.audiences) {
-          if (audience === 'ua' && !event.forUkrainians) return false;
-          if (audience === 'family' && !event.familyFriendly) return false;
-          if (audience === 'volunteer' && !event.volunteer) return false;
+      if (activeFilters.tags.size) {
+        const eventTags = getTagList(event.tags).map((tag) => normalize(tag.label));
+        for (const tag of activeFilters.tags) {
+          if (!eventTags.includes(tag)) return false;
         }
       }
       return true;
@@ -1512,27 +1485,6 @@ import {
     helsingor: { uk: 'Хельсінгёр' }
     };
 
-    const CATEGORY_TRANSLATIONS = {
-    art: { uk: 'Мистецтво' },
-    food: { uk: 'Їжа' },
-    sports: { uk: 'Спорт' },
-    business: { uk: 'Бізнес' },
-    market: { uk: 'Маркет' },
-    outdoors: { uk: 'На природі' },
-    science: { uk: 'Наука' },
-    volunteer: { uk: 'Волонтерство' },
-    culture: { uk: 'Культура' },
-    career: { uk: "Кар'єра" },
-    wellbeing: { uk: 'Добробут' },
-    history: { uk: 'Історія' },
-    education: { uk: 'Освіта' },
-    music: { uk: 'Музика' },
-    networking: { uk: 'Нетворкінг' },
-    cinema: { uk: 'Кіно' },
-    kids: { uk: 'Для дітей' },
-    community: { uk: 'Спільнота' }
-    };
-
     const TAG_TRANSLATIONS = {
     adventure: { uk: 'пригоди' },
     art: { uk: 'мистецтво' },
@@ -1607,9 +1559,6 @@ import {
     return localizeByMap(value, CITY_TRANSLATIONS);
     };
 
-  const getLocalizedCategory = (value) =>
-    localizeByMap(value, CATEGORY_TRANSLATIONS);
-
   const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
 
     const getTagLabel = (tag) => (typeof tag === 'string' ? tag : tag?.label || '');
@@ -1636,7 +1585,6 @@ import {
       formatMessage,
       getTagList,
       getLocalizedTag,
-      getLocalizedCategory,
       getLocalizedEventTitle,
       getLocalizedCity,
       formatDateRange,
@@ -1742,9 +1690,6 @@ import {
       heroTitle.textContent = title;
       heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
       const tagLabels = [];
-      if (event.category?.label) {
-      tagLabels.push(getLocalizedCategory(event.category.label));
-      }
       const firstTag = getTagList(event.tags)[0];
       if (firstTag) {
       tagLabels.push(getLocalizedTag(firstTag.label));
@@ -1948,7 +1893,6 @@ import {
       const dateFrom = formData.get('date-from');
       const dateTo = formData.get('date-to');
       const city = normalize(formData.get('city'));
-      const category = normalize(formData.get('category'));
       const price = normalize(formData.get('price'));
       const format = normalize(formData.get('format'));
       const quickToday = formData.get('quick-today');
@@ -1956,9 +1900,7 @@ import {
       const quickWeekend = formData.get('quick-weekend');
       const quickOnline = formData.get('quick-online');
       const showPast = formData.get('show-past');
-      const audienceUa = formData.get('audience-ua');
-      const audienceFamily = formData.get('audience-family');
-      const audienceVolunteer = formData.get('audience-volunteer');
+      const selectedTags = formData.getAll('tags').map((tag) => normalize(tag));
       const searchValue = normalize(activeFilters.searchQuery || '');
 
       if (!ignorePastToggle) {
@@ -2011,26 +1953,26 @@ import {
       if (quickOnline && normalize(event.format) !== 'online') {
         return false;
       }
-      if (audienceUa && !event.forUkrainians) return false;
-      if (audienceFamily && !event.familyFriendly) return false;
-      if (audienceVolunteer && !event.volunteer) return false;
       if (city && normalize(event.city) !== city) return false;
-      const categoryLabel = normalize(event.category?.label || event.categoryId || '');
-      if (category && categoryLabel !== category) return false;
       if (price && normalize(event.priceType) !== price) return false;
       if (format && normalize(event.format) !== format) return false;
+      if (selectedTags.length) {
+        const eventTags = getTagList(event.tags).map((tag) => normalize(tag.label));
+        for (const tag of selectedTags) {
+          if (!tag) continue;
+          if (!eventTags.includes(tag)) return false;
+        }
+      }
       if (searchValue) {
         const localizedTitle = getLocalizedEventTitle(event, lang);
         const localizedCity = getLocalizedCity(event.city, lang);
-        const localizedCategory = getLocalizedCategory(event.category?.label || '', lang);
         const localizedTags = getTagList(event.tags).map((tag) => getLocalizedTag(tag.label, lang));
         const haystack = [
           localizedTitle,
           event.description,
           localizedCity,
           event.venue,
-          localizedTags.join(' '),
-          localizedCategory
+          localizedTags.join(' ')
         ]
           .map(normalize)
           .join(' ');
@@ -2051,21 +1993,42 @@ import {
       activeFilters.searchQuery = normalizeSearchValue(value);
     };
 
-    const setAudienceFilter = (name, checked) => {
-      const key = AUDIENCE_KEYS[name];
-      if (!key) return;
-      if (checked) {
-        activeFilters.audiences.add(key);
-      } else {
-        activeFilters.audiences.delete(key);
+    let selectedTagOrder = [];
+
+    const syncSelectedTags = () => {
+      if (!filtersForm) {
+        activeFilters.tags.clear();
+        selectedTagOrder = [];
+        return;
       }
+      const formData = new FormData(filtersForm);
+      const values = formData.getAll('tags').map((value) => normalize(value)).filter(Boolean);
+      const selectedSet = new Set(values);
+      selectedTagOrder = selectedTagOrder.filter((tag) => selectedSet.has(tag));
+      values.forEach((tag) => {
+        if (!selectedTagOrder.includes(tag)) {
+          selectedTagOrder.push(tag);
+        }
+      });
+      activeFilters.tags = new Set(selectedTagOrder);
+    };
+
+    const setSelectedTag = (value, checked) => {
+      const normalized = normalize(value);
+      if (!normalized) return;
+      selectedTagOrder = selectedTagOrder.filter((tag) => tag !== normalized);
+      if (checked) {
+        selectedTagOrder.unshift(normalized);
+      }
+      activeFilters.tags = new Set(selectedTagOrder);
     };
 
     const resetActiveFilters = () => {
       activeFilters.city = '';
       activeFilters.searchQuery = '';
       activeFilters.priceCategory = '';
-      activeFilters.audiences.clear();
+      activeFilters.tags.clear();
+      selectedTagOrder = [];
     };
 
     const applyFilters = () => {
@@ -2188,15 +2151,97 @@ import {
       return false;
     };
 
-    const setCheckboxFromTokens = (input, labelEl, tokens) => {
-      if (!input || !labelEl || !tokens.length) return false;
-      const label = normalize(labelEl.textContent);
-      if (!label || !tokens.includes(label)) return false;
-      if (!input.checked) {
-        input.checked = true;
-        return true;
+    let tagFilterData = [];
+
+    const buildTagToggle = (tag, index, selected, target) => {
+      const tone = index % 2 === 0 ? 'cool' : 'warm';
+      const checked = selected ? ' checked' : '';
+      const selectedClass = selected ? ' filters__tag--selected' : '';
+      const name = target === 'modal' ? 'tags-modal' : 'tags';
+      return `<label class="filters__tag${selectedClass}" data-tone="${tone}">
+        <input type="checkbox" name="${name}" value="${escapeHtml(tag.value)}"${checked} />
+        <span>${escapeHtml(tag.label)}</span>
+      </label>`;
+    };
+
+    const updateTagOverflow = () => {
+      if (!tagsFilterList || !tagsFilterMoreButton) return;
+      const hasOverflow = tagsFilterList.scrollHeight - tagsFilterList.clientHeight > 4;
+      tagsFilterMoreButton.hidden = !hasOverflow;
+    };
+
+    const syncTagsGroupHeight = () => {
+      if (!tagsGroup || !dateGroup || !paramsGroup) return;
+      const dateHeight = dateGroup.getBoundingClientRect().height;
+      const paramsHeight = paramsGroup.getBoundingClientRect().height;
+      let gap = 0;
+      if (advancedFilters) {
+        const styles = window.getComputedStyle(advancedFilters);
+        gap = parseFloat(styles.rowGap || styles.gap || '0') || 0;
       }
-      return false;
+      const total = Math.max(0, dateHeight + paramsHeight + gap);
+      if (!total) return;
+      tagsGroup.style.height = `${total}px`;
+      tagsGroup.style.maxHeight = `${total}px`;
+    };
+
+    const renderTagFilters = (events) => {
+      if (!tagsFilterList) return;
+      const tagMap = new Map();
+      (events || []).forEach((event) => {
+        getTagList(event.tags).forEach((tag) => {
+          const label = tag?.label ? String(tag.label).trim() : '';
+          if (!label) return;
+          const normalized = normalize(label);
+          if (!normalized || tagMap.has(normalized)) return;
+          tagMap.set(normalized, {
+            label: getLocalizedTag(label),
+            value: label
+          });
+        });
+      });
+      const locale = document.documentElement.lang || 'uk';
+      const sorted = Array.from(tagMap.values()).sort((a, b) =>
+        a.label.localeCompare(b.label, locale)
+      );
+      const selected = new Set(activeFilters.tags);
+      const selectedTags = selectedTagOrder
+        .map((value) => tagMap.get(value))
+        .filter(Boolean);
+      const restTags = sorted.filter((tag) => !selected.has(normalize(tag.value)));
+      const ordered = [...selectedTags, ...restTags];
+      tagFilterData = ordered;
+      tagsFilterList.innerHTML = ordered
+        .map((tag, index) => buildTagToggle(tag, index, selected.has(normalize(tag.value)), 'list'))
+        .join('');
+      if (tagsFilterEmpty) {
+        tagsFilterEmpty.hidden = ordered.length > 0;
+      }
+      if (tagsModalList) {
+        tagsModalList.innerHTML = ordered
+          .map((tag, index) => buildTagToggle(tag, index, selected.has(normalize(tag.value)), 'modal'))
+          .join('');
+      }
+      syncTagCheckboxes();
+      requestAnimationFrame(() => {
+        syncTagsGroupHeight();
+        updateTagOverflow();
+      });
+    };
+
+    const syncTagCheckboxes = () => {
+      if (!tagsFilterList) return;
+      const selected = new Set(activeFilters.tags);
+      tagsFilterList.querySelectorAll('input[name="tags"]').forEach((input) => {
+        if (!(input instanceof HTMLInputElement)) return;
+        input.checked = selected.has(normalize(input.value));
+      });
+      if (tagsModalList) {
+        tagsModalList.querySelectorAll('input[name="tags-modal"]').forEach((input) => {
+          if (!(input instanceof HTMLInputElement)) return;
+          input.checked = selected.has(normalize(input.value));
+        });
+      }
     };
 
     const applySearchFilters = (query) => {
@@ -2206,19 +2251,23 @@ import {
       let changed = false;
 
       changed = setSelectFromTokens(filtersForm.elements.city, tokens) || changed;
-      changed = setSelectFromTokens(filtersForm.elements.category, tokens) || changed;
       changed = setSelectFromTokens(filtersForm.elements.price, tokens) || changed;
       changed = setSelectFromTokens(filtersForm.elements.format, tokens) || changed;
 
-      const audienceMap = [
-        { input: filtersForm.elements['audience-ua'], key: 'audience-ua' },
-        { input: filtersForm.elements['audience-family'], key: 'audience-family' },
-        { input: filtersForm.elements['audience-volunteer'], key: 'audience-volunteer' }
-      ];
-      audienceMap.forEach(({ input }) => {
-        const labelEl = input?.closest('label')?.querySelector('span');
-        changed = setCheckboxFromTokens(input, labelEl, tokens) || changed;
-      });
+      if (tagsFilterList) {
+        const tagInputs = Array.from(tagsFilterList.querySelectorAll('input[name="tags"]'));
+        tagInputs.forEach((input) => {
+          const labelEl = input.closest('label')?.querySelector('span');
+          const label = labelEl ? normalize(labelEl.textContent) : '';
+          const value = normalize(input.value);
+          if (!label && !value) return;
+          if (!tokens.includes(label) && !tokens.includes(value)) return;
+          if (!input.checked) {
+            input.checked = true;
+            changed = true;
+          }
+        });
+      }
 
       ['today', 'tomorrow', 'weekend', 'online'].forEach((key) => {
         const input = presetInputs[key];
@@ -2245,6 +2294,7 @@ import {
 
       if (changed) {
         syncPresetButtons();
+        syncSelectedTags();
       }
       return changed;
     };
@@ -2269,7 +2319,7 @@ import {
       const cityParam = params.get('city') || '';
       const priceParam = params.get('price') || '';
       const searchParam = params.get('q') || '';
-      const audienceParam = params.get('audience') || '';
+      const tagsParam = params.get('tags') || '';
       if (filtersForm) {
         if (cityField instanceof HTMLSelectElement) {
           cityField.value = cityParam;
@@ -2281,21 +2331,18 @@ import {
       activeFilters.city = normalize(cityParam);
       activeFilters.priceCategory = normalize(priceParam);
       activeFilters.searchQuery = normalizeSearchValue(searchParam);
-      activeFilters.audiences.clear();
-      if (audienceParam) {
-        audienceParam.split(',').forEach((value) => {
+      activeFilters.tags.clear();
+      selectedTagOrder = [];
+      if (tagsParam) {
+        tagsParam.split(',').forEach((value) => {
           const normalized = normalize(value);
           if (normalized) {
-            activeFilters.audiences.add(normalized);
+            selectedTagOrder.push(normalized);
           }
         });
+        activeFilters.tags = new Set(selectedTagOrder);
       }
-      audienceFields.forEach((input) => {
-        if (!(input instanceof HTMLInputElement)) return;
-        const key = AUDIENCE_KEYS[input.name];
-        if (!key) return;
-        input.checked = activeFilters.audiences.has(key);
-      });
+      syncTagCheckboxes();
       if (searchInputs.length) {
         syncSearchInputs(activeFilters.searchQuery);
       }
@@ -2312,7 +2359,6 @@ import {
         setValue('date-from', params.get('from') || '');
         setValue('date-to', params.get('to') || '');
         setValue('city', params.get('city') || '');
-        setValue('category', params.get('category') || '');
         setValue('price', params.get('price') || '');
         setValue('format', params.get('format') || '');
         const quickToday = filtersForm.elements['quick-today'];
@@ -2375,7 +2421,6 @@ import {
           ['date-from', 'from'],
           ['date-to', 'to'],
           ['city', 'city'],
-          ['category', 'category'],
           ['price', 'price'],
           ['format', 'format']
         ];
@@ -2385,6 +2430,10 @@ import {
             params.set(key, String(value));
           }
         });
+        const selectedTags = formData.getAll('tags').map((value) => normalize(value)).filter(Boolean);
+        if (selectedTags.length) {
+          params.set('tags', selectedTags.join(','));
+        }
         if (formData.get('quick-today')) {
           params.set('today', '1');
         }
@@ -2411,6 +2460,9 @@ import {
       advancedPanel.hidden = !isOpen;
       advancedToggle.setAttribute('aria-expanded', String(isOpen));
       advancedToggle.classList.toggle('is-active', isOpen);
+      if (isOpen) {
+        requestAnimationFrame(updateTagOverflow);
+      }
     };
 
     const syncAdvancedPanel = (force) => {
@@ -2432,6 +2484,7 @@ import {
         setLoading(false);
         setErrorState(false);
         readQueryParams();
+        renderTagFilters(fetchedEvents);
         applyFilters();
         syncAdvancedPanel();
       } catch (error) {
@@ -2474,7 +2527,7 @@ import {
 
       filtersForm.addEventListener('input', (event) => {
         const target = event.target;
-        const skipFields = ['city', 'price', ...Object.keys(AUDIENCE_KEYS)];
+        const skipFields = ['city', 'price'];
         if (target instanceof HTMLElement && skipFields.includes(target.getAttribute('name') || '')) {
           return;
         }
@@ -2541,8 +2594,54 @@ import {
             filtersForm.elements.price.value = '';
           }
           resetActiveFilters();
+          syncTagCheckboxes();
+          renderTagFilters(state.events);
         }, 0);
       });
+    }
+
+    if (tagsFilterMoreButton && tagsModal) {
+      tagsFilterMoreButton.addEventListener('click', () => {
+        tagsModal.hidden = false;
+        tagsModal.setAttribute('aria-hidden', 'false');
+      });
+    }
+
+    if (tagsModal && tagsModalCloseButtons.length) {
+      tagsModalCloseButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          tagsModal.hidden = true;
+          tagsModal.setAttribute('aria-hidden', 'true');
+        });
+      });
+    }
+
+    if (tagsModalList && tagsModal) {
+      tagsModalList.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        if (target.name !== 'tags-modal') return;
+        const listInput = tagsFilterList?.querySelector(
+          `input[name="tags"][value="${CSS.escape(target.value)}"]`
+        );
+        if (listInput instanceof HTMLInputElement) {
+          listInput.checked = target.checked;
+        }
+        setSelectedTag(target.value, target.checked);
+        updateCatalogQueryParams();
+        renderTagFilters(state.events);
+        applyFilters();
+      });
+    }
+
+    if (tagsGroup && dateGroup && paramsGroup) {
+      syncTagsGroupHeight();
+      window.addEventListener('resize', syncTagsGroupHeight);
+      const resizeObserver = new ResizeObserver(() => {
+        syncTagsGroupHeight();
+      });
+      resizeObserver.observe(dateGroup);
+      resizeObserver.observe(paramsGroup);
     }
 
     const handleSearchInput = (value) => {
@@ -2619,6 +2718,10 @@ import {
       });
     }
 
+    if (tagsFilterList) {
+      window.addEventListener('resize', updateTagOverflow);
+    }
+
     pendingCatalogState = loadCatalogState();
     if (pendingCatalogState) {
       applyStoredFilters();
@@ -2632,7 +2735,6 @@ import {
   const pastBanner = document.querySelector('[data-past-banner]');
   const ticketNote = document.querySelector('.event-sidebar__note');
   const eventTitleEl = document.querySelector('[data-event-title]');
-  const eventCategoryEl = document.querySelector('[data-event-category]');
   const eventDescriptionEl = document.querySelector('[data-event-description]');
   const eventDescriptionToggle = document.querySelector('[data-event-description-toggle]');
   const eventLocationEl = document.querySelector('[data-event-location]');
@@ -2729,9 +2831,6 @@ import {
     if (!eventData) return;
     activeEventData = eventData;
     if (eventTitleEl) eventTitleEl.textContent = eventData.title;
-    if (eventCategoryEl && eventData.category?.label) {
-      eventCategoryEl.textContent = eventData.category.label;
-    }
     if (eventDescriptionEl && eventData.description) {
       eventDescriptionEl.textContent = eventData.description;
       if (eventDescriptionToggle) {
@@ -2772,19 +2871,17 @@ import {
       eventMeta.dataset.eventCity = eventData.city || '';
     }
     if (eventTagsEl) {
-      const tags = [
-        ...(eventData.category?.label
-          ? [{ label: eventData.category.label, status: eventData.category.status || 'approved', type: 'category' }]
-          : []),
-        ...(eventData.tags || []).map((tag) => ({ label: tag.label, status: tag.status || 'approved', type: 'tag' }))
-      ];
+      const tags = (eventData.tags || []).map((tag) => ({
+        label: tag.label,
+        status: tag.status || 'approved',
+        type: 'tag'
+      }));
       eventTagsEl.innerHTML = tags
         .map((tag) => {
           const isPending = tag.status === 'pending';
           const pendingClass = isPending ? ' event-tag--pending' : '';
           const pendingAttrs = isPending ? ` data-i18n-title="pending_tooltip"` : '';
-          const typeAttr = tag.type === 'category' ? ' data-tag-type="category"' : '';
-          return `<span class="event-tag${pendingClass}" data-tag-label="${tag.label}"${typeAttr}${pendingAttrs}>${tag.label}</span>`;
+          return `<span class="event-tag${pendingClass}" data-tag-label="${tag.label}"${pendingAttrs}>${tag.label}</span>`;
         })
         .join('');
       updateStaticTagAria();

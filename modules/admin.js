@@ -349,7 +349,6 @@ export const initAdmin = ({ formatMessage }) => {
       };
       setValue('title', payload.title || item?.title || '');
       setValue('description', payload.description || '');
-      setValue('category', payload.category || '');
       const tagsValue = Array.isArray(payload.tags) ? payload.tags.join(', ') : payload.tags || '';
       setValue('tags', tagsValue);
       setValue('start', payload.start || '');

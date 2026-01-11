@@ -87,14 +87,17 @@ const matchesFilters = (event: any, filters: any, now: Date) => {
     if (day !== 0 && day !== 6) return false;
   }
   if (filters.quickOnline && normalize(event.format) !== 'online') return false;
-  if (filters.audienceUa && !event.forUkrainians) return false;
-  if (filters.audienceFamily && !event.familyFriendly) return false;
-  if (filters.audienceVolunteer && !event.volunteer) return false;
   if (filters.city && normalize(event.city) !== normalize(filters.city)) return false;
-  const categoryLabel = normalize(event.category?.label || event.categoryId || '');
-  if (filters.category && categoryLabel !== normalize(filters.category)) return false;
   if (filters.price && normalize(event.priceType) !== normalize(filters.price)) return false;
   if (filters.format && normalize(event.format) !== normalize(filters.format)) return false;
+  if (filters.tags.length) {
+    const eventTags = (event.tags || [])
+      .map((tag: any) => (typeof tag === 'string' ? tag : tag?.label || ''))
+      .map((tag: string) => normalize(tag));
+    for (const tag of filters.tags) {
+      if (!eventTags.includes(normalize(tag))) return false;
+    }
+  }
 
   return true;
 };
@@ -162,7 +165,6 @@ test('random filter clicks match rendered data', async ({ page }) => {
   };
 
   const cityOptions = ['', 'copenhagen', 'aarhus', 'odense', 'aalborg', 'esbjerg'];
-  const categoryOptions = ['', 'music', 'networking', 'cinema', 'education', 'kids', 'community'];
   const priceOptions = ['', 'free', 'paid'];
   const formatOptions = ['', 'online', 'offline'];
 
@@ -184,10 +186,11 @@ test('random filter clicks match rendered data', async ({ page }) => {
     },
     async () => {
       await ensureAdvancedOpen();
-      const select = page.locator('select[name="category"]');
-      await expect(select).toBeVisible();
-      const value = categoryOptions[Math.floor(rand() * categoryOptions.length)];
-      await select.selectOption(value);
+      const labels = page.locator('[data-filters-tags-list] label');
+      const count = await labels.count();
+      if (!count) return;
+      const index = Math.floor(rand() * count);
+      await labels.nth(index).click();
     },
     async () => {
       await ensureAdvancedOpen();
@@ -205,27 +208,10 @@ test('random filter clicks match rendered data', async ({ page }) => {
     },
     async () => {
       await ensureAdvancedOpen();
-      const toggle = page.locator('input[name="audience-ua"]');
-      const label = page.locator('label:has(input[name="audience-ua"])');
-      const checked = await toggle.isChecked();
-      await label.click();
-      await expect(toggle).toBeChecked({ checked: !checked });
-    },
-    async () => {
-      await ensureAdvancedOpen();
-      const toggle = page.locator('input[name="audience-family"]');
-      const label = page.locator('label:has(input[name="audience-family"])');
-      const checked = await toggle.isChecked();
-      await label.click();
-      await expect(toggle).toBeChecked({ checked: !checked });
-    },
-    async () => {
-      await ensureAdvancedOpen();
-      const toggle = page.locator('input[name="audience-volunteer"]');
-      const label = page.locator('label:has(input[name="audience-volunteer"])');
-      const checked = await toggle.isChecked();
-      await label.click();
-      await expect(toggle).toBeChecked({ checked: !checked });
+      const labels = page.locator('[data-filters-tags-list] label');
+      const count = await labels.count();
+      if (!count) return;
+      await labels.nth(Math.floor(rand() * count)).click();
     }
   ];
 
@@ -251,7 +237,6 @@ test('random filter clicks match rendered data', async ({ page }) => {
         dateFrom: fd.get('date-from') || '',
         dateTo: fd.get('date-to') || '',
         city: fd.get('city') || '',
-        category: fd.get('category') || '',
         price: fd.get('price') || '',
         format: fd.get('format') || '',
         quickToday: Boolean(fd.get('quick-today')),
@@ -259,9 +244,7 @@ test('random filter clicks match rendered data', async ({ page }) => {
         quickWeekend: Boolean(fd.get('quick-weekend')),
         quickOnline: Boolean(fd.get('quick-online')),
         showPast: Boolean(fd.get('show-past')),
-        audienceUa: Boolean(fd.get('audience-ua')),
-        audienceFamily: Boolean(fd.get('audience-family')),
-        audienceVolunteer: Boolean(fd.get('audience-volunteer'))
+        tags: fd.getAll('tags')
       };
     });
 
