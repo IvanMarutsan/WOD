@@ -22,6 +22,8 @@ import {
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const themeToggle = document.querySelector('.theme-toggle');
   const adminLinks = document.querySelectorAll('[data-admin-link]');
+  const heroKicker = document.querySelector('[data-hero-kicker]');
+  const heroStatus = document.querySelector('[data-hero-status]');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
   const logBuffer = [];
   let debugPanel = null;
@@ -248,6 +250,9 @@ import {
       tagline: 'Концерти, зустрічі, освітні події — у містах Данії та онлайн.',
       hero_eyebrow: 'Найближчі події',
       next_up_empty: 'Немає майбутніх подій за цим запитом.',
+      hero_next_up: 'Next up',
+      hero_live_kicker: 'Наживо зараз',
+      live_label: 'Наживо',
       nav_events: 'Події',
       nav_organizers: 'Організатори',
       nav_about: 'Про нас',
@@ -1686,21 +1691,53 @@ import {
       return upcoming[0] || null;
     };
 
-    const renderNextUp = (event) => {
+    let liveRotationTimer = null;
+    let liveRotationIndex = 0;
+    let liveRotationKey = '';
+
+    const getEventEndDate = (event) => {
+      const start = new Date(event.start);
+      if (Number.isNaN(start.getTime())) return null;
+      if (event.end) {
+        const end = new Date(event.end);
+        if (!Number.isNaN(end.getTime())) return end;
+      }
+      return new Date(start.getTime() + 90 * 60 * 1000);
+    };
+
+    const getLiveEvents = (list) => {
+      const now = new Date();
+      return list.filter((event) => {
+        if (!event || event.status !== 'published') return false;
+        if (isArchivedEvent(event)) return false;
+        const start = new Date(event.start);
+        const end = getEventEndDate(event);
+        if (Number.isNaN(start.getTime()) || !end) return false;
+        return start <= now && now <= end;
+      });
+    };
+
+    const renderHeroCard = (event, isLive) => {
       if (!heroTitle || !heroMeta || !heroTags) return;
       if (!event) {
         heroTitle.textContent = formatMessage('next_up_empty', {});
         heroMeta.textContent = '';
         heroTags.innerHTML = '';
         heroTags.hidden = true;
+        if (heroStatus) {
+          heroStatus.hidden = true;
+        }
+        if (heroKicker) {
+          heroKicker.textContent = formatMessage('hero_next_up', {});
+        }
         if (heroLink) {
           heroLink.setAttribute('href', './main-page.html#events');
           heroLink.setAttribute('aria-disabled', 'true');
         }
         return;
       }
-    const title = getLocalizedEventTitle(event);
-    const city = getLocalizedCity(event.city);
+      const title = getLocalizedEventTitle(event);
+      const city = getLocalizedCity(event.city);
       const timeLabel = formatDateRange(event.start, event.end);
       heroTitle.textContent = title;
       heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
@@ -1718,6 +1755,15 @@ import {
         heroLink.setAttribute('href', `event-card.html?id=${encodeURIComponent(event.id)}`);
         heroLink.removeAttribute('aria-disabled');
       }
+      if (heroStatus) {
+        heroStatus.hidden = !isLive;
+        if (isLive) {
+          heroStatus.textContent = formatMessage('live_label', {});
+        }
+      }
+      if (heroKicker) {
+        heroKicker.textContent = formatMessage(isLive ? 'hero_live_kicker' : 'hero_next_up', {});
+      }
     };
 
     const renderApp = () => {
@@ -1725,7 +1771,30 @@ import {
       const list = state.filteredEvents.slice(0, visibleCount);
       renderEvents(list);
       renderHighlights(state.events);
-      renderNextUp(getNextUpcomingEvent(payload));
+      const liveEvents = getLiveEvents(state.events);
+      const liveKey = liveEvents.map((event) => event.id).join('|');
+      if (liveKey !== liveRotationKey) {
+        liveRotationKey = liveKey;
+        liveRotationIndex = 0;
+      }
+      if (liveEvents.length > 0) {
+        renderHeroCard(liveEvents[liveRotationIndex % liveEvents.length], true);
+        if (liveEvents.length > 1 && !liveRotationTimer) {
+          liveRotationTimer = window.setInterval(() => {
+            liveRotationIndex = (liveRotationIndex + 1) % liveEvents.length;
+            renderHeroCard(liveEvents[liveRotationIndex], true);
+          }, 6000);
+        } else if (liveEvents.length <= 1 && liveRotationTimer) {
+          window.clearInterval(liveRotationTimer);
+          liveRotationTimer = null;
+        }
+      } else {
+        if (liveRotationTimer) {
+          window.clearInterval(liveRotationTimer);
+          liveRotationTimer = null;
+        }
+        renderHeroCard(getNextUpcomingEvent(payload), false);
+      }
     };
 
     const updateCount = (count) => {

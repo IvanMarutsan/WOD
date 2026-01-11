@@ -658,6 +658,10 @@ export const initAdmin = ({ formatMessage }) => {
       if (auditEmptyEl) auditEmptyEl.hidden = true;
       items.forEach((entry) => {
         const row = auditTemplate.content.firstElementChild.cloneNode(true);
+        if (entry.id) {
+          row.dataset.eventId = entry.id;
+        }
+        row.dataset.action = entry.action || '';
         const titleEl = row.querySelector('[data-admin-audit-title]');
         const linkEl = row.querySelector('[data-admin-audit-link]');
         const metaEl = row.querySelector('[data-admin-audit-meta]');
@@ -873,6 +877,7 @@ export const initAdmin = ({ formatMessage }) => {
         if (target.dataset.action === 'restore' && eventData) {
           restoreLocalEvent(eventData, actorEmail);
           loadModerationQueue();
+          return;
         }
         if (target.dataset.action === 'delete' && eventData) {
           if (!window.confirm(formatMessage('admin_confirm_delete', {}))) {
@@ -880,7 +885,25 @@ export const initAdmin = ({ formatMessage }) => {
           }
           deleteLocalEvent(eventData, actorEmail);
           loadModerationQueue();
+          return;
         }
+        if (eventId) {
+          window.location.href = `./event-card.html?id=${encodeURIComponent(eventId)}`;
+        }
+      });
+    }
+
+    if (auditContainer) {
+      auditContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (target.closest('a')) return;
+        const row = target.closest('[data-admin-audit-row]');
+        if (!row) return;
+        const eventId = row.dataset.eventId || '';
+        const action = row.dataset.action || '';
+        if (!eventId || action === 'delete') return;
+        window.location.href = `./event-card.html?id=${encodeURIComponent(eventId)}`;
       });
     }
 
