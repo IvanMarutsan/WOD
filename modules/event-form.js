@@ -400,6 +400,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     const value = Array.from(pendingTags).join(', ');
     if (tagsHidden) tagsHidden.value = value;
     ensureTagsSelected();
+    publishState.update();
   };
 
   const updatePendingCategory = () => {
