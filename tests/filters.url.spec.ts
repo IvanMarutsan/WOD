@@ -18,3 +18,19 @@ test('filters update URL and back/forward restores state', async ({ page }) => {
   await page.goBack();
   await expect(page).toHaveURL(/q=music/);
 });
+
+test('page query param opens requested catalog page', async ({ page }) => {
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const firstTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+
+  await page.goto('/main-page.html?page=2');
+  await waitForEventsRendered(page);
+
+  const secondTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+  expect(secondTitle).not.toEqual(firstTitle);
+
+  const current = page.locator('[data-catalog-pages] .catalog-page[aria-current="page"]');
+  await expect(current).toHaveText('2');
+});

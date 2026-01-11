@@ -7,7 +7,7 @@ const events = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'data', 'events.json'), 'utf-8')
 );
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 16;
 const FIXED_NOW = new Date('2026-01-03T12:00:00+01:00');
 
 const normalize = (value: unknown) => String(value || '').toLowerCase();
@@ -24,21 +24,6 @@ const isPast = (event: any, now: Date) => {
   if (!startValue) return false;
   const startDate = new Date(startValue);
   return !Number.isNaN(startDate.getTime()) && startDate < now;
-};
-
-const getWindowRange = (showPast: boolean, now: Date, windowOffset = 0) => {
-  if (showPast) {
-    const end = new Date(now);
-    end.setMonth(end.getMonth() - windowOffset);
-    const start = new Date(end);
-    start.setMonth(start.getMonth() - 1);
-    return { start, end };
-  }
-  const start = new Date(now);
-  start.setMonth(start.getMonth() + windowOffset);
-  const end = new Date(start);
-  end.setMonth(end.getMonth() + 1);
-  return { start, end };
 };
 
 const matchesFilters = (event: any, filters: any, now: Date) => {
@@ -104,14 +89,7 @@ const matchesFilters = (event: any, filters: any, now: Date) => {
 
 const filterEvents = (filters: any, now: Date) => {
   const baseList = events.filter((event: any) => matchesFilters(event, filters, now));
-  const hasDateFilter = Boolean(filters.dateFrom || filters.dateTo);
-  const range = hasDateFilter ? null : getWindowRange(Boolean(filters.showPast), now);
-  const filtered = range
-    ? baseList.filter((event: any) => {
-        const startDate = new Date(event.start);
-        return startDate >= range.start && startDate < range.end;
-      })
-    : baseList.slice();
+  const filtered = baseList.slice();
 
   if (filters.showPast) {
     filtered.sort((a: any, b: any) => {
@@ -123,7 +101,10 @@ const filterEvents = (filters: any, now: Date) => {
     filtered.sort((a: any, b: any) => new Date(a.start).getTime() - new Date(b.start).getTime());
   }
 
-  return Math.min(PAGE_SIZE, filtered.length);
+  return {
+    total: filtered.length,
+    visible: Math.min(PAGE_SIZE, filtered.length)
+  };
 };
 
 const mulberry32 = (seed: number) => {
@@ -249,14 +230,14 @@ test('random filter clicks match rendered data', async ({ page }) => {
       };
     });
 
-    const expectedVisible = filterEvents(filters, FIXED_NOW);
+    const { total, visible } = filterEvents(filters, FIXED_NOW);
 
     await expect
       .poll(async () => page.locator('[data-testid="event-card"]').count(), { timeout: 5000 })
-      .toBe(expectedVisible);
+      .toBe(visible);
 
     const countText = await page.locator('.filters__count').innerText();
     const count = Number(countText.match(/\d+/)?.[0]);
-    expect(count).toBe(expectedVisible);
+    expect(count).toBe(total);
   }
 });

@@ -158,6 +158,54 @@ test('show more scrolls back to catalog start', async ({ page }) => {
   expect(after).toBeLessThan(before);
 });
 
+test('catalog pagination shows page numbers and switches pages', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const pages = page.locator('[data-catalog-pages] .catalog-page');
+  await expect(pages.first()).toBeVisible();
+  const pageCount = await pages.count();
+  expect(pageCount).toBeGreaterThan(1);
+
+  const firstTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+  await pages.nth(1).click();
+  await expect(page).toHaveURL(/page=2/);
+
+  const secondTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
+  expect(secondTitle).not.toEqual(firstTitle);
+});
+
+test('tag filter pulls events from later pages and resets to page 1', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const pages = page.locator('[data-catalog-pages] .catalog-page');
+  const pageCount = await pages.count();
+  expect(pageCount).toBeGreaterThan(1);
+
+  await pages.nth(1).click();
+  await expect(page).toHaveURL(/page=2/);
+
+  const secondPageCard = page.getByTestId('event-card').first();
+  const cardTitle = await secondPageCard.locator('.event-card__title a').innerText();
+  const tag = secondPageCard.locator('.event-card__tag').first();
+  await expect(tag).toBeVisible();
+  const tagLabel = await tag.innerText();
+
+  const advancedToggle = page.locator('[data-action="filters-advanced"]');
+  if ((await advancedToggle.getAttribute('aria-expanded')) !== 'true') {
+    await advancedToggle.click();
+  }
+
+  await page.locator('[data-filters-tags-list] .filters__tag', { hasText: tagLabel }).first().click();
+
+  await expect(page).not.toHaveURL(/page=2/);
+  await expect(page).toHaveURL(/tags=/);
+  await expect(page.locator('.event-card__title a', { hasText: cardTitle })).toBeVisible();
+});
+
 test('event card actions link to details', async ({ page }) => {
   await freezeTime(page);
   await page.goto('/main-page.html');

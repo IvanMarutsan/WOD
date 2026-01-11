@@ -1216,6 +1216,7 @@ import {
       const errorState = document.querySelector('.catalog-error');
     const nextEventsButton = document.querySelector('[data-action="events-next"]');
     const resetEventsButton = document.querySelector('[data-action="events-reset"]');
+    const paginationContainer = document.querySelector('[data-catalog-pages]');
     const searchInputs = Array.from(document.querySelectorAll('[data-event-search]'));
     const primarySearchInput = searchInputs[0] || null;
     const heroTitle = document.querySelector('[data-hero-title]');
@@ -1237,9 +1238,9 @@ import {
     const emptyResetButton = document.querySelector('[data-action="reset-filters"]');
     const errorRetryButton = errorState ? errorState.querySelector('[data-action="retry-load"]') : null;
       let currentFormData = null;
-      let visibleCount = 0;
-      let windowOffset = 0;
-      const pageSize = 15;
+      let currentPage = 1;
+      let totalPages = 1;
+      const pageSize = 16;
       const activeFilters = {
         city: '',
         searchQuery: '',
@@ -1285,7 +1286,7 @@ import {
       try {
         const state = {
           scrollY: window.scrollY,
-          visibleCount,
+          page: currentPage,
           filters: window.location.search || ''
         };
         sessionStorage.setItem(CATALOG_STATE_KEY, JSON.stringify(state));
@@ -1296,16 +1297,9 @@ import {
 
     const restoreCatalogState = () => {
       if (!pendingCatalogState || catalogStateRestored) return;
-      const targetCount = Number(pendingCatalogState.visibleCount) || 0;
-      if (targetCount > visibleCount && state.filteredEvents.length) {
-        while (visibleCount < targetCount && visibleCount < state.filteredEvents.length) {
-          const nextCount = Math.min(
-            visibleCount + pageSize,
-            state.filteredEvents.length,
-            targetCount
-          );
-          visibleCount = nextCount;
-        }
+      const targetPage = Number(pendingCatalogState.page) || 1;
+      if (targetPage > 1) {
+        currentPage = targetPage;
       }
       const scrollY = Number(pendingCatalogState.scrollY) || 0;
       if (scrollY) {
@@ -1713,7 +1707,9 @@ import {
 
     const renderApp = () => {
       const payload = currentFormData || (filtersForm ? new FormData(filtersForm) : null);
-      const list = state.filteredEvents.slice(0, visibleCount);
+      const startIndex = Math.max(0, (currentPage - 1) * pageSize);
+      const endIndex = startIndex + pageSize;
+      const list = state.filteredEvents.slice(startIndex, endIndex);
       renderEvents(list);
       renderHighlights(state.events);
       const liveEvents = getLiveEvents(state.events);
@@ -1748,31 +1744,20 @@ import {
       }
     };
 
-    const getWindowRange = (showPast) => {
-      const now = new Date();
-      if (showPast) {
-        const end = new Date(now);
-        end.setMonth(end.getMonth() - windowOffset);
-        const start = new Date(end);
-        start.setMonth(start.getMonth() - 1);
-        return { start, end };
+    const renderPagination = () => {
+      if (!paginationContainer) return;
+      if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        paginationContainer.hidden = true;
+        return;
       }
-      const start = new Date(now);
-      start.setMonth(start.getMonth() + windowOffset);
-      const end = new Date(start);
-      end.setMonth(end.getMonth() + 1);
-      return { start, end };
-    };
-
-    const updateWindowButtons = (baseList, range) => {
-      if (!nextEventsButton && !resetEventsButton) return;
-      const hasNext = baseList.some((event) => new Date(event.start) >= range.end);
-      if (nextEventsButton) {
-        nextEventsButton.disabled = !hasNext;
-      }
-      if (resetEventsButton) {
-        resetEventsButton.hidden = windowOffset === 0;
-      }
+      paginationContainer.hidden = false;
+      const buttons = Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+        const isActive = page === currentPage;
+        return `<button class="catalog-page${isActive ? ' is-active' : ''}" type="button" data-page="${page}" aria-current="${isActive ? 'page' : 'false'}">${page}</button>`;
+      });
+      paginationContainer.innerHTML = buttons.join('');
     };
 
     const syncPastFilterState = (shouldClear) => {
@@ -1793,7 +1778,6 @@ import {
       if (isPast && shouldClear) {
         clearOtherDatePresets();
         syncPresetButtons();
-        windowOffset = 0;
       }
       if (pastHint) {
         pastHint.hidden = !isPast;
@@ -1846,7 +1830,7 @@ import {
       if (errorState) {
         errorState.hidden = true;
       }
-      updateCount(list.length);
+      updateCount(state.filteredEvents.length);
       observeCards();
     };
 
@@ -2031,7 +2015,11 @@ import {
       selectedTagOrder = [];
     };
 
-    const applyFilters = () => {
+    const applyFilters = (options = {}) => {
+      const preservePage = options.preservePage === true;
+      if (!preservePage) {
+        currentPage = 1;
+      }
       syncPastFilterState(false);
       setErrorState(false);
       updateCatalogQueryParams();
@@ -2042,14 +2030,7 @@ import {
         matchesFilters(event, formData, { includeArchived })
       );
       const showPast = formData?.get('show-past');
-      const hasDateFilter = Boolean(formData?.get('date-from') || formData?.get('date-to'));
-      const range = hasDateFilter ? null : getWindowRange(Boolean(showPast));
-      const nextFilteredEvents = range
-        ? baseList.filter((event) => {
-            const startDate = new Date(event.start);
-            return startDate >= range.start && startDate < range.end;
-          })
-        : baseList.slice();
+      const nextFilteredEvents = baseList.slice();
       if (showPast) {
         nextFilteredEvents.sort((a, b) => {
           const aDate = new Date(a.end || a.start || 0).getTime();
@@ -2060,19 +2041,25 @@ import {
         nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       setFilteredEvents(nextFilteredEvents);
-      visibleCount = Math.min(pageSize, nextFilteredEvents.length);
-      if (range) {
-        updateWindowButtons(baseList, range);
-      } else if (resetEventsButton) {
+      totalPages = Math.max(1, Math.ceil(nextFilteredEvents.length / pageSize));
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+      if (nextEventsButton) {
+        nextEventsButton.disabled = currentPage >= totalPages;
+      }
+      if (resetEventsButton) {
         resetEventsButton.hidden = true;
       }
+      renderPagination();
       restoreCatalogState();
       renderApp();
     };
 
-    const stepWindow = (direction) => {
-      windowOffset = Math.max(windowOffset + direction, 0);
-      applyFilters();
+    const goToPage = (page) => {
+      currentPage = Math.min(Math.max(page, 1), totalPages);
+      updateCatalogQueryParams();
+      applyFilters({ preservePage: true });
     };
 
     const getLocalDateString = (date) => date.toISOString().split('T')[0];
@@ -2321,6 +2308,7 @@ import {
       const priceParam = params.get('price') || '';
       const searchParam = params.get('q') || '';
       const tagsParam = params.get('tags') || '';
+      const pageParam = Number(params.get('page')) || 1;
       if (filtersForm) {
         if (cityField instanceof HTMLSelectElement) {
           cityField.value = cityParam;
@@ -2344,6 +2332,7 @@ import {
         activeFilters.tags = new Set(selectedTagOrder);
       }
       syncTagCheckboxes();
+      currentPage = pageParam > 0 ? pageParam : 1;
       if (searchInputs.length) {
         syncSearchInputs(activeFilters.searchQuery);
       }
@@ -2451,6 +2440,9 @@ import {
           params.set('past', '1');
         }
       }
+      if (currentPage > 1) {
+        params.set('page', String(currentPage));
+      }
       const query = params.toString();
       const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
       window.history.pushState({}, '', nextUrl);
@@ -2486,7 +2478,7 @@ import {
         setErrorState(false);
         readQueryParams();
         renderTagFilters(fetchedEvents);
-        applyFilters();
+        applyFilters({ preservePage: true });
         syncAdvancedPanel();
       } catch (error) {
         setLoading(false);
@@ -2682,7 +2674,7 @@ import {
 
     if (nextEventsButton) {
       nextEventsButton.addEventListener('click', () => {
-        stepWindow(1);
+        goToPage(currentPage + 1);
         const catalogSection = document.querySelector('#events');
         if (catalogSection) {
           requestAnimationFrame(() => {
@@ -2694,8 +2686,7 @@ import {
 
     if (resetEventsButton) {
       resetEventsButton.addEventListener('click', () => {
-        windowOffset = 0;
-        applyFilters();
+        goToPage(1);
         const catalogSection = document.querySelector('#events');
         if (catalogSection) {
           catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2705,8 +2696,22 @@ import {
 
     window.addEventListener('popstate', () => {
       readQueryParams();
-      applyFilters();
+      applyFilters({ preservePage: true });
     });
+
+    if (paginationContainer) {
+      paginationContainer.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-page]');
+        if (!target) return;
+        const page = Number(target.dataset.page) || 1;
+        if (page === currentPage) return;
+        goToPage(page);
+        const catalogSection = document.querySelector('#events');
+        if (catalogSection) {
+          catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
 
     if (emptyResetButton && filtersForm) {
       emptyResetButton.addEventListener('click', () => {
