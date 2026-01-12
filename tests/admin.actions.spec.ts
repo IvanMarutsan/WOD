@@ -60,6 +60,12 @@ test('archived events are visible for admin in catalog and detail', async ({ pag
   });
   await stubAdminIdentity(page);
   await page.goto('/main-page.html#events');
+  const archivedToggle = page.locator('input[name="show-archived"]');
+  await expect(archivedToggle).toBeVisible();
+  await archivedToggle.evaluate((input) => {
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   await page.waitForSelector('[data-event-id="evt-arch-3"]');
 
   const card = page.locator('[data-event-id="evt-arch-3"]');
