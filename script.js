@@ -284,11 +284,6 @@ import {
     let publicData = null;
     let baseError = null;
     let publicError = null;
-    try {
-      baseData = await fetchJson('./data/events.json');
-    } catch (error) {
-      baseError = error;
-    }
     if (hasServerlessSupport) {
       try {
         const adminUser = getAdminIdentity();
@@ -303,20 +298,21 @@ import {
         publicError = error;
       }
     }
+    if (!hasServerlessSupport || !Array.isArray(publicData)) {
+      try {
+        baseData = await fetchJson('./data/events.json');
+      } catch (error) {
+        baseError = error;
+      }
+    }
     if (!baseData && !publicData) {
       throw baseError || publicError || new Error('events');
     }
     const map = new Map();
-    if (Array.isArray(baseData)) {
-      baseData.forEach((event) => {
-        if (event?.id) map.set(event.id, event);
-      });
-    }
-    if (Array.isArray(publicData)) {
-      publicData.forEach((event) => {
-        if (event?.id) map.set(event.id, event);
-      });
-    }
+    const source = Array.isArray(publicData) ? publicData : baseData || [];
+    source.forEach((event) => {
+      if (event?.id) map.set(event.id, event);
+    });
     return mergeWithLocalEvents(Array.from(map.values()));
   };
 

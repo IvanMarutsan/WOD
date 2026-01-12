@@ -128,21 +128,35 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
           }))
       : [];
 
-    const auditLog =
-      roles.includes('super_admin')
-        ? ((await supabaseFetch('admin_audit_log', {
-            query: { order: 'created_at.desc', limit: '50' }
-          })) as any[]).map((entry) => ({
-            id: entry.id,
-            eventId: entry.event_id,
-            title: entry.payload?.title || '',
-            action: entry.action,
-            reason: entry.reason || '',
-            actorEmail: entry.actor || '',
-            actorRole: roles.includes('super_admin') ? 'super_admin' : 'admin',
-            ts: entry.created_at
-          }))
-        : [];
+    let auditLog: any[] = [];
+    if (roles.includes('super_admin')) {
+      const auditEntries = (await supabaseFetch('admin_audit_log', {
+        query: { order: 'created_at.desc', limit: '50' }
+      })) as any[];
+      const auditEventIds = auditEntries.map((entry) => entry.event_id).filter(Boolean);
+      const auditEvents =
+        auditEventIds.length > 0
+          ? ((await supabaseFetch('events', {
+              query: { id: `in.(${auditEventIds.join(',')})` }
+            })) as any[])
+          : [];
+      const externalById = new Map(
+        auditEvents.map((item) => [item.id, item.external_id || item.id])
+      );
+      const titleById = new Map(
+        auditEvents.map((item) => [item.id, item.title || ''])
+      );
+      auditLog = auditEntries.map((entry) => ({
+        id: entry.id,
+        eventId: externalById.get(entry.event_id) || entry.event_id,
+        title: entry.payload?.title || titleById.get(entry.event_id) || '',
+        action: entry.action,
+        reason: entry.reason || '',
+        actorEmail: entry.actor || '',
+        actorRole: roles.includes('super_admin') ? 'super_admin' : 'admin',
+        ts: entry.created_at
+      }));
+    }
 
     const verifications: any[] = [];
     const archive = events
