@@ -1135,6 +1135,13 @@ button:disabled,
   flex-wrap: wrap;
 }
 
+.filters__toggles {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .filters__actions .btn.ghost {
   background: transparent;
   color: var(--text);

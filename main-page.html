@@ -193,14 +193,16 @@
             </div>
 
             <div class="filters__actions">
-              <label class="filters__toggle">
-                <input type="checkbox" name="show-past" />
-                <span data-i18n="filters_past">Показати минулі</span>
-              </label>
-              <label class="filters__toggle" data-admin-only hidden>
-                <input type="checkbox" name="show-archived" />
-                <span data-i18n="filters_archived">Показати архівовані</span>
-              </label>
+              <div class="filters__toggles">
+                <label class="filters__toggle">
+                  <input type="checkbox" name="show-past" />
+                  <span data-i18n="filters_past">Показати минулі</span>
+                </label>
+                <label class="filters__toggle" data-admin-only hidden>
+                  <input type="checkbox" name="show-archived" />
+                  <span data-i18n="filters_archived">Показати архівовані</span>
+                </label>
+              </div>
               <p class="filters__hint" data-past-hint data-i18n="filters_past_hint" hidden>
                 Показати минулі події має пріоритет над датами, діапазон очищено.
               </p>
