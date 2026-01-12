@@ -150,6 +150,8 @@
     "form_ticket_paid": "Платно",
     "form_price_min": "Мінімальна ціна",
     "form_price_max": "Максимальна ціна",
+    "form_price_label": "Ціна квитка",
+    "form_price_placeholder": "Напр.: 320 або 320–360",
     "form_ticket_url": "Зовнішній лінк на квитки",
     "form_ticket_help": "Необов’язково.",
     "form_image_label": "Зображення події",

@@ -1187,6 +1187,12 @@ button:disabled,
 .event-card__title {
   margin: 0;
   font-size: 1.1rem;
+  line-height: 1.35;
+  max-height: calc(1.35em * 4);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 .event-card__link {

@@ -60,6 +60,21 @@ const getRoles = (context: HandlerContext) => {
 
 const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
 
+const parsePriceInput = (value: unknown) => {
+  const raw = String(value ?? '').trim().replace(/,/g, '.');
+  if (!raw) return { min: null, max: null, hasValue: false };
+  const matches = raw.match(/\d+(?:\.\d+)?/g) || [];
+  const numbers = matches.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+  if (!numbers.length) return { min: null, max: null, hasValue: true };
+  if (numbers.length === 1) return { min: numbers[0], max: null, hasValue: true };
+  const min = numbers[0];
+  const max = numbers[1];
+  if (Number.isFinite(min) && Number.isFinite(max) && max < min) {
+    return { min: max, max: min, hasValue: true };
+  }
+  return { min, max, hasValue: true };
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const payload = event.body ? JSON.parse(event.body) : {};
@@ -141,6 +156,9 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
     const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
     const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
+    const parsedPrice = parsePriceInput(payload.price);
+    const resolvedMin = Number.isFinite(priceMin) ? priceMin : parsedPrice.min;
+    const resolvedMax = Number.isFinite(priceMax) ? priceMax : parsedPrice.max;
     const eventRow = (await supabaseFetch('events', {
       method: 'POST',
       body: [
@@ -157,8 +175,8 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
           language: payload.language || '',
           format: payload.format || '',
           price_type: payload['ticket-type'] || '',
-          price_min: Number.isFinite(priceMin) ? priceMin : null,
-          price_max: Number.isFinite(priceMax) ? priceMax : null,
+          price_min: Number.isFinite(resolvedMin) ? resolvedMin : null,
+          price_max: Number.isFinite(resolvedMax) ? resolvedMax : null,
           registration_url: payload['ticket-url'] || '',
           image_url: payload.imageUrl || payload.image_url || null,
           status,

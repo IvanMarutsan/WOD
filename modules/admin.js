@@ -1,5 +1,11 @@
 import { ADMIN_SESSION_KEY, getIdentityToken, getUserRoles, hasAdminRole, isSuperAdmin } from './auth.js';
-import { deleteLocalEvent, fetchMergedLocalEvents, getAuditLog, restoreLocalEvent } from './local-events.js';
+import {
+  archiveLocalEvent,
+  deleteLocalEvent,
+  fetchMergedLocalEvents,
+  getAuditLog,
+  restoreLocalEvent
+} from './local-events.js';
 
 export const initAdmin = ({ formatMessage }) => {
   const moderationList = document.querySelector('.moderation-list');
@@ -343,8 +349,16 @@ export const initAdmin = ({ formatMessage }) => {
       setValue('address', payload.address || '');
       setValue('city', payload.city || '');
       setValue('ticket-type', payload['ticket-type'] || '');
-      setValue('price-min', payload['price-min'] || '');
-      setValue('price-max', payload['price-max'] || '');
+      const min = payload['price-min'];
+      const max = payload['price-max'];
+      if (min !== undefined || max !== undefined) {
+        setValue(
+          'price',
+          min && max ? `${min}–${max}` : min || max || ''
+        );
+      } else {
+        setValue('price', payload.price || '');
+      }
       setValue('ticket-url', payload['ticket-url'] || '');
       setValue('contact-name', payload['contact-name'] || '');
       setValue('contact-email', payload['contact-email'] || '');
@@ -847,7 +861,26 @@ export const initAdmin = ({ formatMessage }) => {
       }
     };
 
+    const isLocalEventId = (id) => String(id || '').startsWith('evt-local-');
+
     const sendArchiveAction = async (eventId, action) => {
+      if (isLocalEventId(eventId)) {
+        try {
+          const merged = await fetchMergedLocalEvents();
+          const localEvent = merged.find((item) => item?.id === eventId);
+          if (!localEvent) return;
+          if (action === 'archive') {
+            archiveLocalEvent(localEvent, user?.email || 'admin');
+          } else if (action === 'restore') {
+            restoreLocalEvent(localEvent, user?.email || 'admin');
+          } else if (action === 'delete') {
+            deleteLocalEvent(localEvent, user?.email || 'admin');
+          }
+        } catch {
+          return;
+        }
+        return;
+      }
       try {
         const authHeaders = await getAuthHeaders();
         await fetch('/.netlify/functions/admin-update', {

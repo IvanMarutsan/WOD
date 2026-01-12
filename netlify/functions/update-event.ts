@@ -10,6 +10,21 @@ const getRoles = (context: HandlerContext) => {
 
 const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
 
+const parsePriceInput = (value: unknown) => {
+  const raw = String(value ?? '').trim().replace(/,/g, '.');
+  if (!raw) return { min: null, max: null, hasValue: true };
+  const matches = raw.match(/\d+(?:\.\d+)?/g) || [];
+  const numbers = matches.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+  if (!numbers.length) return { min: null, max: null, hasValue: true };
+  if (numbers.length === 1) return { min: numbers[0], max: null, hasValue: true };
+  const min = numbers[0];
+  const max = numbers[1];
+  if (Number.isFinite(min) && Number.isFinite(max) && max < min) {
+    return { min: max, max: min, hasValue: true };
+  }
+  return { min, max, hasValue: true };
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const roles = getRoles(context);
@@ -61,13 +76,22 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (updates.city) updatePayload.city = String(updates.city);
     if (updates['ticket-url']) updatePayload.registration_url = String(updates['ticket-url']);
     if (updates['ticket-type']) updatePayload.price_type = String(updates['ticket-type']);
-    if (updates['price-min'] !== undefined) {
+    const hasMin = updates['price-min'] !== undefined;
+    const hasMax = updates['price-max'] !== undefined;
+    if (hasMin) {
       const value = Number(updates['price-min']);
       updatePayload.price_min = Number.isFinite(value) ? value : null;
     }
-    if (updates['price-max'] !== undefined) {
+    if (hasMax) {
       const value = Number(updates['price-max']);
       updatePayload.price_max = Number.isFinite(value) ? value : null;
+    }
+    if (!hasMin && !hasMax) {
+      const { min, max, hasValue } = parsePriceInput(updates.price);
+      if (hasValue) {
+        updatePayload.price_min = Number.isFinite(min) ? min : null;
+        updatePayload.price_max = Number.isFinite(max) ? max : null;
+      }
     }
     if (updates.imageUrl) updatePayload.image_url = String(updates.imageUrl);
     if (Object.keys(updatePayload).length) {

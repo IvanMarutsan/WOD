@@ -60,8 +60,7 @@ export async function createEventToPreview(page) {
 
   // Step 3: tickets
   await page.getByLabel(/Платно|Paid|Betalt/i).check();
-  await page.getByLabel(/Мінімальна ціна|Minimum price|Minimumpris/i).fill('50');
-  await page.getByLabel(/Максимальна ціна|Maximum price|Maksimumspris/i).fill('120');
+  await page.getByLabel(/Ціна квитка|Ticket price|Pris/i).fill('50–120');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
   await page.locator('input[name="image"]').waitFor({ state: 'visible' });
 

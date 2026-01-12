@@ -194,12 +194,14 @@
                 </label>
               </fieldset>
               <label class="form-field">
-                <span data-i18n="form_price_min">Мінімальна ціна</span>
-                <input type="number" name="price-min" min="0" step="1" />
-              </label>
-              <label class="form-field">
-                <span data-i18n="form_price_max">Максимальна ціна</span>
-                <input type="number" name="price-max" min="0" step="1" />
+                <span data-i18n="form_price_label">Ціна квитка</span>
+                <input
+                  type="text"
+                  name="price"
+                  inputmode="decimal"
+                  placeholder="320 або 320–360"
+                  data-i18n-placeholder="form_price_placeholder"
+                />
               </label>
               <label class="form-field form-field--full">
                 <span data-i18n="form_ticket_url">Зовнішній лінк на квитки</span>

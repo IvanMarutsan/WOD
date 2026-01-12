@@ -2699,7 +2699,8 @@ import {
   if (document.body.classList.contains('event-page')) {
     const sendAdminAction = async (action) => {
       if (!activeEventData?.id) return false;
-      if (!hasServerlessSupport) {
+      const isLocalEvent = String(activeEventData.id).startsWith('evt-local-');
+      if (!hasServerlessSupport || isLocalEvent) {
         if (action === 'archive') {
           return Boolean(archiveLocalEvent(activeEventData, 'admin'));
         }

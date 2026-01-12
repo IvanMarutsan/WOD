@@ -133,6 +133,35 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     return `${startLabel} – ${formatDateTime(end)}`;
   };
 
+  const parsePriceInput = (value) => {
+    const raw = String(value || '').replace(/,/g, '.');
+    const matches = raw.match(/\d+(?:\.\d+)?/g) || [];
+    const numbers = matches.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+    if (!numbers.length) {
+      return { min: null, max: null };
+    }
+    if (numbers.length === 1) {
+      return { min: numbers[0], max: null };
+    }
+    const min = numbers[0];
+    const max = numbers[1];
+    if (Number.isFinite(min) && Number.isFinite(max) && max < min) {
+      return { min: max, max: min };
+    }
+    return { min, max };
+  };
+
+  const formatPriceInput = (min, max) => {
+    const minValue = Number.isFinite(min) ? min : null;
+    const maxValue = Number.isFinite(max) ? max : null;
+    if (minValue !== null && maxValue !== null) {
+      return minValue === maxValue ? `${minValue}` : `${minValue}–${maxValue}`;
+    }
+    if (minValue !== null) return `${minValue}`;
+    if (maxValue !== null) return `${maxValue}`;
+    return '';
+  };
+
   const formatInputDateTime = (value) => {
     if (!value) return '';
     const date = new Date(value);
@@ -208,8 +237,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('language', eventData.language || '');
     setValue('address', eventData.address || [eventData.city, eventData.venue].filter(Boolean).join(', '));
     setValue('ticket-type', eventData.priceType || '');
-    setValue('price-min', eventData.priceMin ?? '');
-    setValue('price-max', eventData.priceMax ?? '');
+    setValue('price', formatPriceInput(eventData.priceMin, eventData.priceMax));
     setValue('ticket-url', eventData.ticketUrl || '');
     setValue('contact-name', eventData.contactPerson?.name || '');
     setValue('contact-email', eventData.contactPerson?.email || '');
@@ -350,16 +378,15 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     }
     if (previewTickets) {
       const type = getFieldValue('ticket-type');
-      const min = getFieldValue('price-min');
-      const max = getFieldValue('price-max');
+      const { min, max } = parsePriceInput(getFieldValue('price'));
       if (type === 'free') {
         previewTickets.textContent = formatMessage('form_ticket_free', {});
       } else if (type === 'paid') {
-        const priceRange = [min, max].filter(Boolean).join('–');
+        const priceRange = [min, max].filter((value) => value !== null && value !== undefined).join('–');
         const paidLabel = formatMessage('form_ticket_paid', {});
         previewTickets.textContent = priceRange ? `${paidLabel} · ${priceRange}` : paidLabel;
       } else {
-        previewTickets.textContent = [min, max].filter(Boolean).join('–');
+        previewTickets.textContent = [min, max].filter((value) => value !== null && value !== undefined).join('–');
       }
     }
     if (previewFormat) {
@@ -590,9 +617,9 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       }
       const city = guessCity(payload.address);
       const eventId = editingEventId;
+      const priceInput = payload.price ? String(payload.price).trim() : '';
+      const { min: priceMin, max: priceMax } = parsePriceInput(priceInput);
       if (isLocalHost) {
-        const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
-        const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
         const localId = eventId || buildLocalEventId();
         const nextEvent = {
           id: localId,
@@ -640,6 +667,10 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       }
       payload.city = city || editingEventData?.city || '';
       payload.imageUrl = previewImageUrl || editingEventData?.images?.[0] || '';
+      if (priceInput) {
+        payload['price-min'] = Number.isFinite(priceMin) ? String(priceMin) : '';
+        payload['price-max'] = Number.isFinite(priceMax) ? String(priceMax) : '';
+      }
       if (eventId) {
         payload.tags = tagsForPayload;
         const headers = { 'Content-Type': 'application/json' };
