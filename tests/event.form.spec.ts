@@ -4,13 +4,15 @@ import { enableAdminSession } from './helpers';
 test('create event without end time', async ({ page }) => {
   await enableAdminSession(page);
   await page.goto('/new-event.html');
+  await page.locator('.multi-step[data-ready="true"]').waitFor({ state: 'attached' });
   // Step 1
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
   await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description.');
   const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
   await tagsInput.fill('Community');
-  await page.keyboard.press('Enter');
+  await tagsInput.press('Enter');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
+  await page.getByLabel(/Початок|Start/i).waitFor({ state: 'visible' });
 
   // Step 2: set only start, no end
   await page.getByLabel(/Початок|Start/i).fill('2030-05-01T18:00');

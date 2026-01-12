@@ -8,6 +8,28 @@ export async function waitForEventsRendered(page) {
 
 export async function enableAdminSession(page) {
   await page.addInitScript(() => {
+    const user = {
+      email: 'admin@test.local',
+      app_metadata: { roles: ['admin'] },
+      token: { access_token: 'test-token' }
+    };
+    window.netlifyIdentity = {
+      _handlers: {},
+      on(event, cb) {
+        this._handlers[event] = cb;
+      },
+      init() {
+        if (this._handlers.init) this._handlers.init(user);
+      },
+      currentUser() {
+        return user;
+      },
+      open() {},
+      close() {},
+      logout() {
+        if (this._handlers.logout) this._handlers.logout();
+      }
+    };
     localStorage.setItem('wodAdminSession', '1');
   });
 }
@@ -15,14 +37,18 @@ export async function enableAdminSession(page) {
 export async function createEventToPreview(page) {
   await enableAdminSession(page);
   await page.goto('/new-event.html');
+  await page.locator('.multi-step').waitFor({ state: 'visible' });
+  await page.locator('.multi-step').waitFor({ state: 'attached' });
+  await page.locator('.multi-step[data-ready="true"]').waitFor({ state: 'attached' });
 
   // Step 1: basics
   await page.getByLabel(/Назва|Title|Titel/i).fill('Test meetup');
   await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Short event description for preview.');
   const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
   await tagsInput.fill('Community');
-  await page.keyboard.press('Enter');
+  await tagsInput.press('Enter');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
+  await page.getByLabel(/Початок|Start/i).waitFor({ state: 'visible' });
 
   // Step 2: time & location
   await page.getByLabel(/Початок|Start/i).fill('2030-05-01T18:00');
@@ -37,6 +63,7 @@ export async function createEventToPreview(page) {
   await page.getByLabel(/Мінімальна ціна|Minimum price|Minimumpris/i).fill('50');
   await page.getByLabel(/Максимальна ціна|Maximum price|Maksimumspris/i).fill('120');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
+  await page.locator('input[name="image"]').waitFor({ state: 'visible' });
 
   // Step 4: contacts
   await page.locator('input[name="image"]').setInputFiles({

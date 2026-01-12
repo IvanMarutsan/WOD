@@ -2,7 +2,7 @@ import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
 import { buildFilters, eventMatchesFilters } from './modules/filters.mjs';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
-import { ADMIN_SESSION_KEY } from './modules/auth.js';
+import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
 import {
   archiveLocalEvent,
@@ -32,21 +32,69 @@ import {
   let debugList = null;
   const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
   const hasServerlessSupport = !LOCAL_HOSTNAMES.has(window.location.hostname);
-  const isAdminSession = () => {
+  const isLocalHost = LOCAL_HOSTNAMES.has(window.location.hostname);
+  const hasLocalAdminSession = () => {
+    if (!isLocalHost) return false;
     try {
       return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
     } catch (error) {
       return false;
     }
   };
+  const getAdminUser = () => {
+    if (!window.netlifyIdentity?.currentUser) return null;
+    const user = window.netlifyIdentity.currentUser();
+    if (!user || !hasAdminRole(user)) return null;
+    return user;
+  };
+  const getAdminIdentity = () => getAdminUser() || (hasLocalAdminSession() ? { app_metadata: { roles: ['admin'] } } : null);
+  const loadIdentityWidget = () => {
+    if (window.netlifyIdentity) return Promise.resolve(window.netlifyIdentity);
+    if (!document.querySelector('[data-identity-widget]')) {
+      const identityScript = document.createElement('script');
+      identityScript.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
+      identityScript.async = true;
+      identityScript.defer = true;
+      identityScript.dataset.identityWidget = 'true';
+      document.body.appendChild(identityScript);
+    }
+    return new Promise((resolve) => {
+      let attempts = 0;
+      const tick = () => {
+        if (window.netlifyIdentity) {
+          resolve(window.netlifyIdentity);
+          return;
+        }
+        attempts += 1;
+        if (attempts < 20) {
+          window.setTimeout(tick, 100);
+        } else {
+          resolve(null);
+        }
+      };
+      tick();
+    });
+  };
 
-  if (adminLinks.length) {
-    const showAdmin = isAdminSession();
+  const initAdminLinks = async () => {
+    if (!adminLinks.length) return;
     adminLinks.forEach((link) => {
       if (!(link instanceof HTMLElement)) return;
-      link.hidden = !showAdmin;
+      link.hidden = true;
     });
-  }
+    const identity = await loadIdentityWidget();
+    if (!identity) return;
+    identity.on('init', (user) => {
+      const showAdmin = Boolean(user && hasAdminRole(user));
+      adminLinks.forEach((link) => {
+        if (!(link instanceof HTMLElement)) return;
+        link.hidden = !showAdmin;
+      });
+    });
+    identity.init();
+  };
+
+  initAdminLinks();
 
   const redirectIdentityHashToLogin = () => {
     const hash = window.location.hash || '';
@@ -65,10 +113,29 @@ import {
 
   redirectIdentityHashToLogin();
 
-  if (document.body.classList.contains('new-event-page') && !isAdminSession()) {
+  if (document.body.classList.contains('new-event-page')) {
     const redirect = encodeURIComponent('./new-event.html');
-    window.location.replace(`./admin-login.html?redirect=${redirect}`);
-    return;
+    if (!hasLocalAdminSession()) {
+      loadIdentityWidget().then((identity) => {
+        if (!identity) {
+          window.location.replace(`./admin-login.html?redirect=${redirect}`);
+          return;
+        }
+        let resolved = false;
+        identity.on('init', (user) => {
+          resolved = true;
+          if (!user || !hasAdminRole(user)) {
+            window.location.replace(`./admin-login.html?redirect=${redirect}`);
+          }
+        });
+        identity.init();
+        window.setTimeout(() => {
+          if (!resolved) {
+            window.location.replace(`./admin-login.html?redirect=${redirect}`);
+          }
+        }, 800);
+      });
+    }
   }
 
   if (document.body.classList.contains('organizer-dashboard-page')) {
@@ -204,8 +271,8 @@ import {
     document.head.appendChild(script);
   };
 
-  const fetchJson = async (url) => {
-    const response = await fetch(url);
+  const fetchJson = async (url, options = {}) => {
+    const response = await fetch(url, options);
     if (!response.ok) {
       throw new Error(`Failed to load ${url}`);
     }
@@ -224,7 +291,14 @@ import {
     }
     if (hasServerlessSupport) {
       try {
-        publicData = await fetchJson('/.netlify/functions/public-events');
+        const adminUser = getAdminIdentity();
+        const token = adminUser ? await getIdentityToken() : null;
+        const includeArchived = Boolean(adminUser && token);
+        const url = includeArchived
+          ? '/.netlify/functions/public-events?includeArchived=1'
+          : '/.netlify/functions/public-events';
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        publicData = await fetchJson(url, { headers });
       } catch (error) {
         publicError = error;
       }
@@ -1639,7 +1713,7 @@ import {
       const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
       currentFilters = filters;
       updateCatalogQueryParams();
-      const includeArchived = isAdminSession();
+      const includeArchived = Boolean(getAdminIdentity());
       const baseList = state.events.filter((event) =>
         eventMatchesFilters(event, filters, filterHelpers, { includeArchived })
       );
@@ -2610,7 +2684,7 @@ import {
     }
     if (adminControls) {
       const archived = isArchivedEvent(eventData);
-      adminControls.hidden = !isAdminSession();
+      adminControls.hidden = !getAdminIdentity();
       if (adminArchivedBadge) adminArchivedBadge.hidden = !archived;
       if (adminArchiveButton) adminArchiveButton.hidden = archived;
       if (adminRestoreButton) adminRestoreButton.hidden = !archived;
@@ -2623,6 +2697,38 @@ import {
   };
 
   if (document.body.classList.contains('event-page')) {
+    const sendAdminAction = async (action) => {
+      if (!activeEventData?.id) return false;
+      if (!hasServerlessSupport) {
+        if (action === 'archive') {
+          return Boolean(archiveLocalEvent(activeEventData, 'admin'));
+        }
+        if (action === 'restore') {
+          return Boolean(restoreLocalEvent(activeEventData, 'admin'));
+        }
+        if (action === 'delete') {
+          deleteLocalEvent(activeEventData, 'admin');
+          return true;
+        }
+      }
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = await getIdentityToken();
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+        const response = await fetch('/.netlify/functions/admin-update', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ id: activeEventData.id, action })
+        });
+        if (!response.ok) return false;
+        const result = await response.json();
+        return Boolean(result?.ok);
+      } catch (error) {
+        return false;
+      }
+    };
     if (eventDescriptionToggle) {
       eventDescriptionToggle.addEventListener('click', () => {
         const expanded = eventDescriptionToggle.getAttribute('aria-expanded') === 'true';
@@ -2633,19 +2739,21 @@ import {
     if (adminArchiveButton) {
       adminArchiveButton.addEventListener('click', () => {
         if (!activeEventData) return;
-        const updated = archiveLocalEvent(activeEventData, 'admin');
-        if (updated) {
-          renderEventDetail(updated);
-        }
+        sendAdminAction('archive').then((ok) => {
+          if (!ok) return;
+          activeEventData = { ...activeEventData, status: 'archived', archived: true };
+          renderEventDetail(activeEventData);
+        });
       });
     }
     if (adminRestoreButton) {
       adminRestoreButton.addEventListener('click', () => {
         if (!activeEventData) return;
-        const updated = restoreLocalEvent(activeEventData, 'admin');
-        if (updated) {
-          renderEventDetail(updated);
-        }
+        sendAdminAction('restore').then((ok) => {
+          if (!ok) return;
+          activeEventData = { ...activeEventData, status: 'published', archived: false };
+          renderEventDetail(activeEventData);
+        });
       });
     }
     if (adminDeleteButton) {
@@ -2654,8 +2762,10 @@ import {
         if (!window.confirm(formatMessage('admin_confirm_delete', {}))) {
           return;
         }
-        deleteLocalEvent(activeEventData, 'admin');
-        window.location.href = './admin-page.html#archive';
+        sendAdminAction('delete').then((ok) => {
+          if (!ok) return;
+          window.location.href = './admin-page.html#archive';
+        });
       });
     }
     const params = new URLSearchParams(window.location.search);
@@ -2665,7 +2775,7 @@ import {
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
           if (!eventData) return;
-          if (isArchivedEvent(eventData) && !isAdminSession()) {
+          if (isArchivedEvent(eventData) && !getAdminIdentity()) {
             window.location.replace('./404.html');
             return;
           }

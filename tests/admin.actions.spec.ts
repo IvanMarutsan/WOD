@@ -8,8 +8,10 @@ const stubAdminIdentity = async (page) => {
         this._handlers[event] = cb;
       },
       init() {
-        const user = { email: 'admin@test.local', app_metadata: { roles: ['admin'] } };
-        if (this._handlers.init) this._handlers.init(user);
+        if (this._handlers.init) this._handlers.init(null);
+      },
+      currentUser() {
+        return null;
       },
       open() {},
       close() {},
@@ -17,13 +19,11 @@ const stubAdminIdentity = async (page) => {
         if (this._handlers.logout) this._handlers.logout();
       }
     };
+    localStorage.setItem('wodAdminSession', '1');
   });
 };
 
 test('admin can archive and restore event from detail page', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('wodAdminSession', '1');
-  });
   await stubAdminIdentity(page);
   await page.goto('/event-card.html?id=evt-006');
   await page.waitForSelector('[data-event-title]');
@@ -43,9 +43,6 @@ test('admin can archive and restore event from detail page', async ({ page }) =>
 });
 
 test('admin can delete event from detail page with confirm', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('wodAdminSession', '1');
-  });
   await stubAdminIdentity(page);
   await page.goto('/event-card.html?id=evt-006');
   await page.waitForSelector('[data-event-title]');
@@ -68,7 +65,6 @@ test('admin can restore archived event from admin archive', async ({ page }) => 
       archived: true,
       status: 'archived'
     };
-    localStorage.setItem('wodAdminSession', '1');
     localStorage.setItem('wodLocalEvents', JSON.stringify([archivedEvent]));
     localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
     localStorage.setItem('wodAuditLog', JSON.stringify([]));
@@ -93,7 +89,6 @@ test('admin can delete archived event from admin archive with confirm', async ({
       archived: true,
       status: 'archived'
     };
-    localStorage.setItem('wodAdminSession', '1');
     localStorage.setItem('wodLocalEvents', JSON.stringify([archivedEvent]));
     localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
     localStorage.setItem('wodAuditLog', JSON.stringify([]));

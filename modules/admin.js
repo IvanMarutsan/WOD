@@ -1,11 +1,5 @@
-import { ADMIN_SESSION_KEY, getUserRoles, hasAdminRole, isSuperAdmin } from './auth.js';
-import {
-  archiveLocalEvent,
-  deleteLocalEvent,
-  fetchMergedLocalEvents,
-  getAuditLog,
-  restoreLocalEvent
-} from './local-events.js';
+import { ADMIN_SESSION_KEY, getIdentityToken, getUserRoles, hasAdminRole, isSuperAdmin } from './auth.js';
+import { deleteLocalEvent, fetchMergedLocalEvents, getAuditLog, restoreLocalEvent } from './local-events.js';
 
 export const initAdmin = ({ formatMessage }) => {
   const moderationList = document.querySelector('.moderation-list');
@@ -42,18 +36,6 @@ export const initAdmin = ({ formatMessage }) => {
       document.body.dataset.adminAuth = state;
     };
 
-    const setAdminSession = (value) => {
-      try {
-        if (value) {
-          localStorage.setItem(ADMIN_SESSION_KEY, '1');
-        } else {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      } catch (error) {
-        return;
-      }
-    };
-
     const updateMeta = (user) => {
       if (!userMeta || !roleMeta || !metaContainer) return;
       if (!user) {
@@ -73,6 +55,16 @@ export const initAdmin = ({ formatMessage }) => {
       superAdminSections.forEach((section) => {
         section.hidden = !allowed;
       });
+    };
+
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    const hasLocalAdmin = () => {
+      if (!isLocalHost) return false;
+      try {
+        return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
+      } catch (error) {
+        return false;
+      }
     };
 
     const openLogin = () => {
@@ -126,14 +118,6 @@ export const initAdmin = ({ formatMessage }) => {
 
     let initTimer = null;
 
-    const hasLocalAdmin = () => {
-      try {
-        return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
-      } catch (error) {
-        return false;
-      }
-    };
-
     const handleUser = (user) => {
       if (initTimer) {
         clearTimeout(initTimer);
@@ -148,7 +132,6 @@ export const initAdmin = ({ formatMessage }) => {
           if (logoutButton) logoutButton.hidden = false;
           updateMeta(localUser);
           setSuperAdminVisibility(false);
-          setAdminSession(true);
           if (isAdminPage) {
             initModerationPanel(localUser, false);
           }
@@ -160,7 +143,6 @@ export const initAdmin = ({ formatMessage }) => {
         if (logoutButton) logoutButton.hidden = true;
         updateMeta(null);
         setSuperAdminVisibility(false);
-        setAdminSession(false);
         if (isAdminPage) {
           window.location.href = getAdminLoginRedirect();
         }
@@ -187,7 +169,6 @@ export const initAdmin = ({ formatMessage }) => {
       if (logoutButton) logoutButton.hidden = false;
       updateMeta(user);
       setSuperAdminVisibility(isSuperAdmin(user));
-      setAdminSession(true);
 
       if (isLoginPage) {
         const redirect = searchParams.get('redirect') || './admin-page.html';
@@ -225,6 +206,10 @@ export const initAdmin = ({ formatMessage }) => {
     window.netlifyIdentity.on('logout', () => {
       handleUser(null);
     });
+    const currentUser = window.netlifyIdentity.currentUser?.();
+    if (currentUser) {
+      handleUser(currentUser);
+    }
     initTimer = window.setTimeout(() => {
       if (document.body.dataset.adminAuth === 'checking') {
         handleUser(null);
@@ -237,6 +222,7 @@ export const initAdmin = ({ formatMessage }) => {
   const initModerationPanel = (user, superAdmin) => {
     if (!moderationList || !modal || moderationList.dataset.ready) return;
     moderationList.dataset.ready = 'true';
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 
     const pendingContainer = document.querySelector('[data-admin-pending]');
     const verificationContainer = document.querySelector('[data-admin-verifications]');
@@ -515,11 +501,12 @@ export const initAdmin = ({ formatMessage }) => {
       if (elems.saveButton) elems.saveButton.disabled = true;
       if (elems.cancelButton) elems.cancelButton.disabled = true;
       try {
+        const authHeaders = await getAuthHeaders();
         const response = await fetch('/.netlify/functions/update-event', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            ...getAuthHeaders()
+            ...authHeaders
           },
           body: JSON.stringify({ id: eventId, payload, lastModifiedByAdmin })
         });
@@ -730,8 +717,8 @@ export const initAdmin = ({ formatMessage }) => {
       el.hidden = !isEmpty;
     };
 
-    const getAuthHeaders = () => {
-      const token = user?.token?.access_token;
+    const getAuthHeaders = async () => {
+      const token = user?.token?.access_token || (await getIdentityToken());
       return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
@@ -755,8 +742,9 @@ export const initAdmin = ({ formatMessage }) => {
       if (auditEmptyEl) auditEmptyEl.hidden = true;
       try {
         const lang = 'uk';
+        const authHeaders = await getAuthHeaders();
         const response = await fetch(`/.netlify/functions/admin-events?lang=${encodeURIComponent(lang)}`, {
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders(), 'x-locale': lang }
+          headers: { 'Content-Type': 'application/json', ...authHeaders, 'x-locale': lang }
         });
         if (!response.ok) {
           throw new Error('admin events failed');
@@ -766,6 +754,7 @@ export const initAdmin = ({ formatMessage }) => {
         const rejected = Array.isArray(result?.rejected) ? result.rejected : [];
         const audit = Array.isArray(result?.audit) ? result.audit : [];
         const verifications = Array.isArray(result?.verifications) ? result.verifications : [];
+        const archive = Array.isArray(result?.archive) ? result.archive : [];
         pendingById.clear();
         pending.forEach((item) => {
           if (item?.id) pendingById.set(item.id, item);
@@ -779,29 +768,50 @@ export const initAdmin = ({ formatMessage }) => {
         if (superAdmin) {
           renderAudit(audit);
         }
+        renderArchive(archive);
+        if (archive.length === 0 && isLocalHost) {
+          const mergedEvents = await fetchMergedLocalEvents();
+          const archived = mergedEvents
+            .filter((item) => item?.archived === true || item?.status === 'archived')
+            .map((item) => ({
+              id: item.id,
+              title: item.title,
+              meta: formatEventMeta(item),
+              payload: { ...item, __source: 'local' }
+            }));
+          renderArchive(archived);
+          const localAudit = getAuditLog();
+          if (localAudit.length && superAdmin) {
+            renderAudit(localAudit);
+          }
+        }
       } catch (error) {
         setEmptyState(emptyEl, true);
         setEmptyState(verificationEmptyEl, true);
         setEmptyState(rejectedEmptyEl, true);
         if (auditEmptyEl) auditEmptyEl.hidden = false;
-      }
-      try {
-        const mergedEvents = await fetchMergedLocalEvents();
-        const archived = mergedEvents
-          .filter((event) => event?.archived === true || event?.status === 'archived')
-          .map((event) => ({
-            id: event.id,
-            title: event.title,
-            meta: formatEventMeta(event),
-            payload: event
-          }));
-        renderArchive(archived);
-        const localAudit = getAuditLog();
-        if (localAudit.length) {
-          renderAudit(localAudit);
+        if (isLocalHost) {
+          try {
+            const mergedEvents = await fetchMergedLocalEvents();
+            const archived = mergedEvents
+              .filter((item) => item?.archived === true || item?.status === 'archived')
+              .map((item) => ({
+                id: item.id,
+                title: item.title,
+                meta: formatEventMeta(item),
+                payload: { ...item, __source: 'local' }
+              }));
+            renderArchive(archived);
+            const localAudit = getAuditLog();
+            if (localAudit.length && superAdmin) {
+              renderAudit(localAudit);
+            }
+          } catch (localError) {
+            if (archiveEmptyEl) archiveEmptyEl.hidden = false;
+          }
+        } else if (archiveEmptyEl) {
+          archiveEmptyEl.hidden = false;
         }
-      } catch (localError) {
-        if (archiveEmptyEl) archiveEmptyEl.hidden = false;
       } finally {
         if (loadingEl) loadingEl.hidden = true;
       }
@@ -813,9 +823,10 @@ export const initAdmin = ({ formatMessage }) => {
         if (payload && typeof payload === 'object') {
           body.payload = payload;
         }
+        const authHeaders = await getAuthHeaders();
         await fetch('/.netlify/functions/admin-update', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify(body)
         });
       } catch (error) {
@@ -825,10 +836,24 @@ export const initAdmin = ({ formatMessage }) => {
 
     const sendVerificationAction = async ({ link, name, action }) => {
       try {
+        const authHeaders = await getAuthHeaders();
         await fetch('/.netlify/functions/admin-verify', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify({ link, name, action })
+        });
+      } catch (error) {
+        // Ignore network errors for optimistic UI.
+      }
+    };
+
+    const sendArchiveAction = async (eventId, action) => {
+      try {
+        const authHeaders = await getAuthHeaders();
+        await fetch('/.netlify/functions/admin-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify({ id: eventId, action })
         });
       } catch (error) {
         // Ignore network errors for optimistic UI.
@@ -885,18 +910,25 @@ export const initAdmin = ({ formatMessage }) => {
         if (!card) return;
         const eventId = card.dataset.eventId || '';
         const eventData = archiveById.get(eventId);
-        const actorEmail = user?.email || 'admin';
-        if (target.dataset.action === 'restore' && eventData) {
-          restoreLocalEvent(eventData, actorEmail);
-          loadModerationQueue();
+        if (target.dataset.action === 'restore' && eventId) {
+          if (eventData?.__source === 'local') {
+            restoreLocalEvent(eventData, user?.email || 'admin');
+            loadModerationQueue();
+            return;
+          }
+          sendArchiveAction(eventId, 'restore').then(loadModerationQueue);
           return;
         }
-        if (target.dataset.action === 'delete' && eventData) {
+        if (target.dataset.action === 'delete' && eventId) {
           if (!window.confirm(formatMessage('admin_confirm_delete', {}))) {
             return;
           }
-          deleteLocalEvent(eventData, actorEmail);
-          loadModerationQueue();
+          if (eventData?.__source === 'local') {
+            deleteLocalEvent(eventData, user?.email || 'admin');
+            loadModerationQueue();
+            return;
+          }
+          sendArchiveAction(eventId, 'delete').then(loadModerationQueue);
           return;
         }
         if (eventId) {
@@ -1000,9 +1032,10 @@ export const initAdmin = ({ formatMessage }) => {
         const formData = new FormData(editForm);
         const payload = Object.fromEntries(formData.entries());
         try {
+          const authHeaders = await getAuthHeaders();
           const response = await fetch('/.netlify/functions/admin-update', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify({ id: activeEditId, action: 'edit', payload })
           });
           if (!response.ok) throw new Error('edit failed');

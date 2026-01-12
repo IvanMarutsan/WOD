@@ -1,4 +1,4 @@
-import { ADMIN_SESSION_KEY, hasAdminRole } from './auth.js';
+import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './auth.js';
 import { buildLocalEventId, findMergedEventById, upsertLocalEvent } from './local-events.js';
 
 export const initEventForm = ({ formatMessage, getVerificationState, publishState }) => {
@@ -44,6 +44,8 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   const isAdminBypass = () => {
     if (identityUser && hasAdminRole(identityUser)) return true;
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    if (!isLocalHost) return false;
     try {
       return localStorage.getItem(ADMIN_SESSION_KEY) === '1';
     } catch (error) {
@@ -232,42 +234,31 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     updatePreview();
   };
 
-  const updateAdminSessionFlag = (user) => {
-    try {
-      if (user && hasAdminRole(user)) {
-        localStorage.setItem(ADMIN_SESSION_KEY, '1');
-      } else {
-        localStorage.removeItem(ADMIN_SESSION_KEY);
-      }
-    } catch (error) {
-      return;
-    }
-  };
-
   const initIdentitySession = () => {
     if (!window.netlifyIdentity) {
-      window.addEventListener(
-        'load',
-        () => {
-          if (window.netlifyIdentity) initIdentitySession();
-        },
-        { once: true }
-      );
+      if (!document.querySelector('[data-identity-widget]')) {
+        const identityScript = document.createElement('script');
+        identityScript.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
+        identityScript.async = true;
+        identityScript.defer = true;
+        identityScript.dataset.identityWidget = 'true';
+        identityScript.onload = () => {
+          initIdentitySession();
+        };
+        document.body.appendChild(identityScript);
+      }
       return;
     }
     window.netlifyIdentity.on('init', (user) => {
       identityUser = user;
-      updateAdminSessionFlag(user);
       publishState.update();
     });
     window.netlifyIdentity.on('login', (user) => {
       identityUser = user;
-      updateAdminSessionFlag(user);
       publishState.update();
     });
     window.netlifyIdentity.on('logout', () => {
       identityUser = null;
-      updateAdminSessionFlag(null);
       publishState.update();
     });
     window.netlifyIdentity.init();
@@ -520,6 +511,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   publishState.update();
   initIdentitySession();
   loadOrganizerStatus();
+  multiStepForm.dataset.ready = 'true';
 
   const params = new URLSearchParams(window.location.search);
   const eventIdParam = params.get('id');
@@ -587,6 +579,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       submitStatus.textContent = '';
     }
     try {
+      const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
       const formData = new FormData(multiStepForm);
       const payload = Object.fromEntries(formData.entries());
       const tagsForPayload = Array.from(pendingTags);
@@ -595,51 +588,98 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
       }
-      const eventId = editingEventId || buildLocalEventId();
       const city = guessCity(payload.address);
-      const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
-      const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
-      const nextEvent = {
-        id: eventId,
-        title: payload.title || editingEventData?.title || '—',
-        slug: editingEventData?.slug || eventId,
-        description: payload.description || editingEventData?.description || '',
-        tags: tagsForPayload.map((label) => ({ label, status: 'approved' })),
-        start: payload.start || '',
-        end: payload.end || '',
-        format: payload.format || '',
-        language: payload.language || '',
-        venue: payload.address || '',
-        address: payload.address || '',
-        city: city || editingEventData?.city || '',
-        priceType: payload['ticket-type'] || '',
-        priceMin: Number.isFinite(priceMin) ? priceMin : null,
-        priceMax: Number.isFinite(priceMax) ? priceMax : null,
-        ticketUrl: payload['ticket-url'] || '',
-        organizerId,
-        images: previewImageUrl ? [previewImageUrl] : editingEventData?.images || [],
-        imageAlt: imageAltInput?.value?.trim() || editingEventData?.imageAlt || '',
-        contactPerson: {
-          name: payload['contact-name'] || '',
-          email: payload['contact-email'] || '',
-          phone: payload['contact-phone'] || '',
-          website: payload['contact-website'] || '',
-          instagram: payload['contact-instagram'] || '',
-          facebook: payload['contact-facebook'] || '',
-          telegram: payload['contact-telegram'] || ''
-        },
-        status: 'published',
-        archived: false,
-        forUkrainians: editingEventData?.forUkrainians ?? true,
-        familyFriendly: editingEventData?.familyFriendly ?? false,
-        volunteer: editingEventData?.volunteer ?? false
-      };
-      const saved = upsertLocalEvent(nextEvent, identityUser?.email || 'admin');
-      if (submitStatus) {
-        submitStatus.textContent = formatMessage('submit_success', {});
+      const eventId = editingEventId;
+      if (isLocalHost) {
+        const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
+        const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
+        const localId = eventId || buildLocalEventId();
+        const nextEvent = {
+          id: localId,
+          title: payload.title || editingEventData?.title || '—',
+          slug: editingEventData?.slug || localId,
+          description: payload.description || editingEventData?.description || '',
+          tags: tagsForPayload.map((label) => ({ label, status: 'approved' })),
+          start: payload.start || '',
+          end: payload.end || '',
+          format: payload.format || '',
+          language: payload.language || '',
+          venue: payload.address || '',
+          address: payload.address || '',
+          city: city || editingEventData?.city || '',
+          priceType: payload['ticket-type'] || '',
+          priceMin: Number.isFinite(priceMin) ? priceMin : null,
+          priceMax: Number.isFinite(priceMax) ? priceMax : null,
+          ticketUrl: payload['ticket-url'] || '',
+          organizerId,
+          images: previewImageUrl ? [previewImageUrl] : editingEventData?.images || [],
+          imageAlt: imageAltInput?.value?.trim() || editingEventData?.imageAlt || '',
+          contactPerson: {
+            name: payload['contact-name'] || '',
+            email: payload['contact-email'] || '',
+            phone: payload['contact-phone'] || '',
+            website: payload['contact-website'] || '',
+            instagram: payload['contact-instagram'] || '',
+            facebook: payload['contact-facebook'] || '',
+            telegram: payload['contact-telegram'] || ''
+          },
+          status: 'published',
+          archived: false,
+          forUkrainians: editingEventData?.forUkrainians ?? true,
+          familyFriendly: editingEventData?.familyFriendly ?? false,
+          volunteer: editingEventData?.volunteer ?? false
+        };
+        const saved = upsertLocalEvent(nextEvent, identityUser?.email || 'admin');
+        if (submitStatus) {
+          submitStatus.textContent = formatMessage('submit_success', {});
+        }
+        if (saved?.id) {
+          window.location.href = `./event-card.html?id=${encodeURIComponent(saved.id)}`;
+        }
+        return;
       }
-      if (saved?.id) {
-        window.location.href = `./event-card.html?id=${encodeURIComponent(saved.id)}`;
+      payload.city = city || editingEventData?.city || '';
+      payload.imageUrl = previewImageUrl || editingEventData?.images?.[0] || '';
+      if (eventId) {
+        payload.tags = tagsForPayload;
+        const headers = { 'Content-Type': 'application/json' };
+        const token = await getIdentityToken();
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+        const response = await fetch('/.netlify/functions/update-event', {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ id: eventId, payload, lastModifiedByAdmin: new Date().toISOString() })
+        });
+        if (!response.ok) throw new Error('update failed');
+        const result = await response.json();
+        if (!result?.ok) throw new Error('update failed');
+        if (submitStatus) {
+          submitStatus.textContent = formatMessage('submit_success', {});
+        }
+        window.location.href = `./event-card.html?id=${encodeURIComponent(eventId)}`;
+      } else {
+        payload.tags = tagsPayload;
+        const headers = { 'Content-Type': 'application/json' };
+        const token = await getIdentityToken();
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+        const response = await fetch('/.netlify/functions/submit-event', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('submit failed');
+        const result = await response.json();
+        if (!result?.ok) throw new Error('submit failed');
+        if (submitStatus) {
+          submitStatus.textContent = formatMessage('submit_success', {});
+        }
+        if (result?.id) {
+          window.location.href = `./event-card.html?id=${encodeURIComponent(result.id)}`;
+        }
       }
     } catch (error) {
       if (submitStatus) {

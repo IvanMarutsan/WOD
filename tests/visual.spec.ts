@@ -19,6 +19,28 @@ for (const route of routes) {
     });
     if (route.url.includes('new-event')) {
       await page.addInitScript(() => {
+        const user = {
+          email: 'admin@test.local',
+          app_metadata: { roles: ['admin'] },
+          token: { access_token: 'test-token' }
+        };
+        window.netlifyIdentity = {
+          _handlers: {},
+          on(event, cb) {
+            this._handlers[event] = cb;
+          },
+          init() {
+            if (this._handlers.init) this._handlers.init(user);
+          },
+          currentUser() {
+            return user;
+          },
+          open() {},
+          close() {},
+          logout() {
+            if (this._handlers.logout) this._handlers.logout();
+          }
+        };
         localStorage.setItem('wodAdminSession', '1');
       });
     }
@@ -46,6 +68,7 @@ for (const route of routes) {
     if (route.key === 'new-event') {
       const form = page.locator('form.multi-step');
       const steps = page.locator('.stepper');
+      await page.locator('.multi-step[data-ready="true"]').waitFor({ state: 'attached' });
       await expect(form).toBeVisible();
       await expect(steps).toBeVisible();
       expect(await form.screenshot()).toMatchSnapshot('new-event-form.png', { maxDiffPixels: 200 });

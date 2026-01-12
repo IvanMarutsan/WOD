@@ -1,5 +1,4 @@
-import { getAdminStore } from './blob-store';
-import { pruneEvents } from './admin-storage';
+import { supabaseFetch } from './supabase';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
@@ -103,31 +102,96 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    const id = `evt_${Date.now()}`;
-    const store = getAdminStore();
-    const existing = (await store.get('events', { type: 'json' })) as any[] | null;
-    const events = Array.isArray(existing) ? existing : [];
-    const title = payload.title || payload.name || payload.eventTitle || 'Untitled event';
-    const createdAt = new Date().toISOString();
     const roles = getRoles(context);
-    const canApprove = hasAdminRole(roles);
-    const status = canApprove && payload.status === 'approved' ? 'approved' : 'pending';
-    const eventRecord = {
-      id,
-      title,
-      city: payload.city || payload.eventCity || '',
-      start: payload.start || payload.eventStart || '',
-      end: payload.end || payload.eventEnd || '',
-      status,
-      createdAt,
-      updatedAt: createdAt,
-      payload
-    };
-    const updated = pruneEvents([eventRecord, ...events]);
-    await store.set('events', JSON.stringify(updated), {
-      contentType: 'application/json'
-    });
-    console.log('submit-event', { id, title });
+    if (!hasAdminRole(roles)) {
+      return {
+        statusCode: 403,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ok: false, error: 'forbidden' })
+      };
+    }
+
+    const id = `evt-${Date.now()}`;
+    const title = payload.title || payload.name || payload.eventTitle || 'Untitled event';
+    const status = payload.status === 'approved' ? 'published' : 'published';
+    const contactName = String(payload['contact-name'] || '');
+    const contactEmail = String(payload['contact-email'] || '');
+    const contactPhone = String(payload['contact-phone'] || '');
+    const contactWebsite = String(payload['contact-website'] || '');
+    const contactInstagram = String(payload['contact-instagram'] || '');
+    const contactFacebook = String(payload['contact-facebook'] || '');
+    const contactMeta = String(payload['contact-meta'] || '');
+    let organizerId: string | null = null;
+    if (contactName || contactEmail || contactPhone || contactWebsite || contactInstagram || contactFacebook) {
+      const organizer = (await supabaseFetch('organizers', {
+        method: 'POST',
+        body: [
+          {
+            name: contactName || 'Організатор',
+            email: contactEmail || null,
+            phone: contactPhone || null,
+            website: contactWebsite || null,
+            instagram: contactInstagram || null,
+            facebook: contactFacebook || null,
+            meta: contactMeta || null
+          }
+        ]
+      })) as any[];
+      organizerId = organizer?.[0]?.id || null;
+    }
+    const priceMin = payload['price-min'] ? Number(payload['price-min']) : null;
+    const priceMax = payload['price-max'] ? Number(payload['price-max']) : null;
+    const eventRow = (await supabaseFetch('events', {
+      method: 'POST',
+      body: [
+        {
+          external_id: id,
+          slug: payload.slug || id,
+          title,
+          description: payload.description || '',
+          city: payload.city || payload.eventCity || '',
+          address: payload.address || '',
+          venue: payload.venue || payload.address || '',
+          start_at: payload.start || payload.eventStart || null,
+          end_at: payload.end || payload.eventEnd || null,
+          language: payload.language || '',
+          format: payload.format || '',
+          price_type: payload['ticket-type'] || '',
+          price_min: Number.isFinite(priceMin) ? priceMin : null,
+          price_max: Number.isFinite(priceMax) ? priceMax : null,
+          registration_url: payload['ticket-url'] || '',
+          image_url: payload.imageUrl || payload.image_url || null,
+          status,
+          organizer_id: organizerId
+        }
+      ]
+    })) as any[];
+    const savedEvent = eventRow?.[0];
+    const tags = parseTags(payload.tags);
+    if (savedEvent?.id && tags.length) {
+      await supabaseFetch('event_tags', {
+        method: 'POST',
+        body: tags.map((tag) => ({
+          event_id: savedEvent.id,
+          tag,
+          is_pending: false
+        }))
+      });
+    }
+    if (savedEvent?.id) {
+      await supabaseFetch('admin_audit_log', {
+        method: 'POST',
+        body: [
+          {
+            event_id: savedEvent.id,
+            action: 'publish',
+            actor: context.clientContext?.user?.email || 'admin',
+            payload: { title }
+          }
+        ]
+      });
+    }
+    console.log('submit-event', { id, title, status });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },

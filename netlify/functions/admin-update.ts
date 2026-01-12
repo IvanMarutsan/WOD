@@ -1,5 +1,4 @@
-import { getAdminStore } from './blob-store';
-import { pruneAudit, pruneEvents } from './admin-storage';
+import { supabaseFetch } from './supabase';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { email?: string; app_metadata?: { roles?: string[] } } } };
@@ -35,7 +34,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    if (!['approve', 'reject', 'edit'].includes(action)) {
+    if (!['approve', 'reject', 'edit', 'archive', 'restore', 'delete'].includes(action)) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -51,11 +50,11 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    const store = getAdminStore();
-    const existing = (await store.get('events', { type: 'json' })) as any[] | null;
-    const events = Array.isArray(existing) ? existing : [];
-    const idx = events.findIndex((evt) => evt.id === id);
-    if (idx === -1) {
+    const records = (await supabaseFetch('events', {
+      query: { external_id: `eq.${id}` }
+    })) as any[];
+    const eventRecord = records?.[0];
+    if (!eventRecord) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },
@@ -66,22 +65,55 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const user = context.clientContext?.user;
     const actorEmail = user?.email || 'unknown';
     const actorRole = roles.includes('super_admin') ? 'super_admin' : 'admin';
-    const ts = new Date().toISOString();
-    const historyEntry = { action, reason, actorEmail, actorRole, ts };
-
-    const eventRecord = { ...events[idx] };
     if (action === 'edit') {
       const incoming = payload.payload && typeof payload.payload === 'object' ? payload.payload : {};
-      const nextPayload = { ...(eventRecord.payload || {}), ...incoming };
-      eventRecord.payload = nextPayload;
-      if (nextPayload.title) eventRecord.title = String(nextPayload.title);
-      if (nextPayload.city) eventRecord.city = String(nextPayload.city);
-      if (nextPayload.start) eventRecord.start = String(nextPayload.start);
-      eventRecord.end = nextPayload.end ? String(nextPayload.end) : '';
-      eventRecord.updatedAt = ts;
-      events[idx] = eventRecord;
-      const prunedEvents = pruneEvents(events);
-      await store.set('events', JSON.stringify(prunedEvents), { contentType: 'application/json' });
+      const tagList =
+        Array.isArray(incoming.tags)
+          ? incoming.tags
+          : typeof incoming.tags === 'string'
+            ? incoming.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean)
+            : [];
+      const updatePayload: Record<string, unknown> = {};
+      if (incoming.title) updatePayload.title = String(incoming.title);
+      if (incoming.description) updatePayload.description = String(incoming.description);
+      if (incoming.city) updatePayload.city = String(incoming.city);
+      if (incoming.start) updatePayload.start_at = String(incoming.start);
+      if (incoming.end) updatePayload.end_at = String(incoming.end);
+      if (Object.keys(updatePayload).length) {
+        await supabaseFetch('events', {
+          method: 'PATCH',
+          query: { id: `eq.${eventRecord.id}` },
+          body: updatePayload
+        });
+      }
+      if (incoming.tags !== undefined) {
+        await supabaseFetch('event_tags', {
+          method: 'DELETE',
+          query: { event_id: `eq.${eventRecord.id}` }
+        });
+        if (tagList.length) {
+          await supabaseFetch('event_tags', {
+            method: 'POST',
+            body: tagList.map((tag: string) => ({
+              event_id: eventRecord.id,
+              tag,
+              is_pending: false
+            }))
+          });
+        }
+      }
+      await supabaseFetch('admin_audit_log', {
+        method: 'POST',
+        body: [
+          {
+            event_id: eventRecord.id,
+            action: 'edit',
+            reason,
+            actor: actorEmail,
+            payload: { title: updatePayload.title || eventRecord.title }
+          }
+        ]
+      });
       console.log('admin-update edit', { id, actorEmail });
       return {
         statusCode: 200,
@@ -90,32 +122,35 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    eventRecord.status = action === 'approve' ? 'approved' : 'rejected';
-    eventRecord.updatedAt = ts;
-    eventRecord.lastReason = reason || '';
-    const history = Array.isArray(eventRecord.reasonHistory) ? eventRecord.reasonHistory : [];
-    eventRecord.reasonHistory = [historyEntry, ...history];
-    events[idx] = eventRecord;
-
-    const auditExisting = (await store.get('audit', { type: 'json' })) as any[] | null;
-    const audit = Array.isArray(auditExisting) ? auditExisting : [];
-    const auditEntry = {
-      id: `audit_${Date.now()}`,
-      eventId: id,
-      title: eventRecord.title || 'Untitled event',
-      action,
-      reason,
-      actorEmail,
-      actorRole,
-      ts
-    };
-    audit.unshift(auditEntry);
-
-    const prunedEvents = pruneEvents(events);
-    const prunedAudit = pruneAudit(audit);
-
-    await store.set('events', JSON.stringify(prunedEvents), { contentType: 'application/json' });
-    await store.set('audit', JSON.stringify(prunedAudit), { contentType: 'application/json' });
+    const nextStatus =
+      action === 'approve'
+        ? 'published'
+        : action === 'reject'
+          ? 'rejected'
+          : action === 'archive'
+            ? 'archived'
+            : action === 'restore'
+              ? 'published'
+              : action === 'delete'
+                ? 'deleted'
+                : eventRecord.status;
+    await supabaseFetch('events', {
+      method: 'PATCH',
+      query: { id: `eq.${eventRecord.id}` },
+      body: { status: nextStatus }
+    });
+    await supabaseFetch('admin_audit_log', {
+      method: 'POST',
+      body: [
+        {
+          event_id: eventRecord.id,
+          action,
+          reason,
+          actor: actorEmail,
+          payload: { title: eventRecord.title }
+        }
+      ]
+    });
 
     console.log('admin-update', { id, action, actorEmail });
 

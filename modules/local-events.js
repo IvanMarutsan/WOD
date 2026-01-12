@@ -140,6 +140,14 @@ export const deleteLocalEvent = (event, actorEmail) => {
 };
 
 export const fetchBaseEvents = async () => {
+  try {
+    const response = await fetch('/.netlify/functions/public-events');
+    if (response.ok) {
+      return response.json();
+    }
+  } catch (error) {
+    // Ignore and fall back to static data.
+  }
   const response = await fetch('./data/events.json');
   if (!response.ok) {
     throw new Error('events');

@@ -1,91 +1,125 @@
-import { getAdminStore } from './blob-store';
+import { supabaseFetch } from './supabase';
 
-const KNOWN_CITIES = [
-  'Copenhagen',
-  'Aarhus',
-  'Odense',
-  'Aalborg',
-  'Esbjerg',
-  'Roskilde',
-  'Fredericia'
-];
+const mapTag = (tag: { tag: string; is_pending?: boolean }) => ({
+  label: tag.tag,
+  status: tag.is_pending ? 'pending' : 'approved'
+});
 
-const isNonEmptyString = (value: unknown) =>
-  typeof value === 'string' && value.trim().length > 0;
-
-const parseTags = (value: unknown) => {
-  if (!isNonEmptyString(value)) return [];
-  return String(value)
-    .split(',')
-    .map((tag) => tag.trim())
-    .filter(Boolean);
-};
-
-const parseNumber = (value: unknown) => {
-  if (value === null || value === undefined || value === '') return null;
-  const num = Number(value);
-  return Number.isFinite(num) ? num : null;
-};
-
-const deriveCity = (payload: Record<string, unknown>) => {
-  if (isNonEmptyString(payload.city)) return String(payload.city);
-  const address = String(payload.address || '');
-  if (!address) return '';
-  const lower = address.toLowerCase();
-  const hit = KNOWN_CITIES.find((city) => lower.includes(city.toLowerCase()));
-  if (hit) return hit;
-  const first = address.split(',')[0]?.trim();
-  return first || '';
-};
-
-const mapPayloadToEvent = (record: any) => {
-  const payload = record.payload || {};
-  const tags = parseTags(payload.tags).map((label) => ({ label, status: 'approved' }));
-  const categoryLabel = isNonEmptyString(payload.category) ? String(payload.category) : '';
-  const city = deriveCity(payload);
-  const ticketType = String(payload['ticket-type'] || 'paid');
+const mapOrganizer = (organizer?: {
+  name?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  instagram?: string;
+  facebook?: string;
+  meta?: string;
+}) => {
+  if (!organizer) return null;
   return {
-    id: record.id,
-    slug: record.id,
-    title: String(payload.title || record.title || 'Untitled event'),
-    description: String(payload.description || ''),
-    category: categoryLabel ? { label: categoryLabel, status: 'approved' } : null,
-    tags,
-    start: String(payload.start || ''),
-    end: payload.end ? String(payload.end) : null,
-    format: String(payload.format || 'offline'),
-    venue: String(payload.venue || payload.address || ''),
-    address: String(payload.address || ''),
-    city,
-    priceType: ticketType === 'free' ? 'free' : 'paid',
-    priceMin: parseNumber(payload['price-min']),
-    priceMax: parseNumber(payload['price-max']),
-    ticketUrl: String(payload['ticket-url'] || ''),
-    organizerId: String(payload['contact-name'] || ''),
-    images: [],
-    status: 'published',
-    language: 'uk',
-    forUkrainians: true,
-    familyFriendly: false,
-    volunteer: false,
-    contactPerson: {
-      name: String(payload['contact-name'] || ''),
-      email: String(payload['contact-email'] || ''),
-      phone: String(payload['contact-phone'] || '')
-    }
+    name: organizer.name || '',
+    email: organizer.email || '',
+    phone: organizer.phone || '',
+    website: organizer.website || '',
+    instagram: organizer.instagram || '',
+    facebook: organizer.facebook || '',
+    meta: organizer.meta || ''
   };
 };
 
-export const handler = async () => {
+type HandlerEvent = { queryStringParameters?: Record<string, string> };
+type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
+
+const getRoles = (context: HandlerContext) => {
+  const roles = context.clientContext?.user?.app_metadata?.roles;
+  return Array.isArray(roles) ? roles : [];
+};
+
+const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
+
+export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
-    const store = getAdminStore();
-    const events = (await store.get('events', { type: 'json' })) as any[] | null;
-    const list = Array.isArray(events) ? events : [];
-    const approved = list.filter((event) => event.status === 'approved');
+    const includeArchived =
+      event.queryStringParameters?.includeArchived === '1' ||
+      event.queryStringParameters?.includeArchived === 'true';
+    const statusQuery =
+      includeArchived && hasAdminRole(getRoles(context))
+        ? 'in.(published,archived)'
+        : 'eq.published';
+    const events = (await supabaseFetch('events', {
+      query: {
+        status: statusQuery,
+        order: 'start_at.asc'
+      }
+    })) as any[];
+    const eventIds = events.map((event) => event.id).filter(Boolean);
+    const organizerIds = events
+      .map((event) => event.organizer_id)
+      .filter(Boolean);
+    const tags =
+      eventIds.length > 0
+        ? ((await supabaseFetch('event_tags', {
+            query: { event_id: `in.(${eventIds.join(',')})` }
+          })) as any[])
+        : [];
+    const organizers =
+      organizerIds.length > 0
+        ? ((await supabaseFetch('organizers', {
+            query: { id: `in.(${organizerIds.join(',')})` }
+          })) as any[])
+        : [];
+
+    const tagsByEvent = new Map<string, any[]>();
+    tags.forEach((tag) => {
+      const list = tagsByEvent.get(tag.event_id) || [];
+      list.push(tag);
+      tagsByEvent.set(tag.event_id, list);
+    });
+    const organizersById = new Map(
+      organizers.map((organizer) => [organizer.id, organizer])
+    );
+
+    const response = events.map((event) => {
+      const eventTags = tagsByEvent.get(event.id) || [];
+      const organizer = organizersById.get(event.organizer_id);
+      const contactPerson = mapOrganizer(organizer);
+      return {
+        id: event.external_id || event.id,
+        slug: event.slug || event.external_id || event.id,
+        title: event.title || 'Untitled event',
+        description: event.description || '',
+        tags: eventTags.map(mapTag),
+        start: event.start_at || '',
+        end: event.end_at || null,
+        format: event.format || 'offline',
+        venue: event.venue || event.address || '',
+        address: event.address || '',
+        city: event.city || '',
+        priceType: event.price_type || 'paid',
+        priceMin: event.price_min ?? null,
+        priceMax: event.price_max ?? null,
+        ticketUrl: event.registration_url || '',
+        organizerId: event.organizer_id || '',
+        images: event.image_url ? [event.image_url] : [],
+        status: event.status || 'published',
+        language: event.language || '',
+        forUkrainians: true,
+        familyFriendly: false,
+        volunteer: false,
+        contactPerson: contactPerson || {
+          name: '',
+          email: '',
+          phone: '',
+          website: '',
+          instagram: '',
+          facebook: '',
+          meta: ''
+        }
+      };
+    });
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(approved.map(mapPayloadToEvent))
+      body: JSON.stringify(response)
     };
   } catch (error) {
     console.log('public-events error', error);

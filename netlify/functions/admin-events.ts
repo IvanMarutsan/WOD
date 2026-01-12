@@ -1,5 +1,4 @@
-import { getAdminStore } from './blob-store';
-import { pruneAudit, pruneEvents } from './admin-storage';
+import { supabaseFetch } from './supabase';
 
 type HandlerEvent = {
   headers?: Record<string, string>;
@@ -39,6 +38,29 @@ const formatMeta = (event: any, locale: string) => {
   return parts.join(' · ') || '—';
 };
 
+const buildPayload = (event: any, tags: string[], organizer?: any) => ({
+  id: event.external_id || event.id,
+  title: event.title || '',
+  description: event.description || '',
+  tags,
+  start: event.start_at || '',
+  end: event.end_at || '',
+  format: event.format || '',
+  address: event.address || '',
+  venue: event.venue || '',
+  city: event.city || '',
+  'ticket-type': event.price_type || '',
+  'price-min': event.price_min ?? '',
+  'price-max': event.price_max ?? '',
+  'ticket-url': event.registration_url || '',
+  'contact-name': organizer?.name || '',
+  'contact-email': organizer?.email || '',
+  'contact-phone': organizer?.phone || '',
+  'contact-website': organizer?.website || '',
+  'contact-instagram': organizer?.instagram || '',
+  'contact-facebook': organizer?.facebook || ''
+});
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const roles = getRoles(context);
@@ -50,57 +72,95 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
 
-    const store = getAdminStore();
-    const events = (await store.get('events', { type: 'json' })) as any[] | null;
-    const audit = (await store.get('audit', { type: 'json' })) as any[] | null;
-    const verificationRequests = (await store.get('verificationRequests', { type: 'json' })) as
-      | any[]
-      | null;
-    const list = Array.isArray(events) ? events : [];
-    const prunedEvents = pruneEvents(list);
-    const prunedAudit = pruneAudit(Array.isArray(audit) ? audit : []);
-
-    if (prunedEvents.length !== list.length) {
-      await store.set('events', JSON.stringify(prunedEvents), {
-        contentType: 'application/json'
-      });
-    }
-    if (Array.isArray(audit) && prunedAudit.length !== audit.length) {
-      await store.set('audit', JSON.stringify(prunedAudit), {
-        contentType: 'application/json'
-      });
-    }
     const locale = getLocale(event);
-    const pending = prunedEvents
-      .filter((event) => event.status === 'pending')
-      .map((event) => ({
-        id: event.id,
-        title: event.title || 'Untitled event',
-        meta: formatMeta(event, locale),
-        payload: event.payload || {},
-        history: Array.isArray(event.reasonHistory) ? event.reasonHistory : []
+    const events = (await supabaseFetch('events', {
+      query: { status: 'in.(pending,rejected,archived)' }
+    })) as any[];
+    const eventIds = events.map((item) => item.id).filter(Boolean);
+    const organizerIds = events.map((item) => item.organizer_id).filter(Boolean);
+    const tags =
+      eventIds.length > 0
+        ? ((await supabaseFetch('event_tags', {
+            query: { event_id: `in.(${eventIds.join(',')})` }
+          })) as any[])
+        : [];
+    const organizers =
+      organizerIds.length > 0
+        ? ((await supabaseFetch('organizers', {
+            query: { id: `in.(${organizerIds.join(',')})` }
+          })) as any[])
+        : [];
+
+    const tagsByEvent = new Map<string, string[]>();
+    tags.forEach((tag) => {
+      const list = tagsByEvent.get(tag.event_id) || [];
+      list.push(tag.tag);
+      tagsByEvent.set(tag.event_id, list);
+    });
+    const organizersById = new Map(organizers.map((org) => [org.id, org]));
+
+    const pending = events
+      .filter((item) => item.status === 'pending')
+      .map((item) => ({
+        id: item.external_id || item.id,
+        title: item.title || 'Untitled event',
+        meta: formatMeta(
+          { city: item.city, start: item.start_at },
+          locale
+        ),
+        payload: buildPayload(item, tagsByEvent.get(item.id) || [], organizersById.get(item.organizer_id)),
+        history: []
       }));
+
     const rejected = roles.includes('super_admin')
-      ? prunedEvents
-          .filter((event) => event.status === 'rejected')
-          .map((event) => ({
-            id: event.id,
-            title: event.title || 'Untitled event',
-            meta: formatMeta(event, locale),
-            reason: event.lastReason || '',
-            payload: event.payload || {},
-            history: Array.isArray(event.reasonHistory) ? event.reasonHistory : []
+      ? events
+          .filter((item) => item.status === 'rejected')
+          .map((item) => ({
+            id: item.external_id || item.id,
+            title: item.title || 'Untitled event',
+            meta: formatMeta(
+              { city: item.city, start: item.start_at },
+              locale
+            ),
+            reason: '',
+            payload: buildPayload(item, tagsByEvent.get(item.id) || [], organizersById.get(item.organizer_id)),
+            history: []
           }))
       : [];
-    const auditLog = roles.includes('super_admin') ? prunedAudit.slice(0, 50) : [];
-    const verifications = Array.isArray(verificationRequests)
-      ? verificationRequests.filter((item) => item.status === 'pending')
-      : [];
+
+    const auditLog =
+      roles.includes('super_admin')
+        ? ((await supabaseFetch('admin_audit_log', {
+            query: { order: 'created_at.desc', limit: '50' }
+          })) as any[]).map((entry) => ({
+            id: entry.id,
+            eventId: entry.event_id,
+            title: entry.payload?.title || '',
+            action: entry.action,
+            reason: entry.reason || '',
+            actorEmail: entry.actor || '',
+            actorRole: roles.includes('super_admin') ? 'super_admin' : 'admin',
+            ts: entry.created_at
+          }))
+        : [];
+
+    const verifications: any[] = [];
+    const archive = events
+      .filter((item) => item.status === 'archived')
+      .map((item) => ({
+        id: item.external_id || item.id,
+        title: item.title || 'Untitled event',
+        meta: formatMeta(
+          { city: item.city, start: item.start_at },
+          locale
+        ),
+        payload: buildPayload(item, tagsByEvent.get(item.id) || [], organizersById.get(item.organizer_id))
+      }));
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: true, pending, rejected, audit: auditLog, verifications })
+      body: JSON.stringify({ ok: true, pending, rejected, audit: auditLog, verifications, archive })
     };
   } catch (error) {
     console.log('admin-events error', error);
