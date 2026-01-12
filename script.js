@@ -24,6 +24,7 @@ import {
   const similarCtas = document.querySelectorAll('.event-sidebar__cta--similar');
   const themeToggle = document.querySelector('.theme-toggle');
   const adminLinks = document.querySelectorAll('[data-admin-link]');
+  const adminOnlyItems = document.querySelectorAll('[data-admin-only]');
   const heroKicker = document.querySelector('[data-hero-kicker]');
   const heroStatus = document.querySelector('[data-hero-status]');
   const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
@@ -83,6 +84,10 @@ import {
       if (!(link instanceof HTMLElement)) return;
       link.hidden = true;
     });
+    adminOnlyItems.forEach((item) => {
+      if (!(item instanceof HTMLElement)) return;
+      item.hidden = true;
+    });
     const identity = await loadIdentityWidget();
     if (!identity) return;
     identity.on('init', (user) => {
@@ -90,6 +95,10 @@ import {
       adminLinks.forEach((link) => {
         if (!(link instanceof HTMLElement)) return;
         link.hidden = !showAdmin;
+      });
+      adminOnlyItems.forEach((item) => {
+        if (!(item instanceof HTMLElement)) return;
+        item.hidden = !showAdmin;
       });
       if (showAdmin && typeof refreshAdminData === 'function') {
         refreshAdminData();
@@ -100,6 +109,10 @@ import {
       adminLinks.forEach((link) => {
         if (!(link instanceof HTMLElement)) return;
         link.hidden = !showAdmin;
+      });
+      adminOnlyItems.forEach((item) => {
+        if (!(item instanceof HTMLElement)) return;
+        item.hidden = !showAdmin;
       });
       if (showAdmin && typeof refreshAdminData === 'function') {
         refreshAdminData();
@@ -1046,6 +1059,7 @@ import {
     const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
     const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
     const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
+    const showArchivedField = filtersForm ? filtersForm.elements['show-archived'] : null;
     const advancedFields = filtersForm
       ? [filtersForm.elements.price, filtersForm.elements.format, dateFromField, dateToField]
       : [];
@@ -1079,6 +1093,11 @@ import {
         if (!(target instanceof HTMLInputElement)) return;
         if (target.name !== 'tags') return;
         setSelectedTag(target.value, target.checked);
+        applyFilters();
+      });
+    }
+    if (showArchivedField) {
+      showArchivedField.addEventListener('change', () => {
         applyFilters();
       });
     }
@@ -1733,7 +1752,7 @@ import {
       const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
       currentFilters = filters;
       updateCatalogQueryParams();
-      const includeArchived = Boolean(getAdminIdentity());
+      const includeArchived = Boolean(getAdminIdentity() && showArchivedField && showArchivedField.checked);
       const baseList = state.events.filter((event) =>
         eventMatchesFilters(event, filters, filterHelpers, { includeArchived })
       );
@@ -2084,6 +2103,10 @@ import {
         if (showPast) {
           showPast.checked = params.get('past') === '1';
         }
+        const showArchived = filtersForm.elements['show-archived'];
+        if (showArchived) {
+          showArchived.checked = Boolean(getAdminIdentity()) && params.get('archived') === '1';
+        }
         syncPresetButtons();
       }
       if (searchInputs.length) {
@@ -2130,6 +2153,9 @@ import {
         }
         if (formData.get('show-past')) {
           params.set('past', '1');
+        }
+        if (formData.get('show-archived')) {
+          params.set('archived', '1');
         }
       }
       if (currentPage > 1) {
