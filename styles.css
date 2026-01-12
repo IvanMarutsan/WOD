@@ -245,6 +245,52 @@ button:disabled,
   border-color: var(--accent-2);
 }
 
+.header-search {
+  position: relative;
+}
+
+.header-search__hint {
+  position: absolute;
+  inset: 0 12px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.header-search__hint > span {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+}
+
+.header-search:hover input[type='search']:placeholder-shown + .header-search__hint,
+.header-search:focus-within input[type='search']:placeholder-shown + .header-search__hint {
+  opacity: 1;
+}
+
+.header-search:hover input[type='search']:placeholder-shown + .header-search__hint > span,
+.header-search:focus-within input[type='search']:placeholder-shown + .header-search__hint > span {
+  animation: header-hint-scroll 10s linear infinite;
+}
+
+.header-search:hover input[type='search']:placeholder-shown::placeholder,
+.header-search:focus-within input[type='search']:placeholder-shown::placeholder {
+  color: transparent;
+}
+
+@keyframes header-hint-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 .lang-switch {
   display: inline-flex;
   gap: 8px;
