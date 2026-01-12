@@ -57,58 +57,28 @@
     <main id="content" class="about">
       <div class="container">
         <header class="section-header">
-          <h1>Про проєкт</h1>
-          <p class="section-summary">
-            What’s on DK? - це інформаційна платформа про події та можливості для українців у Данії.
-          </p>
-          <p class="section-summary">
-            Ми збираємо в одному місці анонси подій, які підтримують Україну та українців, допомагають інтеграції,
-            розвитку, волонтерству та культурному життю.
-          </p>
-          <p class="section-summary">
-            Наша мета - щоб українці в Данії менше втрачали важливі можливості й почувалися частиною живої,
-            підтримувальної спільноти.
-          </p>
-          <p class="section-summary">
-            Детальні правила роботи платформи та умови публікації подій ви можете прочитати на сторінці
-            <a href="./legal-terms.html">Умови користування</a>.
-          </p>
+          <h1 data-i18n="about_title">Про проєкт</h1>
+          <div class="section-summary" data-i18n-rich="about_intro_rich"></div>
         </header>
 
         <section id="mission" class="about__section" aria-labelledby="mission-title">
-          <h2 id="mission-title">Наша місія</h2>
-          <p>What’s on DK створено, щоб:</p>
-          <ul class="about__list">
-            <li>об’єднувати українців у Данії через події, зустрічі та спільні ініціативи;</li>
-            <li>підтримувати Україну через благодійні, волонтерські та культурні заходи;</li>
-            <li>
-              допомагати інтеграції - показувати події, які сприяють навчанню, кар’єрі, адаптації та ментальному
-              благополуччю;
-            </li>
-            <li>захищати інфопростір від токсичного, проросійського чи сумнівного контенту;</li>
-            <li>робити інформацію про події зручною, структурованою та надійною.</li>
-          </ul>
-          <p>Це незалежна ініціатива, що працює на користь української спільноти в Данії.</p>
+          <h2 id="mission-title" data-i18n="about_mission_title">Наша місія</h2>
+          <div data-i18n-rich="about_mission_rich"></div>
         </section>
 
         <section id="contacts" class="about__section" aria-labelledby="contacts-title">
-          <h2 id="contacts-title" data-i18n="contacts_title">Контакти</h2>
-          <p class="section-summary" data-i18n="contacts_tagline">
-            Напишіть нам, якщо маєте питання або хочете додати подію.
-          </p>
+          <h2 id="contacts-title" data-i18n="contacts_title"></h2>
+          <p class="section-summary" data-i18n="contacts_tagline"></p>
 
           <section id="email" class="contacts__section" aria-labelledby="contacts-email-title">
-            <h3 id="contacts-email-title" data-i18n="contacts_email_title">Email</h3>
+            <h3 id="contacts-email-title" data-i18n="contacts_email_title"></h3>
             <a class="contacts__email" href="mailto:whatsondk.info@gmail.com" data-i18n="contacts_email_body">
-              hello@whatsondk.test
             </a>
           </section>
 
           <section id="socials" class="contacts__section" aria-labelledby="contacts-socials-title">
-            <h3 id="contacts-socials-title" data-i18n="contacts_socials_title">Соціальні мережі</h3>
-            <p class="contacts__hint" data-i18n="contacts_socials_hint">
-              Напишіть нам у будь-якому зручному каналі.
-            </p>
+            <h3 id="contacts-socials-title" data-i18n="contacts_socials_title"></h3>
+            <p class="contacts__hint" data-i18n="contacts_socials_hint"></p>
             <div class="contacts__social-grid" aria-label="Соціальні мережі з QR">
               <article class="contacts__social-card">
                 <a class="contacts__social-link"
@@ -120,7 +90,7 @@
                     <circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="2" />
                     <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" />
                   </svg>
-                  <span data-i18n="contacts_social_instagram">Instagram</span>
+                  <span data-i18n="contacts_social_instagram"></span>
                 </a>
                 <p class="contacts__social-handle">@whats_on_dk</p>
                 <img class="contacts__social-qr" src="./static/IMG_5359%202.jpg" alt="QR код Instagram" loading="lazy" />
@@ -142,7 +112,7 @@
                       fill="currentColor"
                     />
                   </svg>
-                  <span data-i18n="contacts_social_whatsapp">WhatsApp</span>
+                  <span data-i18n="contacts_social_whatsapp"></span>
                 </a>
                 <p class="contacts__social-handle">WhatsApp group</p>
                 <img class="contacts__social-qr" src="./static/IMG_5070%202.jpg" alt="QR код WhatsApp" loading="lazy" />
@@ -168,7 +138,7 @@
                       stroke-linecap="round"
                     />
                   </svg>
-                  <span data-i18n="contacts_social_threads">Threads</span>
+                  <span data-i18n="contacts_social_threads"></span>
                 </a>
                 <p class="contacts__social-handle">whats_on_dk</p>
                 <img class="contacts__social-qr" src="./static/IMG_5069%202.JPG" alt="QR код Threads" loading="lazy" />
@@ -184,7 +154,7 @@
                       fill="currentColor"
                     />
                   </svg>
-                  <span data-i18n="contacts_social_facebook">Facebook</span>
+                  <span data-i18n="contacts_social_facebook"></span>
                 </a>
                 <p class="contacts__social-handle">Profile</p>
                 <div class="contacts__social-qr contacts__social-qr--placeholder">QR</div>
@@ -193,22 +163,19 @@
           </section>
 
           <section id="faq" class="contacts__section" aria-labelledby="contacts-faq-title">
-            <h3 id="contacts-faq-title" data-i18n="contacts_faq_title">FAQ</h3>
+            <h3 id="contacts-faq-title" data-i18n="contacts_faq_title"></h3>
             <div class="contacts__faq">
               <article>
-                <h4 data-i18n="contacts_faq_q1">Як додати подію?</h4>
-                <p data-i18n-rich="contacts_faq_a1">
-                  Надішліть подію через соціальні мережі або на наш email, і ми її перевіримо та опублікуємо, якщо вона
-                  відповідає [Умовам користування](./legal-terms.html).
-                </p>
+                <h4 data-i18n="contacts_faq_q1"></h4>
+                <p data-i18n-rich="contacts_faq_a1"></p>
               </article>
               <article>
-                <h4 data-i18n="contacts_faq_q2">Які мови підтримуються?</h4>
-                <p data-i18n="contacts_faq_a2">Публікуємо події українською, данською або англійською.</p>
+                <h4 data-i18n="contacts_faq_q2"></h4>
+                <p data-i18n="contacts_faq_a2"></p>
               </article>
               <article>
-                <h4 data-i18n="contacts_faq_q3">Які міста охоплюємо?</h4>
-                <p data-i18n="contacts_faq_a3">Копенгаген, Орхус, Оденсе, Ольборг, Есб'єрг та онлайн.</p>
+                <h4 data-i18n="contacts_faq_q3"></h4>
+                <p data-i18n="contacts_faq_a3"></p>
               </article>
             </div>
           </section>

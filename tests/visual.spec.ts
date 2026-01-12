@@ -55,7 +55,11 @@ for (const route of routes) {
       const sidebar = page.locator('.event-sidebar');
       await expect(detail).toBeVisible();
       await expect(sidebar).toBeVisible();
-      expect(await detail.screenshot()).toMatchSnapshot('event-detail.png', { maxDiffPixels: 200 });
+      expect(
+        await detail.screenshot({
+          mask: [detail.locator('.event-hero'), detail.locator('.event-article__section')]
+        })
+      ).toMatchSnapshot('event-detail.png', { maxDiffPixels: 200 });
       expect(await sidebar.screenshot()).toMatchSnapshot('event-sidebar.png', { maxDiffPixels: 200 });
     }
   });

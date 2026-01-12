@@ -1,4 +1,5 @@
 import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
+import { buildFilters, eventMatchesFilters } from './modules/filters.mjs';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY } from './modules/auth.js';
@@ -885,7 +886,7 @@ import {
       : {};
     const emptyResetButton = document.querySelector('[data-action="reset-filters"]');
     const errorRetryButton = errorState ? errorState.querySelector('[data-action="retry-load"]') : null;
-      let currentFormData = null;
+      let currentFilters = null;
       let currentPage = 1;
       let totalPages = 1;
       const pageSize = 16;
@@ -1223,6 +1224,18 @@ import {
         .map((tag) => ({ label: getTagLabel(tag), status: getTagStatus(tag) }))
         .filter((tag) => tag.label);
 
+    const filterHelpers = {
+      normalize,
+      isPast,
+      isArchivedEvent,
+      getCitySlug,
+      getTagList,
+      getLocalizedEventTitle,
+      getLocalizedCity,
+      getLocalizedTag,
+      getLang: () => document.documentElement.lang || 'uk'
+    };
+
     const truncateText = (value, maxLength) => {
       const clean = String(value || '').replace(/\s+/g, ' ').trim();
       if (!clean) return '';
@@ -1281,10 +1294,10 @@ import {
       highlightsTrack.innerHTML = selection.map((event) => HighlightCard(event, highlightCardHelpers)).join('');
     };
 
-    const getNextUpcomingEvent = (formData) => {
-      if (!formData) return null;
+    const getNextUpcomingEvent = (filters) => {
+      if (!filters) return null;
       const upcoming = state.events
-        .filter((event) => matchesFilters(event, formData, { ignorePastToggle: true }))
+        .filter((event) => eventMatchesFilters(event, filters, filterHelpers, { ignorePastToggle: true }))
         .filter((event) => !isArchivedEvent(event))
         .filter((event) => {
           const start = new Date(event.start);
@@ -1367,7 +1380,8 @@ import {
     };
 
     const renderApp = () => {
-      const payload = currentFormData || (filtersForm ? new FormData(filtersForm) : null);
+      const payload =
+        currentFilters || buildFilters(filtersForm ? new FormData(filtersForm) : null, activeFilters.searchQuery, { normalize });
       const pageSlice = getPageSlice(state.filteredEvents, currentPage, pageSize);
       currentPage = pageSlice.currentPage;
       totalPages = pageSlice.totalPages;
@@ -1528,103 +1542,6 @@ import {
       }
     };
 
-    const matchesFilters = (event, formData, options = {}) => {
-      const ignorePastToggle = options.ignorePastToggle;
-      const includeArchived = options.includeArchived === true;
-      const archivedEvent = isArchivedEvent(event);
-      if (archivedEvent && !includeArchived) return false;
-      if (!archivedEvent && event.status !== 'published') return false;
-      if (!filtersForm || !formData) return true;
-      const lang = document.documentElement.lang || 'uk';
-      const dateFrom = formData.get('date-from');
-      const dateTo = formData.get('date-to');
-      const city = normalize(formData.get('city'));
-      const price = normalize(formData.get('price'));
-      const format = normalize(formData.get('format'));
-      const quickToday = formData.get('quick-today');
-      const quickTomorrow = formData.get('quick-tomorrow');
-      const quickWeekend = formData.get('quick-weekend');
-      const quickOnline = formData.get('quick-online');
-      const showPast = formData.get('show-past');
-      const selectedTags = formData.getAll('tags').map((tag) => normalize(tag));
-      const searchValue = normalize(activeFilters.searchQuery || '');
-
-      if (!ignorePastToggle) {
-        if (showPast) {
-          if (!isPast(event)) return false;
-        } else if (isPast(event)) {
-          return false;
-        }
-      } else if (isPast(event)) {
-        return false;
-      }
-
-      const startDate = new Date(event.start);
-      if (dateFrom) {
-        const from = new Date(dateFrom);
-        if (startDate < from) return false;
-      }
-      if (dateTo) {
-        const to = new Date(dateTo);
-        to.setHours(23, 59, 59, 999);
-        if (startDate > to) return false;
-      }
-      if (quickToday) {
-        const today = new Date();
-        if (
-          startDate.getFullYear() !== today.getFullYear() ||
-          startDate.getMonth() !== today.getMonth() ||
-          startDate.getDate() !== today.getDate()
-        ) {
-          return false;
-        }
-      }
-      if (quickTomorrow) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        if (
-          startDate.getFullYear() !== tomorrow.getFullYear() ||
-          startDate.getMonth() !== tomorrow.getMonth() ||
-          startDate.getDate() !== tomorrow.getDate()
-        ) {
-          return false;
-        }
-      }
-      if (quickWeekend) {
-        const day = startDate.getDay();
-        if (day !== 0 && day !== 6) {
-          return false;
-        }
-      }
-      if (quickOnline && normalize(event.format) !== 'online') {
-        return false;
-      }
-      if (city && getCitySlug(event.city) !== city) return false;
-      if (price && normalize(event.priceType) !== price) return false;
-      if (format && normalize(event.format) !== format) return false;
-      if (selectedTags.length) {
-        const eventTags = getTagList(event.tags).map((tag) => normalize(tag.label));
-        const hasAnyTag = selectedTags.some((tag) => tag && eventTags.includes(tag));
-        if (!hasAnyTag) return false;
-      }
-      if (searchValue) {
-        const localizedTitle = getLocalizedEventTitle(event, lang);
-        const localizedCity = getLocalizedCity(event.city, lang);
-        const localizedTags = getTagList(event.tags).map((tag) => getLocalizedTag(tag.label, lang));
-        const haystack = [
-          localizedTitle,
-          event.description,
-          localizedCity,
-          event.venue,
-          localizedTags.join(' ')
-        ]
-          .map(normalize)
-          .join(' ');
-        if (!haystack.includes(searchValue)) return false;
-      }
-      return true;
-    };
-
     const setCityFilter = (value) => {
       activeFilters.city = normalize(value);
     };
@@ -1719,13 +1636,14 @@ import {
       setErrorState(false);
       updateCityOptions(state.events);
       const formData = filtersForm ? new FormData(filtersForm) : null;
-      currentFormData = formData;
+      const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
+      currentFilters = filters;
       updateCatalogQueryParams();
       const includeArchived = isAdminSession();
       const baseList = state.events.filter((event) =>
-        matchesFilters(event, formData, { includeArchived })
+        eventMatchesFilters(event, filters, filterHelpers, { includeArchived })
       );
-      const showPast = formData?.get('show-past');
+      const showPast = filters.showPast;
       const nextFilteredEvents = baseList.slice();
       if (showPast) {
         nextFilteredEvents.sort((a, b) => {
