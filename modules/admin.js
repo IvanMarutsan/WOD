@@ -245,6 +245,11 @@ export const initAdmin = ({ formatMessage }) => {
     const rejectedEmptyEl = rejectedContainer?.querySelector('[data-admin-rejected-empty]');
     const archiveEmptyEl = archiveContainer?.querySelector('[data-admin-archive-empty]');
     const auditEmptyEl = auditContainer?.querySelector('[data-admin-audit-empty]');
+    const pendingMoreButton = document.querySelector('[data-admin-more="pending"]');
+    const verificationMoreButton = document.querySelector('[data-admin-more="verifications"]');
+    const rejectedMoreButton = document.querySelector('[data-admin-more="rejected"]');
+    const archiveMoreButton = document.querySelector('[data-admin-more="archive"]');
+    const auditMoreButton = document.querySelector('[data-admin-more="audit"]');
     const modalDialog = modal.querySelector('.modal__dialog');
     const modalTextarea = modal.querySelector('textarea[name="reject-reason"]');
     const modalCloseButtons = modal.querySelectorAll('[data-modal-close]');
@@ -263,9 +268,69 @@ export const initAdmin = ({ formatMessage }) => {
     let lastEditTrigger = null;
     const pendingById = new Map();
     const archiveById = new Map();
+    const PAGE_SIZE = 5;
+    const listLimits = {
+      pending: PAGE_SIZE,
+      verifications: PAGE_SIZE,
+      rejected: PAGE_SIZE,
+      archive: PAGE_SIZE,
+      audit: PAGE_SIZE
+    };
+
+    const applyListPagination = (key, container, selector, button) => {
+      if (!container) return;
+      const items = Array.from(container.querySelectorAll(selector));
+      const limit = listLimits[key] || PAGE_SIZE;
+      items.forEach((item, index) => {
+        item.hidden = index >= limit;
+      });
+      if (button) {
+        button.hidden = items.length <= limit;
+      }
+    };
+
+    const bumpListPagination = (key, container, selector, button) => {
+      listLimits[key] = (listLimits[key] || PAGE_SIZE) + PAGE_SIZE;
+      applyListPagination(key, container, selector, button);
+    };
+
+    const resetListPagination = (key) => {
+      listLimits[key] = PAGE_SIZE;
+    };
 
     const focusableSelector =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    if (pendingMoreButton) {
+      pendingMoreButton.addEventListener('click', () =>
+        bumpListPagination('pending', pendingContainer, '[data-admin-card]', pendingMoreButton)
+      );
+    }
+    if (verificationMoreButton) {
+      verificationMoreButton.addEventListener('click', () =>
+        bumpListPagination(
+          'verifications',
+          verificationContainer,
+          '[data-admin-verification-row]',
+          verificationMoreButton
+        )
+      );
+    }
+    if (rejectedMoreButton) {
+      rejectedMoreButton.addEventListener('click', () =>
+        bumpListPagination('rejected', rejectedContainer, '[data-admin-card]', rejectedMoreButton)
+      );
+    }
+    if (archiveMoreButton) {
+      archiveMoreButton.addEventListener('click', () =>
+        bumpListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton)
+      );
+    }
+    if (auditMoreButton) {
+      auditMoreButton.addEventListener('click', () =>
+        bumpListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton)
+      );
+    }
 
     const openModal = (triggerButton, card) => {
       activeCard = card;
@@ -776,13 +841,28 @@ export const initAdmin = ({ formatMessage }) => {
         renderCards(pendingContainer, pending, true);
         renderCards(rejectedContainer, rejected, false);
         renderVerifications(verifications);
+        resetListPagination('pending');
+        resetListPagination('rejected');
+        resetListPagination('verifications');
+        applyListPagination('pending', pendingContainer, '[data-admin-card]', pendingMoreButton);
+        applyListPagination('rejected', rejectedContainer, '[data-admin-card]', rejectedMoreButton);
+        applyListPagination(
+          'verifications',
+          verificationContainer,
+          '[data-admin-verification-row]',
+          verificationMoreButton
+        );
         setEmptyState(emptyEl, pending.length === 0);
         setEmptyState(verificationEmptyEl, verifications.length === 0);
         setEmptyState(rejectedEmptyEl, rejected.length === 0);
         if (superAdmin) {
           renderAudit(audit);
+          resetListPagination('audit');
+          applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
         }
         renderArchive(archive);
+        resetListPagination('archive');
+        applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
         if (archive.length === 0 && isLocalHost) {
           const mergedEvents = await fetchMergedLocalEvents();
           const archived = mergedEvents
@@ -794,9 +874,13 @@ export const initAdmin = ({ formatMessage }) => {
               payload: { ...item, __source: 'local' }
             }));
           renderArchive(archived);
+          resetListPagination('archive');
+          applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
           const localAudit = getAuditLog();
           if (localAudit.length && superAdmin) {
             renderAudit(localAudit);
+            resetListPagination('audit');
+            applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
           }
         }
       } catch (error) {
@@ -816,9 +900,13 @@ export const initAdmin = ({ formatMessage }) => {
                 payload: { ...item, __source: 'local' }
               }));
             renderArchive(archived);
+            resetListPagination('archive');
+            applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
             const localAudit = getAuditLog();
             if (localAudit.length && superAdmin) {
               renderAudit(localAudit);
+              resetListPagination('audit');
+              applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
             }
           } catch (localError) {
             if (archiveEmptyEl) archiveEmptyEl.hidden = false;

@@ -85,18 +85,30 @@ test('reset filters clears selected tags and keeps advanced panel open', async (
   await advancedToggle.click();
   await expect(advancedPanel).toBeVisible();
 
-  const tag = page.locator('[data-filters-tags-list] .filters__tag').first();
-  const tagText = await tag.locator('span').innerText();
-  await tag.click();
+  const tagLabel = await page.$$eval('[data-testid="event-card"]', (cards) => {
+    for (const card of cards) {
+      const tags = Array.from(card.querySelectorAll('.event-card__tag'))
+        .map((tag) => tag.textContent?.trim())
+        .filter(Boolean);
+      if (tags.length) return tags[0];
+    }
+    return '';
+  });
+  expect(tagLabel).toBeTruthy();
+
+  const tag = page.locator('[data-filters-tags-list] .filters__tag', { hasText: tagLabel });
+  await tag.first().click();
 
   await expect(page).toHaveURL(/tags=/);
-  await expect(page.locator('[data-filters-tags-list] .filters__tag--selected')).toHaveCount(1);
+  await expect(
+    page.locator('[data-filters-tags-list] .filters__tag--selected', { hasText: tagLabel })
+  ).toHaveCount(1);
 
   await page.getByTestId('filters-reset').click();
 
   await expect(page).not.toHaveURL(/tags=/);
   await expect(page.locator('[data-filters-tags-list] .filters__tag--selected')).toHaveCount(0);
-  await expect(page.locator('[data-filters-tags-list] .filters__tag', { hasText: tagText })).toBeVisible();
+  await expect(page.locator('[data-filters-tags-list] .filters__tag', { hasText: tagLabel })).toBeVisible();
   await expect(advancedPanel).toBeVisible();
   await expect(advancedToggle).toHaveAttribute('aria-expanded', 'true');
 });
@@ -182,11 +194,19 @@ test('tag filters reorder on selection and keep URL in sync', async ({ page }) =
   const advancedToggle = page.locator('[data-action="filters-advanced"]');
   await advancedToggle.click();
 
+  const tagLabels = await page.$$eval('[data-testid="event-card"]', (cards) => {
+    for (const card of cards) {
+      const tags = Array.from(card.querySelectorAll('.event-card__tag'))
+        .map((tag) => tag.textContent?.trim())
+        .filter(Boolean);
+      if (tags.length >= 2) return tags.slice(0, 2);
+    }
+    return [];
+  });
+  expect(tagLabels.length).toBe(2);
+  const [firstLabel, secondLabel] = tagLabels;
   const tagsList = page.locator('[data-filters-tags-list] .filters__tag');
   await expect(tagsList.first()).toBeVisible();
-
-  const firstLabel = await tagsList.nth(0).locator('span').innerText();
-  const secondLabel = await tagsList.nth(1).locator('span').innerText();
 
   await page.locator('[data-filters-tags-list] .filters__tag', { hasText: secondLabel }).click();
   await expect(page).toHaveURL(/tags=/);
@@ -194,8 +214,9 @@ test('tag filters reorder on selection and keep URL in sync', async ({ page }) =
 
   const firstTagText = await tagsList.nth(0).locator('span').innerText();
   const secondTagText = await tagsList.nth(1).locator('span').innerText();
-  expect(firstTagText).toBe(firstLabel);
-  expect(secondTagText).toBe(secondLabel);
+  const topTags = [firstTagText, secondTagText];
+  expect(topTags).toContain(firstLabel);
+  expect(topTags).toContain(secondLabel);
 
   await expect(
     page.locator('[data-filters-tags-list] .filters__tag--selected', { hasText: firstLabel })

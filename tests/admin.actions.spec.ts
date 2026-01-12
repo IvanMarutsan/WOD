@@ -42,6 +42,33 @@ test('admin can archive and restore event from detail page', async ({ page }) =>
   await expect(archiveBtn).toBeVisible();
 });
 
+test('archived events are visible for admin in catalog and detail', async ({ page }) => {
+  await page.addInitScript(() => {
+    const archivedEvent = {
+      id: 'evt-arch-3',
+      title: 'Archived Event 3',
+      start: '2026-02-01T10:00:00',
+      city: 'Copenhagen',
+      tags: [{ label: 'архів' }],
+      priceType: 'free',
+      archived: true,
+      status: 'archived'
+    };
+    localStorage.setItem('wodLocalEvents', JSON.stringify([archivedEvent]));
+    localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
+    localStorage.setItem('wodAuditLog', JSON.stringify([]));
+  });
+  await stubAdminIdentity(page);
+  await page.goto('/main-page.html#events');
+  await page.waitForSelector('[data-event-id="evt-arch-3"]');
+
+  const card = page.locator('[data-event-id="evt-arch-3"]');
+  await expect(card.locator('.event-card__status')).toBeVisible();
+
+  await card.locator('.event-card__link').click();
+  await expect(page.locator('[data-admin-archived-badge]')).toBeVisible();
+});
+
 test('admin can delete event from detail page with confirm', async ({ page }) => {
   await stubAdminIdentity(page);
   await page.goto('/event-card.html?id=evt-006');

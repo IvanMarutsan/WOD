@@ -1,5 +1,5 @@
 import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
-import { buildFilters, eventMatchesFilters } from './modules/filters.mjs';
+import { buildFilters, eventMatchesFilters, getAvailableTags } from './modules/filters.mjs';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
@@ -30,6 +30,7 @@ import {
   const logBuffer = [];
   let debugPanel = null;
   let debugList = null;
+  let refreshAdminData = null;
   const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
   const hasServerlessSupport = !LOCAL_HOSTNAMES.has(window.location.hostname);
   const isLocalHost = LOCAL_HOSTNAMES.has(window.location.hostname);
@@ -85,11 +86,24 @@ import {
     const identity = await loadIdentityWidget();
     if (!identity) return;
     identity.on('init', (user) => {
+      const showAdmin = Boolean((user && hasAdminRole(user)) || hasLocalAdminSession());
+      adminLinks.forEach((link) => {
+        if (!(link instanceof HTMLElement)) return;
+        link.hidden = !showAdmin;
+      });
+      if (showAdmin && typeof refreshAdminData === 'function') {
+        refreshAdminData();
+      }
+    });
+    identity.on('login', (user) => {
       const showAdmin = Boolean(user && hasAdminRole(user));
       adminLinks.forEach((link) => {
         if (!(link instanceof HTMLElement)) return;
         link.hidden = !showAdmin;
       });
+      if (showAdmin && typeof refreshAdminData === 'function') {
+        refreshAdminData();
+      }
     });
     identity.init();
   };
@@ -298,7 +312,7 @@ import {
         publicError = error;
       }
     }
-    if (!hasServerlessSupport || !Array.isArray(publicData)) {
+    if (!hasServerlessSupport) {
       try {
         baseData = await fetchJson('./data/events.json');
       } catch (error) {
@@ -942,6 +956,7 @@ import {
     const heroMeta = document.querySelector('[data-hero-meta]');
     const heroTags = document.querySelector('[data-hero-tags]');
     const heroLink = document.querySelector('[data-hero-link]');
+    const heroMedia = document.querySelector('[data-hero-media]');
     const pastHint = document.querySelector('[data-past-hint]');
     const advancedToggle = document.querySelector('[data-action="filters-advanced"]');
     const advancedPanel = document.querySelector('#filters-advanced');
@@ -1064,7 +1079,6 @@ import {
         if (!(target instanceof HTMLInputElement)) return;
         if (target.name !== 'tags') return;
         setSelectedTag(target.value, target.checked);
-        renderTagFilters(state.events);
         applyFilters();
       });
     }
@@ -1410,6 +1424,10 @@ import {
         heroMeta.textContent = '';
         heroTags.innerHTML = '';
         heroTags.hidden = true;
+        if (heroMedia) {
+          heroMedia.style.backgroundImage = '';
+          heroMedia.classList.add('hero-card__media--placeholder');
+        }
         if (heroStatus) {
           heroStatus.hidden = true;
         }
@@ -1427,6 +1445,11 @@ import {
       const timeLabel = formatDateRange(event.start, event.end);
       heroTitle.textContent = title;
       heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
+      if (heroMedia) {
+        const image = event.images && event.images.length ? event.images[0] : '';
+        heroMedia.style.backgroundImage = image ? `url("${image}")` : '';
+        heroMedia.classList.toggle('hero-card__media--placeholder', !image);
+      }
       const tagLabels = [];
       const firstTag = getTagList(event.tags)[0];
       if (firstTag) {
@@ -1706,6 +1729,7 @@ import {
       setErrorState(false);
       updateCityOptions(state.events);
       const formData = filtersForm ? new FormData(filtersForm) : null;
+      syncSelectedTags();
       const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
       currentFilters = filters;
       updateCatalogQueryParams();
@@ -1725,6 +1749,7 @@ import {
         nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       setFilteredEvents(nextFilteredEvents);
+      renderTagFilters(nextFilteredEvents);
       totalPages = getTotalPages(nextFilteredEvents.length, pageSize);
       currentPage = clampPage(currentPage, totalPages);
       if (nextEventsButton) {
@@ -1857,23 +1882,8 @@ import {
 
     const renderTagFilters = (events) => {
       if (!tagsFilterList) return;
-      const tagMap = new Map();
-      (events || []).forEach((event) => {
-        getTagList(event.tags).forEach((tag) => {
-          const label = tag?.label ? String(tag.label).trim() : '';
-          if (!label) return;
-          const normalized = normalize(label);
-          if (!normalized || tagMap.has(normalized)) return;
-          tagMap.set(normalized, {
-            label: getLocalizedTag(label),
-            value: label
-          });
-        });
-      });
-      const locale = document.documentElement.lang || 'uk';
-      const sorted = Array.from(tagMap.values()).sort((a, b) =>
-        a.label.localeCompare(b.label, locale)
-      );
+      const sorted = getAvailableTags(events, filterHelpers);
+      const tagMap = new Map(sorted.map((tag) => [normalize(tag.value), tag]));
       const selected = new Set(activeFilters.tags);
       const selectedTags = selectedTagOrder
         .map((value) => tagMap.get(value))
@@ -2160,7 +2170,6 @@ import {
         setErrorState(false);
         updateCityOptions(fetchedEvents);
         readQueryParams();
-        renderTagFilters(fetchedEvents);
         applyFilters({ preservePage: true });
         syncAdvancedPanel();
       } catch (error) {
@@ -2168,6 +2177,10 @@ import {
         setErrorState(true);
       }
     };
+    refreshAdminData = () => loadEvents();
+    if (getAdminIdentity()) {
+      refreshAdminData();
+    }
 
     if (filtersForm) {
       if (advancedToggle && advancedPanel) {
@@ -2269,7 +2282,6 @@ import {
           }
           resetActiveFilters();
           syncTagCheckboxes();
-          renderTagFilters(state.events);
           updateCatalogQueryParams();
           applyFilters();
           setAdvancedPanelOpen(wasOpen);
@@ -2306,7 +2318,6 @@ import {
         }
         setSelectedTag(target.value, target.checked);
         updateCatalogQueryParams();
-        renderTagFilters(state.events);
         applyFilters();
       });
     }
@@ -2767,7 +2778,13 @@ import {
     }
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('id');
-    if (eventId) {
+    const loadEventDetail = () => {
+      if (!eventId) {
+        updateEventMeta();
+        updateEventPrice();
+        updateDescriptionToggle();
+        return;
+      }
       fetchMergedEvents()
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
@@ -2783,11 +2800,9 @@ import {
           updateEventPrice();
           updateDescriptionToggle();
         });
-    } else {
-      updateEventMeta();
-      updateEventPrice();
-      updateDescriptionToggle();
-    }
+    };
+    refreshAdminData = () => loadEventDetail();
+    loadEventDetail();
   }
 
   document.addEventListener('click', async (event) => {

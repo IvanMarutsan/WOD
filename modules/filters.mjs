@@ -118,3 +118,25 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
 
 export const filterEvents = (events, filters, helpers = {}, options = {}) =>
   (events || []).filter((event) => eventMatchesFilters(event, filters, helpers, options));
+
+export const getAvailableTags = (events, helpers = {}) => {
+  const normalize = helpers.normalize || defaultNormalize;
+  const getTagList = helpers.getTagList || ((tags) => (tags || []).map((label) => ({ label })));
+  const getLocalizedTag = helpers.getLocalizedTag || ((value) => value || '');
+  const getLang = helpers.getLang || (() => 'uk');
+  const tagMap = new Map();
+  (events || []).forEach((event) => {
+    getTagList(event?.tags).forEach((tag) => {
+      const label = tag?.label ? String(tag.label).trim() : '';
+      if (!label) return;
+      const normalized = normalize(label);
+      if (!normalized || tagMap.has(normalized)) return;
+      tagMap.set(normalized, {
+        label: getLocalizedTag(label, getLang()),
+        value: label
+      });
+    });
+  });
+  const locale = getLang();
+  return Array.from(tagMap.values()).sort((a, b) => a.label.localeCompare(b.label, locale));
+};

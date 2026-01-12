@@ -593,10 +593,25 @@ button:disabled,
   padding: 18px;
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
 }
 
 .hero-card:hover {
   box-shadow: var(--shadow);
+}
+
+.hero-card__media {
+  border-radius: 12px;
+  min-height: 140px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--surface);
+}
+
+.hero-card__media--placeholder {
+  background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
 }
 
 .hero-card__header {
@@ -2669,6 +2684,11 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 .moderation-list {
   display: grid;
   gap: 16px;
+}
+
+.moderation__more {
+  margin-top: 12px;
+  align-self: start;
 }
 
 .moderation-card {

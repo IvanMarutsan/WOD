@@ -81,6 +81,7 @@
               <p class="moderation__state" data-admin-loading data-i18n="admin_loading">Завантаження...</p>
               <p class="moderation__state" data-admin-empty data-i18n="admin_pending_empty" hidden>Наразі немає подій на модерації.</p>
             </div>
+            <button class="btn ghost moderation__more" type="button" data-admin-more="pending" data-i18n="admin_show_more" hidden>Показати ще 5</button>
           </section>
 
           <section class="moderation moderation--verification" aria-labelledby="verification-title">
@@ -91,6 +92,7 @@
             <div class="moderation-list" data-admin-verifications>
               <p class="moderation__state" data-admin-verifications-empty data-i18n="admin_verification_empty" hidden>Наразі немає запитів на верифікацію.</p>
             </div>
+            <button class="btn ghost moderation__more" type="button" data-admin-more="verifications" data-i18n="admin_show_more" hidden>Показати ще 5</button>
           </section>
 
         <section class="moderation moderation--rejected" aria-labelledby="rejected-title" data-super-admin-only hidden>
@@ -101,6 +103,7 @@
           <div class="moderation-list" data-admin-rejected>
             <p class="moderation__state" data-admin-rejected-empty data-i18n="admin_rejected_empty" hidden>Немає відхилених подій.</p>
           </div>
+          <button class="btn ghost moderation__more" type="button" data-admin-more="rejected" data-i18n="admin_show_more" hidden>Показати ще 5</button>
         </section>
 
         <section class="moderation moderation--archive" aria-labelledby="archive-title">
@@ -111,6 +114,7 @@
           <div class="moderation-list" data-admin-archive>
             <p class="moderation__state" data-admin-archive-empty data-i18n="admin_archive_empty" hidden>Архів поки порожній.</p>
           </div>
+          <button class="btn ghost moderation__more" type="button" data-admin-more="archive" data-i18n="admin_show_more" hidden>Показати ще 5</button>
         </section>
 
         <section class="moderation moderation--audit" aria-labelledby="audit-title">
@@ -121,6 +125,7 @@
           <div class="moderation-list moderation-list--compact" data-admin-audit>
             <p class="moderation__state" data-admin-audit-empty data-i18n="admin_audit_empty" hidden>Журнал поки порожній.</p>
           </div>
+          <button class="btn ghost moderation__more" type="button" data-admin-more="audit" data-i18n="admin_show_more" hidden>Показати ще 5</button>
         </section>
         </div>
       </div>
