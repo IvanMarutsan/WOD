@@ -167,7 +167,6 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       ]
     })) as any[];
     const savedEvent = eventRow?.[0];
-    const tags = parseTags(payload.tags);
     if (savedEvent?.id && tags.length) {
       await supabaseFetch('event_tags', {
         method: 'POST',
