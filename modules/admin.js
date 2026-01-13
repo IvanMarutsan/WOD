@@ -855,11 +855,9 @@ export const initAdmin = ({ formatMessage }) => {
         setEmptyState(emptyEl, pending.length === 0);
         setEmptyState(verificationEmptyEl, verifications.length === 0);
         setEmptyState(rejectedEmptyEl, rejected.length === 0);
-        if (superAdmin) {
-          renderAudit(audit);
-          resetListPagination('audit');
-          applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
-        }
+        renderAudit(audit);
+        resetListPagination('audit');
+        applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
         renderArchive(archive);
         resetListPagination('archive');
         applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
@@ -877,7 +875,7 @@ export const initAdmin = ({ formatMessage }) => {
           resetListPagination('archive');
           applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
           const localAudit = getAuditLog();
-          if (localAudit.length && superAdmin) {
+          if (localAudit.length) {
             renderAudit(localAudit);
             resetListPagination('audit');
             applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);
@@ -903,7 +901,7 @@ export const initAdmin = ({ formatMessage }) => {
             resetListPagination('archive');
             applyListPagination('archive', archiveContainer, '[data-admin-archive-card]', archiveMoreButton);
             const localAudit = getAuditLog();
-            if (localAudit.length && superAdmin) {
+            if (localAudit.length) {
               renderAudit(localAudit);
               resetListPagination('audit');
               applyListPagination('audit', auditContainer, '[data-admin-audit-row]', auditMoreButton);

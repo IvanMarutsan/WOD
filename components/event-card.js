@@ -22,6 +22,7 @@ export const EventCard = (event, helpers) => {
     isPast,
     isArchived
   } = helpers;
+  const normalizePart = (value) => String(value || '').trim().toLowerCase();
   const image = event.images && event.images.length ? event.images[0] : '';
   const priceInfo =
     event.priceType === 'free'
@@ -54,7 +55,11 @@ export const EventCard = (event, helpers) => {
   const ticketUrl = event.ticketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
-  const locationParts = [cityLabel, event.venue].filter((part) => part && String(part).trim());
+  const venue = event.venue || event.address || '';
+  let locationParts = [venue, cityLabel].filter((part) => part && String(part).trim());
+  if (venue && cityLabel && normalizePart(venue).includes(normalizePart(cityLabel))) {
+    locationParts = [venue];
+  }
   const location = locationParts.join(' · ');
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';
   return `

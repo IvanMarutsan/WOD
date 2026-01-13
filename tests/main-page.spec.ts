@@ -37,6 +37,17 @@ test('main page renders key sections and hides add-event CTA', async ({ page }) 
   await expect(addEventLinks).toHaveCount(0);
 });
 
+test('hero card shows background image when available', async ({ page }) => {
+  await freezeTime(page);
+  await page.goto('/main-page.html');
+  await waitForEventsRendered(page);
+
+  const heroMedia = page.locator('[data-hero-media]');
+  await expect(heroMedia).toBeVisible();
+  const backgroundImage = await heroMedia.evaluate((el) => getComputedStyle(el).backgroundImage);
+  expect(backgroundImage).not.toBe('none');
+});
+
 test('admin sees archived toggle in filters', async ({ page }) => {
   await freezeTime(page);
   await stubAdminIdentity(page);

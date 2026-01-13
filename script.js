@@ -340,7 +340,11 @@ import {
     source.forEach((event) => {
       if (event?.id) map.set(event.id, event);
     });
-    return mergeWithLocalEvents(Array.from(map.values()));
+    const baseEvents = Array.from(map.values());
+    if (hasServerlessSupport) {
+      return baseEvents;
+    }
+    return mergeWithLocalEvents(baseEvents);
   };
 
   let translations = { uk: {} };
@@ -1238,6 +1242,27 @@ import {
       return acc;
     }, {});
 
+    const CITY_HINTS = {
+      copenhagen: ['copenhagen', 'københavn', 'kobenhavn'],
+      aarhus: ['aarhus', 'århus'],
+      odense: ['odense'],
+      aalborg: ['aalborg', 'ålborg'],
+      esbjerg: ['esbjerg']
+    };
+
+    const guessCitySlug = (text) => {
+      const normalized = normalize(text);
+      if (!normalized) return '';
+      for (const [slug, aliases] of Object.entries(CITY_HINTS)) {
+        if (normalized.includes(slug)) return slug;
+        if (aliases.some((alias) => normalized.includes(alias))) return slug;
+      }
+      for (const [alias, slug] of Object.entries(CITY_ALIASES)) {
+        if (normalized.includes(alias)) return slug;
+      }
+      return '';
+    };
+
     const TAG_TRANSLATIONS = {
     adventure: { uk: 'пригоди' },
     art: { uk: 'мистецтво' },
@@ -1366,7 +1391,19 @@ import {
     const highlightCardHelpers = {
       formatShortDate,
       getLocalizedEventTitle,
-      getLocalizedCity
+      getLocalizedCity: (value, event) => {
+        const localized = getLocalizedCity(value);
+        const slug = getCitySlug(value);
+        if (CITY_TRANSLATIONS[slug]) {
+          return getLocalizedCity(slug);
+        }
+        const fallbackSource = [event?.address, event?.venue, value].filter(Boolean).join(' ');
+        const guessedSlug = guessCitySlug(fallbackSource);
+        if (guessedSlug) {
+          return getLocalizedCity(guessedSlug);
+        }
+        return localized;
+      }
     };
 
     const renderHighlights = (list) => {
@@ -1465,7 +1502,11 @@ import {
       heroTitle.textContent = title;
       heroMeta.textContent = city ? `${city} · ${timeLabel}` : timeLabel;
       if (heroMedia) {
-        const image = event.images && event.images.length ? event.images[0] : '';
+        const image =
+          (event.images && event.images.length ? event.images[0] : '') ||
+          event.imageUrl ||
+          event.image_url ||
+          '';
         heroMedia.style.backgroundImage = image ? `url("${image}")` : '';
         heroMedia.classList.toggle('hero-card__media--placeholder', !image);
       }
@@ -2569,6 +2610,17 @@ import {
     }
   };
 
+  const normalizePart = (value) => String(value || '').trim().toLowerCase();
+  const getUniqueParts = (parts) => {
+    const seen = new Set();
+    return parts.filter((part) => {
+      const key = normalizePart(part);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
   const renderEventDetail = (eventData) => {
     if (!eventData) return;
     activeEventData = eventData;
@@ -2581,7 +2633,7 @@ import {
       updateDescriptionToggle(eventData.description);
     }
     if (eventLocationEl) {
-      const parts = [eventData.venue, eventData.address, eventData.city].filter(Boolean);
+      const parts = getUniqueParts([eventData.venue, eventData.address, eventData.city]);
       const location = parts.length ? parts.join(', ') : '';
       eventLocationEl.textContent = location || '—';
       const mapQuery = encodeURIComponent(location || eventData.city || '');
