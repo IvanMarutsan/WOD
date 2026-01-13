@@ -2434,15 +2434,7 @@ import {
     }
 
     if (nextEventsButton) {
-      nextEventsButton.addEventListener('click', () => {
-        goToPage(currentPage + 1);
-        const catalogSection = document.querySelector('#events');
-        if (catalogSection) {
-          requestAnimationFrame(() => {
-            catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        }
-      });
+      nextEventsButton.hidden = true;
     }
 
     if (resetEventsButton) {
