@@ -296,7 +296,7 @@ import {
   };
 
   const fetchAllPublicEvents = async () => {
-    const limit = 50;
+    const limit = 25;
     const maxPages = 50;
     const collected = [];
     for (let page = 1; page <= maxPages; page += 1) {

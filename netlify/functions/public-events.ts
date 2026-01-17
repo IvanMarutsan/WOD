@@ -31,8 +31,8 @@ type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: stri
 
 const parseLimit = (value?: string) => {
   const numeric = Number.parseInt(value || '', 10);
-  if (!Number.isFinite(numeric) || numeric <= 0) return 50;
-  return Math.min(numeric, 100);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 25;
+  return Math.min(numeric, 50);
 };
 
 const parsePage = (value?: string) => {
