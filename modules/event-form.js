@@ -36,7 +36,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const verificationWarning = multiStepForm.querySelector('[data-verification-warning]');
   const submitStatus = multiStepForm.querySelector('[data-submit-status]');
   const organizerId = multiStepForm.dataset.organizerId || 'org-001';
-  let organizerStatus = 'none';
   let previewImageUrl = null;
   let identityUser = null;
   let editingEventId = null;
@@ -513,27 +512,9 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const getEffectiveOrganizerStatus = () => {
     const verification = getVerificationState();
     if (isAdminBypass()) return 'admin';
-    if (organizerStatus && organizerStatus !== 'none') return organizerStatus;
     if (verification.websiteApproved) return 'verified';
     if (verification.websitePending) return 'pending_manual';
     return 'none';
-  };
-
-  const loadOrganizerStatus = async () => {
-    try {
-      const response = await fetch('./data/organizers.json');
-      if (!response.ok) return;
-      const list = await response.json();
-      const organizer = Array.isArray(list)
-        ? list.find((item) => item.id === organizerId)
-        : null;
-      if (organizer && organizer.verificationStatus) {
-        organizerStatus = organizer.verificationStatus;
-        publishState.update();
-      }
-    } catch (error) {
-      return;
-    }
   };
 
   setStep(currentStep);
@@ -554,7 +535,6 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   };
   publishState.update();
   initIdentitySession();
-  loadOrganizerStatus();
   multiStepForm.dataset.ready = 'true';
 
   const params = new URLSearchParams(window.location.search);

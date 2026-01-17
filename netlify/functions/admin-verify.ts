@@ -1,4 +1,4 @@
-import { getAdminStore } from './blob-store';
+import { supabaseFetch } from './supabase';
 
 type HandlerEvent = { body?: string };
 type HandlerContext = { clientContext?: { user?: { email?: string; app_metadata?: { roles?: string[] } } } };
@@ -32,32 +32,40 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       };
     }
     const linkKey = link.toLowerCase();
-
-    const store = getAdminStore();
-    const existingRequests = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
-    const requests = Array.isArray(existingRequests) ? existingRequests : [];
-    const nextRequests = requests.filter((req) => req.linkKey !== linkKey || req.status !== 'pending');
-    await store.set('verificationRequests', JSON.stringify(nextRequests), {
-      contentType: 'application/json'
-    });
-
-    if (action === 'approve') {
-      const existingOrganizers = (await store.get('organizers', { type: 'json' })) as any[] | null;
-      const organizers = Array.isArray(existingOrganizers) ? existingOrganizers : [];
-      const existing = organizers.find((item) => item.linkKey === linkKey);
-      const record = {
-        link,
-        linkKey,
-        name: name || link,
-        verifiedAt: new Date().toISOString()
-      };
-      if (existing) {
-        Object.assign(existing, record);
+    const existing = (await supabaseFetch('organizer_verification_requests', {
+      query: { link_key: `eq.${linkKey}`, limit: '1', select: 'id' }
+    })) as any[];
+    const record = Array.isArray(existing) ? existing[0] : null;
+    const now = new Date().toISOString();
+    if (!record) {
+      if (action === 'approve') {
+        await supabaseFetch('organizer_verification_requests', {
+          method: 'POST',
+          body: [
+            {
+              link,
+              link_key: linkKey,
+              name: name || link,
+              status: 'approved',
+              verified_at: now
+            }
+          ]
+        });
       } else {
-        organizers.unshift(record);
+        return {
+          statusCode: 404,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ok: false, error: 'not_found' })
+        };
       }
-      await store.set('organizers', JSON.stringify(organizers), {
-        contentType: 'application/json'
+    } else {
+      await supabaseFetch('organizer_verification_requests', {
+        method: 'PATCH',
+        query: { id: `eq.${record.id}` },
+        body:
+          action === 'approve'
+            ? { status: 'approved', verified_at: now, rejected_at: null }
+            : { status: 'rejected', rejected_at: now, verified_at: null }
       });
     }
 

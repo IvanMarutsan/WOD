@@ -27,14 +27,12 @@ import {
   const adminOnlyItems = document.querySelectorAll('[data-admin-only]');
   const heroKicker = document.querySelector('[data-hero-kicker]');
   const heroStatus = document.querySelector('[data-hero-status]');
-  const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
-  const logBuffer = [];
-  let debugPanel = null;
-  let debugList = null;
   let refreshAdminData = null;
   const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
-  const hasServerlessSupport = !LOCAL_HOSTNAMES.has(window.location.hostname);
-  const isLocalHost = LOCAL_HOSTNAMES.has(window.location.hostname);
+  const queryParams = new URLSearchParams(window.location.search);
+  const forceServerless = queryParams.get('serverless') === '1';
+  const hasServerlessSupport = forceServerless || !LOCAL_HOSTNAMES.has(window.location.hostname);
+  const isLocalHost = !forceServerless && LOCAL_HOSTNAMES.has(window.location.hostname);
   const hasLocalAdminSession = () => {
     if (!isLocalHost) return false;
     try {
@@ -159,23 +157,11 @@ import {
     return;
   }
 
-  const appendLogEntry = (entry) => {
-    logBuffer.push(entry);
-    if (!debugList) return;
-    const item = document.createElement('div');
-    item.className = 'debug-panel__item';
-    item.textContent = `[${entry.ts}] ${entry.msg}`;
-    debugList.prepend(item);
-  };
-
   const emitClientLog = (entry) => {
     try {
       console.log('client-error', entry);
     } catch (error) {
       // Ignore logging errors.
-    }
-    if (debugEnabled) {
-      appendLogEntry(entry);
     }
     try {
       fetch('/.netlify/functions/log', {
@@ -188,25 +174,6 @@ import {
       // Optional log endpoint; ignore failures.
     }
   };
-
-  if (debugEnabled) {
-    debugPanel = document.createElement('section');
-    debugPanel.className = 'debug-panel';
-    debugPanel.setAttribute('aria-live', 'polite');
-    debugPanel.innerHTML = `
-      <button class="debug-panel__toggle" type="button" aria-expanded="true">Debug</button>
-      <div class="debug-panel__list" role="status"></div>
-    `;
-    document.body.appendChild(debugPanel);
-    debugList = debugPanel.querySelector('.debug-panel__list');
-    const toggle = debugPanel.querySelector('.debug-panel__toggle');
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        const isCollapsed = debugPanel.classList.toggle('is-collapsed');
-        toggle.setAttribute('aria-expanded', String(!isCollapsed));
-      });
-    }
-  }
 
   window.addEventListener('error', (event) => {
     emitClientLog({
@@ -295,6 +262,24 @@ import {
     return response.json();
   };
 
+  const fetchAdminEventById = async (eventId) => {
+    if (!eventId) return null;
+    try {
+      const token = await getIdentityToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const payload = await fetchJson(
+        `/.netlify/functions/admin-event?id=${encodeURIComponent(eventId)}`,
+        { headers }
+      );
+      if (payload && payload.ok && payload.event) {
+        return payload.event;
+      }
+    } catch (error) {
+      return null;
+    }
+    return null;
+  };
+
   const fetchMergedEvents = async () => {
     let baseData = null;
     let publicData = null;
@@ -302,14 +287,7 @@ import {
     let publicError = null;
     if (hasServerlessSupport) {
       try {
-        const adminUser = getAdminIdentity();
-        const token = adminUser ? await getIdentityToken() : null;
-        const includeArchived = Boolean(adminUser && token);
-        const url = includeArchived
-          ? '/.netlify/functions/public-events?includeArchived=1'
-          : '/.netlify/functions/public-events';
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        publicData = await fetchJson(url, { headers });
+        publicData = await fetchJson('/.netlify/functions/public-events');
       } catch (error) {
         publicError = error;
       }
@@ -1056,7 +1034,6 @@ import {
     const dateFromField = filtersForm ? filtersForm.elements['date-from'] : null;
     const dateToField = filtersForm ? filtersForm.elements['date-to'] : null;
     const showPastField = filtersForm ? filtersForm.elements['show-past'] : null;
-    const showArchivedField = filtersForm ? filtersForm.elements['show-archived'] : null;
     const advancedFields = filtersForm
       ? [filtersForm.elements.price, filtersForm.elements.format, dateFromField, dateToField]
       : [];
@@ -1093,12 +1070,6 @@ import {
         applyFilters();
       });
     }
-    if (showArchivedField) {
-      showArchivedField.addEventListener('change', () => {
-        applyFilters();
-      });
-    }
-
     const normalize = (value) => String(value || '').toLowerCase();
     const getTokens = (value) =>
       normalize(value)
@@ -1789,9 +1760,8 @@ import {
       const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
       currentFilters = filters;
       updateCatalogQueryParams();
-      const includeArchived = Boolean(getAdminIdentity() && showArchivedField && showArchivedField.checked);
       const baseList = state.events.filter((event) =>
-        eventMatchesFilters(event, filters, filterHelpers, { includeArchived })
+        eventMatchesFilters(event, filters, filterHelpers)
       );
       const showPast = filters.showPast;
       const nextFilteredEvents = baseList.slice();
@@ -2140,10 +2110,6 @@ import {
         if (showPast) {
           showPast.checked = params.get('past') === '1';
         }
-        const showArchived = filtersForm.elements['show-archived'];
-        if (showArchived) {
-          showArchived.checked = Boolean(getAdminIdentity()) && params.get('archived') === '1';
-        }
         syncPresetButtons();
       }
       if (searchInputs.length) {
@@ -2190,9 +2156,6 @@ import {
         }
         if (formData.get('show-past')) {
           params.set('past', '1');
-        }
-        if (formData.get('show-archived')) {
-          params.set('archived', '1');
         }
       }
       if (currentPage > 1) {
@@ -2851,20 +2814,46 @@ import {
         updateDescriptionToggle();
         return;
       }
+      const isAdmin = Boolean(getAdminIdentity());
       fetchMergedEvents()
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
-          if (!eventData) return;
-          if (isArchivedEvent(eventData) && !getAdminIdentity()) {
+          if (eventData) {
+            if (isArchivedEvent(eventData) && !isAdmin) {
+              window.location.replace('./404.html');
+              return;
+            }
+            renderEventDetail(eventData);
+            return;
+          }
+          if (!isAdmin) {
             window.location.replace('./404.html');
             return;
           }
-          renderEventDetail(eventData);
+          fetchAdminEventById(eventId).then((adminEvent) => {
+            if (!adminEvent) {
+              window.location.replace('./404.html');
+              return;
+            }
+            renderEventDetail(adminEvent);
+          });
         })
         .catch(() => {
-          updateEventMeta();
-          updateEventPrice();
-          updateDescriptionToggle();
+          if (!isAdmin) {
+            updateEventMeta();
+            updateEventPrice();
+            updateDescriptionToggle();
+            return;
+          }
+          fetchAdminEventById(eventId).then((adminEvent) => {
+            if (!adminEvent) {
+              updateEventMeta();
+              updateEventPrice();
+              updateDescriptionToggle();
+              return;
+            }
+            renderEventDetail(adminEvent);
+          });
         });
     };
     refreshAdminData = () => loadEventDetail();

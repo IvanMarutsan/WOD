@@ -51,7 +51,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
 
     const records = (await supabaseFetch('events', {
-      query: { external_id: `eq.${id}` }
+      query: { or: `(id.eq.${id},external_id.eq.${id})`, limit: '1' }
     })) as any[];
     const eventRecord = records?.[0];
     if (!eventRecord) {

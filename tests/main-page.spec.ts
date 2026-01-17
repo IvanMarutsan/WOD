@@ -2,29 +2,6 @@ import { test, expect } from '@playwright/test';
 import { freezeTime } from './setup.freeze-time';
 import { waitForEventsRendered } from './helpers';
 
-const stubAdminIdentity = async (page) => {
-  await page.addInitScript(() => {
-    window.netlifyIdentity = {
-      _handlers: {},
-      on(event, cb) {
-        this._handlers[event] = cb;
-      },
-      init() {
-        if (this._handlers.init) this._handlers.init(null);
-      },
-      currentUser() {
-        return null;
-      },
-      open() {},
-      close() {},
-      logout() {
-        if (this._handlers.logout) this._handlers.logout();
-      }
-    };
-    localStorage.setItem('wodAdminSession', '1');
-  });
-};
-
 test('main page renders key sections and hides add-event CTA', async ({ page }) => {
   await freezeTime(page);
   await page.goto('/main-page.html');
@@ -46,16 +23,6 @@ test('hero card shows background image when available', async ({ page }) => {
   await expect(heroMedia).toBeVisible();
   const backgroundImage = await heroMedia.evaluate((el) => getComputedStyle(el).backgroundImage);
   expect(backgroundImage).not.toBe('none');
-});
-
-test('admin sees archived toggle in filters', async ({ page }) => {
-  await freezeTime(page);
-  await stubAdminIdentity(page);
-  await page.goto('/main-page.html#events');
-  await waitForEventsRendered(page);
-
-  const archivedToggle = page.locator('input[name="show-archived"]');
-  await expect(archivedToggle).toBeVisible();
 });
 
 test('hero CTA navigates to catalog anchor', async ({ page }) => {

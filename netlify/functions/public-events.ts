@@ -29,26 +29,15 @@ const mapOrganizer = (organizer?: {
 type HandlerEvent = { queryStringParameters?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
 
-const getRoles = (context: HandlerContext) => {
-  const roles = context.clientContext?.user?.app_metadata?.roles;
-  return Array.isArray(roles) ? roles : [];
-};
-
-const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
-
-export const handler = async (event: HandlerEvent, context: HandlerContext) => {
+export const handler = async (_event: HandlerEvent, _context: HandlerContext) => {
   try {
-    const includeArchived =
-      event.queryStringParameters?.includeArchived === '1' ||
-      event.queryStringParameters?.includeArchived === 'true';
-    const statusQuery =
-      includeArchived && hasAdminRole(getRoles(context))
-        ? 'in.(published,archived)'
-        : 'eq.published';
+    const statusQuery = 'eq.published';
     const events = (await supabaseFetch('events', {
       query: {
         status: statusQuery,
-        order: 'start_at.asc'
+        order: 'start_at.asc',
+        select:
+          'id,external_id,slug,title,description,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'
       }
     })) as any[];
     const eventIds = events.map((event) => event.id).filter(Boolean);
@@ -58,13 +47,19 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const tags =
       eventIds.length > 0
         ? ((await supabaseFetch('event_tags', {
-            query: { event_id: `in.(${eventIds.join(',')})` }
+            query: {
+              event_id: `in.(${eventIds.join(',')})`,
+              select: 'event_id,tag,is_pending'
+            }
           })) as any[])
         : [];
     const organizers =
       organizerIds.length > 0
         ? ((await supabaseFetch('organizers', {
-            query: { id: `in.(${organizerIds.join(',')})` }
+            query: {
+              id: `in.(${organizerIds.join(',')})`,
+              select: 'id,name,email,phone,website,instagram,facebook,meta'
+            }
           })) as any[])
         : [];
 

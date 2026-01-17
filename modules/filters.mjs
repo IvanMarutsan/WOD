@@ -33,10 +33,8 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   const getLang = helpers.getLang || (() => 'uk');
 
   const ignorePastToggle = options.ignorePastToggle;
-  const includeArchived = options.includeArchived === true;
-  const archivedEvent = isArchivedEvent(event);
-  if (archivedEvent && !includeArchived) return false;
-  if (!archivedEvent && event.status !== 'published') return false;
+  if (isArchivedEvent(event)) return false;
+  if (event.status !== 'published') return false;
   if (!filters) return true;
 
   if (!ignorePastToggle) {

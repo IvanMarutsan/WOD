@@ -54,15 +54,30 @@ create table if not exists admin_audit_log (
   created_at timestamptz default now()
 );
 
+create table if not exists organizer_verification_requests (
+  id uuid primary key default gen_random_uuid(),
+  link text not null,
+  link_key text not null unique,
+  name text,
+  status text not null default 'pending',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  verified_at timestamptz,
+  rejected_at timestamptz
+);
+
 create index if not exists events_start_at_idx on events (start_at);
 create index if not exists events_status_idx on events (status);
 create index if not exists events_city_idx on events (city);
 create index if not exists events_language_idx on events (language);
+create index if not exists organizer_verification_status_idx on organizer_verification_requests (status);
+create index if not exists organizer_verification_link_idx on organizer_verification_requests (link_key);
 
 alter table organizers enable row level security;
 alter table events enable row level security;
 alter table event_tags enable row level security;
 alter table admin_audit_log enable row level security;
+alter table organizer_verification_requests enable row level security;
 
 drop policy if exists "public_read_events" on events;
 create policy "public_read_events"
@@ -118,5 +133,11 @@ execute function set_updated_at();
 drop trigger if exists events_set_updated_at on events;
 create trigger events_set_updated_at
 before update on events
+for each row
+execute function set_updated_at();
+
+drop trigger if exists organizer_verification_set_updated_at on organizer_verification_requests;
+create trigger organizer_verification_set_updated_at
+before update on organizer_verification_requests
 for each row
 execute function set_updated_at();

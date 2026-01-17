@@ -1,4 +1,4 @@
-import { getAdminStore } from './blob-store';
+import { supabaseFetch } from './supabase';
 
 type HandlerEvent = { body?: string; queryStringParameters?: Record<string, string> };
 
@@ -7,7 +7,6 @@ const isNonEmptyString = (value: unknown) =>
 
 export const handler = async (event: HandlerEvent) => {
   try {
-    const store = getAdminStore();
     if (event.body) {
       const payload = JSON.parse(event.body);
       const link = String(payload.link || '').trim();
@@ -20,20 +19,27 @@ export const handler = async (event: HandlerEvent) => {
         };
       }
       const linkKey = link.toLowerCase();
-      const existing = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
-      const requests = Array.isArray(existing) ? existing : [];
-      const hasPending = requests.some((req) => req.linkKey === linkKey && req.status === 'pending');
-      if (!hasPending) {
-        requests.unshift({
-          id: `ver_${Date.now()}`,
-          link,
-          linkKey,
-          name: name || link,
-          status: 'pending',
-          createdAt: new Date().toISOString()
+      const existing = (await supabaseFetch('organizer_verification_requests', {
+        query: { link_key: `eq.${linkKey}`, limit: '1', select: 'id,status' }
+      })) as any[];
+      const record = Array.isArray(existing) ? existing[0] : null;
+      if (!record) {
+        await supabaseFetch('organizer_verification_requests', {
+          method: 'POST',
+          body: [
+            {
+              link,
+              link_key: linkKey,
+              name: name || link,
+              status: 'pending'
+            }
+          ]
         });
-        await store.set('verificationRequests', JSON.stringify(requests), {
-          contentType: 'application/json'
+      } else if (record.status === 'rejected') {
+        await supabaseFetch('organizer_verification_requests', {
+          method: 'PATCH',
+          query: { id: `eq.${record.id}` },
+          body: { status: 'pending', rejected_at: null, verified_at: null }
         });
       }
       return {
@@ -52,14 +58,12 @@ export const handler = async (event: HandlerEvent) => {
       };
     }
     const linkKey = link.toLowerCase();
-    const organizers = (await store.get('organizers', { type: 'json' })) as any[] | null;
-    const requests = (await store.get('verificationRequests', { type: 'json' })) as any[] | null;
-    const verified = Array.isArray(organizers)
-      ? organizers.find((item) => item.linkKey === linkKey)
-      : null;
-    const pending = Array.isArray(requests)
-      ? requests.some((item) => item.linkKey === linkKey && item.status === 'pending')
-      : false;
+    const records = (await supabaseFetch('organizer_verification_requests', {
+      query: { link_key: `eq.${linkKey}`, limit: '1', select: 'status' }
+    })) as any[];
+    const status = Array.isArray(records) ? records[0]?.status : null;
+    const verified = status === 'approved';
+    const pending = status === 'pending';
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },

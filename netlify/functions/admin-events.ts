@@ -156,7 +156,18 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       ts: entry.created_at
     }));
 
-    const verifications: any[] = [];
+    const verificationRows = (await supabaseFetch('organizer_verification_requests', {
+      query: {
+        status: 'eq.pending',
+        order: 'created_at.desc',
+        select: 'link,name,created_at'
+      }
+    })) as any[];
+    const verifications = (verificationRows || []).map((item) => ({
+      link: item.link || '',
+      name: item.name || item.link || '',
+      createdAt: item.created_at || ''
+    }));
     const archive = events
       .filter((item) => item.status === 'archived')
       .map((item) => ({
