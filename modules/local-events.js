@@ -139,12 +139,26 @@ export const deleteLocalEvent = (event, actorEmail) => {
   return event;
 };
 
+const fetchAllPublicEvents = async () => {
+  const limit = 100;
+  const maxPages = 50;
+  const collected = [];
+  for (let page = 1; page <= maxPages; page += 1) {
+    const response = await fetch(`/.netlify/functions/public-events?limit=${limit}&page=${page}`);
+    if (!response.ok) {
+      throw new Error('events');
+    }
+    const batch = await response.json();
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    collected.push(...batch);
+    if (batch.length < limit) break;
+  }
+  return collected;
+};
+
 export const fetchBaseEvents = async () => {
   try {
-    const response = await fetch('/.netlify/functions/public-events');
-    if (response.ok) {
-      return response.json();
-    }
+    return await fetchAllPublicEvents();
   } catch (error) {
     // Ignore and fall back to static data.
   }

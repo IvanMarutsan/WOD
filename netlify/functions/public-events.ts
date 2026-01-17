@@ -29,13 +29,30 @@ const mapOrganizer = (organizer?: {
 type HandlerEvent = { queryStringParameters?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
 
-export const handler = async (_event: HandlerEvent, _context: HandlerContext) => {
+const parseLimit = (value?: string) => {
+  const numeric = Number.parseInt(value || '', 10);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 100;
+  return Math.min(numeric, 200);
+};
+
+const parsePage = (value?: string) => {
+  const numeric = Number.parseInt(value || '', 10);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 1;
+  return numeric;
+};
+
+export const handler = async (event: HandlerEvent, _context: HandlerContext) => {
   try {
+    const limit = parseLimit(event.queryStringParameters?.limit);
+    const page = parsePage(event.queryStringParameters?.page);
+    const offset = (page - 1) * limit;
     const statusQuery = 'eq.published';
     const events = (await supabaseFetch('events', {
       query: {
         status: statusQuery,
         order: 'start_at.asc',
+        limit: String(limit),
+        offset: String(offset),
         select:
           'id,external_id,slug,title,description,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'
       }

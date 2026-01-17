@@ -280,6 +280,20 @@ import {
     return null;
   };
 
+  const fetchAllPublicEvents = async () => {
+    const limit = 100;
+    const maxPages = 50;
+    const collected = [];
+    for (let page = 1; page <= maxPages; page += 1) {
+      const url = `/.netlify/functions/public-events?limit=${limit}&page=${page}`;
+      const batch = await fetchJson(url);
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      collected.push(...batch);
+      if (batch.length < limit) break;
+    }
+    return collected;
+  };
+
   const fetchMergedEvents = async () => {
     let baseData = null;
     let publicData = null;
@@ -287,7 +301,7 @@ import {
     let publicError = null;
     if (hasServerlessSupport) {
       try {
-        publicData = await fetchJson('/.netlify/functions/public-events');
+        publicData = await fetchAllPublicEvents();
       } catch (error) {
         publicError = error;
       }
