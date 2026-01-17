@@ -262,6 +262,21 @@ import {
     return response.json();
   };
 
+  const fetchPublicEventById = async (eventId) => {
+    if (!eventId) return null;
+    try {
+      const payload = await fetchJson(
+        `/.netlify/functions/public-event?id=${encodeURIComponent(eventId)}`
+      );
+      if (payload && payload.ok && payload.event) {
+        return payload.event;
+      }
+    } catch (error) {
+      return null;
+    }
+    return null;
+  };
+
   const fetchAdminEventById = async (eventId) => {
     if (!eventId) return null;
     try {
@@ -281,7 +296,7 @@ import {
   };
 
   const fetchAllPublicEvents = async () => {
-    const limit = 100;
+    const limit = 50;
     const maxPages = 50;
     const collected = [];
     for (let page = 1; page <= maxPages; page += 1) {
@@ -2838,6 +2853,12 @@ import {
               return;
             }
             renderEventDetail(eventData);
+            if (!eventData.description) {
+              fetchPublicEventById(eventId).then((publicEvent) => {
+                if (!publicEvent) return;
+                renderEventDetail({ ...eventData, ...publicEvent });
+              });
+            }
             return;
           }
           if (!isAdmin) {

@@ -31,8 +31,8 @@ type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: stri
 
 const parseLimit = (value?: string) => {
   const numeric = Number.parseInt(value || '', 10);
-  if (!Number.isFinite(numeric) || numeric <= 0) return 100;
-  return Math.min(numeric, 200);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 50;
+  return Math.min(numeric, 100);
 };
 
 const parsePage = (value?: string) => {
@@ -54,7 +54,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         limit: String(limit),
         offset: String(offset),
         select:
-          'id,external_id,slug,title,description,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'
+          'id,external_id,slug,title,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'
       }
     })) as any[];
     const eventIds = events.map((event) => event.id).filter(Boolean);
@@ -98,7 +98,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         id: event.external_id || event.id,
         slug: event.slug || event.external_id || event.id,
         title: event.title || 'Untitled event',
-        description: event.description || '',
+        description: '',
         tags: eventTags.map(mapTag),
         start: event.start_at || '',
         end: event.end_at || null,

@@ -140,7 +140,7 @@ export const deleteLocalEvent = (event, actorEmail) => {
 };
 
 const fetchAllPublicEvents = async () => {
-  const limit = 100;
+  const limit = 50;
   const maxPages = 50;
   const collected = [];
   for (let page = 1; page <= maxPages; page += 1) {
