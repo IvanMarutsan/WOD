@@ -1,30 +1,8 @@
 import { test, expect } from '@playwright/test';
-
-const stubAdminIdentity = async (page) => {
-  await page.addInitScript(() => {
-    window.netlifyIdentity = {
-      _handlers: {},
-      on(event, cb) {
-        this._handlers[event] = cb;
-      },
-      init() {
-        if (this._handlers.init) this._handlers.init(null);
-      },
-      currentUser() {
-        return null;
-      },
-      open() {},
-      close() {},
-      logout() {
-        if (this._handlers.logout) this._handlers.logout();
-      }
-    };
-    localStorage.setItem('wodAdminSession', '1');
-  });
-};
+import { enableAdminSession } from './helpers';
 
 test('admin can archive and restore event from detail page', async ({ page }) => {
-  await stubAdminIdentity(page);
+  await enableAdminSession(page);
   await page.goto('/event-card.html?id=evt-006');
   await page.waitForSelector('[data-event-title]');
 
@@ -58,7 +36,7 @@ test('archived events are visible for admin in catalog and detail', async ({ pag
     localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
     localStorage.setItem('wodAuditLog', JSON.stringify([]));
   });
-  await stubAdminIdentity(page);
+  await enableAdminSession(page);
   await page.goto('/main-page.html#events');
   const archivedToggle = page.locator('input[name="show-archived"]');
   await expect(archivedToggle).toBeVisible();
@@ -76,7 +54,7 @@ test('archived events are visible for admin in catalog and detail', async ({ pag
 });
 
 test('admin can delete event from detail page with confirm', async ({ page }) => {
-  await stubAdminIdentity(page);
+  await enableAdminSession(page);
   await page.goto('/event-card.html?id=evt-006');
   await page.waitForSelector('[data-event-title]');
 
@@ -102,7 +80,7 @@ test('admin can restore archived event from admin archive', async ({ page }) => 
     localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
     localStorage.setItem('wodAuditLog', JSON.stringify([]));
   });
-  await stubAdminIdentity(page);
+  await enableAdminSession(page);
   await page.goto('/admin-page.html');
 
   const card = page.locator('[data-admin-archive-card][data-event-id="evt-arch-1"]');
@@ -126,7 +104,7 @@ test('admin can delete archived event from admin archive with confirm', async ({
     localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
     localStorage.setItem('wodAuditLog', JSON.stringify([]));
   });
-  await stubAdminIdentity(page);
+  await enableAdminSession(page);
   await page.goto('/admin-page.html');
 
   const card = page.locator('[data-admin-archive-card][data-event-id="evt-arch-2"]');

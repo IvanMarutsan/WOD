@@ -172,6 +172,23 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     )}:${pad(date.getMinutes())}`;
   };
 
+  const toOffsetISO = (value) => {
+    const date = parseDateTime(value);
+    if (!date) return value || '';
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hour = pad(date.getHours());
+    const minute = pad(date.getMinutes());
+    const offsetMinutes = -date.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const abs = Math.abs(offsetMinutes);
+    const offsetHour = pad(Math.floor(abs / 60));
+    const offsetMinute = pad(abs % 60);
+    return `${year}-${month}-${day}T${hour}:${minute}:00${sign}${offsetHour}:${offsetMinute}`;
+  };
+
   const guessCity = (address) => {
     const normalized = String(address || '').toLowerCase();
     const map = [
@@ -619,6 +636,8 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       const eventId = editingEventId;
       const priceInput = payload.price ? String(payload.price).trim() : '';
       const { min: priceMin, max: priceMax } = parsePriceInput(priceInput);
+      payload.start = toOffsetISO(payload.start);
+      payload.end = toOffsetISO(payload.end);
       if (isLocalHost) {
         const localId = eventId || buildLocalEventId();
         const nextEvent = {

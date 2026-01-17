@@ -18,7 +18,7 @@ test('past events hidden by default and banner on detail', async ({ page }) => {
   // If there are no past events in fixtures, empty state should be visible
   const pastCards = page.locator('[data-status="past"]');
   if ((await pastCards.count()) === 0) {
-    await expect(page.getByText(/Немає подій|No events/i)).toBeVisible();
+    await expect(page.locator('.catalog-empty [data-i18n="empty_state"]')).toBeVisible();
   } else {
     await pastCards.first().locator('.event-card__title a').click();
   }

@@ -79,44 +79,33 @@ import {
   };
 
   const initAdminLinks = async () => {
-    if (!adminLinks.length) return;
-    adminLinks.forEach((link) => {
-      if (!(link instanceof HTMLElement)) return;
-      link.hidden = true;
-    });
-    adminOnlyItems.forEach((item) => {
-      if (!(item instanceof HTMLElement)) return;
-      item.hidden = true;
-    });
+    const setAdminVisibility = (showAdmin) => {
+      document.body.classList.toggle('is-admin', showAdmin);
+      adminLinks.forEach((link) => {
+        if (!(link instanceof HTMLElement)) return;
+        link.hidden = !showAdmin;
+      });
+      adminOnlyItems.forEach((item) => {
+        if (!(item instanceof HTMLElement)) return;
+        item.hidden = !showAdmin;
+      });
+      if (showAdmin && typeof refreshAdminData === 'function') {
+        refreshAdminData();
+      }
+    };
+    setAdminVisibility(Boolean(getAdminIdentity() || hasLocalAdminSession()));
     const identity = await loadIdentityWidget();
     if (!identity) return;
     identity.on('init', (user) => {
       const showAdmin = Boolean((user && hasAdminRole(user)) || hasLocalAdminSession());
-      adminLinks.forEach((link) => {
-        if (!(link instanceof HTMLElement)) return;
-        link.hidden = !showAdmin;
-      });
-      adminOnlyItems.forEach((item) => {
-        if (!(item instanceof HTMLElement)) return;
-        item.hidden = !showAdmin;
-      });
-      if (showAdmin && typeof refreshAdminData === 'function') {
-        refreshAdminData();
-      }
+      setAdminVisibility(showAdmin);
     });
     identity.on('login', (user) => {
       const showAdmin = Boolean(user && hasAdminRole(user));
-      adminLinks.forEach((link) => {
-        if (!(link instanceof HTMLElement)) return;
-        link.hidden = !showAdmin;
-      });
-      adminOnlyItems.forEach((item) => {
-        if (!(item instanceof HTMLElement)) return;
-        item.hidden = !showAdmin;
-      });
-      if (showAdmin && typeof refreshAdminData === 'function') {
-        refreshAdminData();
-      }
+      setAdminVisibility(showAdmin);
+    });
+    identity.on('logout', () => {
+      setAdminVisibility(false);
     });
     identity.init();
   };
@@ -1025,6 +1014,10 @@ import {
         pendingCatalogState.filters = current;
         return;
       }
+      if (current && stored !== current) {
+        pendingCatalogState.filters = current;
+        return;
+      }
       if (stored === current) {
         pendingCatalogState.filters = current;
         return;
@@ -1538,7 +1531,10 @@ import {
       const pageSlice = getPageSlice(state.filteredEvents, currentPage, pageSize);
       currentPage = pageSlice.currentPage;
       totalPages = pageSlice.totalPages;
-      const list = pageSlice.items;
+    const list = pageSlice.items;
+    if (currentPage > 1) {
+      console.log('renderApp page', currentPage, 'first event', list[0]?.title);
+    }
       renderEvents(list);
       renderHighlights(state.events);
       const liveEvents = getLiveEvents(state.events);

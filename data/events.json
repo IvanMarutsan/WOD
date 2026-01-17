@@ -22,8 +22,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-04T12:00:00",
-    "end": "2026-01-04T14:00:00",
+    "start": "2031-01-04T12:00:00",
+    "end": "2031-01-04T14:00:00",
     "format": "offline",
     "venue": "Kødbyen Creative Hub",
     "address": "Flæsketorvet 10, 1711 København",
@@ -74,8 +74,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-05T13:00:00",
-    "end": "2026-01-05T15:00:00",
+    "start": "2031-01-05T13:00:00",
+    "end": "2031-01-05T15:00:00",
     "format": "offline",
     "venue": "Latin Quarter Square",
     "address": "Klostertorvet 4, 8000 Aarhus",
@@ -126,8 +126,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-06T14:00:00",
-    "end": "2026-01-06T16:00:00",
+    "start": "2031-01-06T14:00:00",
+    "end": "2031-01-06T16:00:00",
     "format": "offline",
     "venue": "Odense Harbor",
     "address": "Havnegade 7, 5000 Odense",
@@ -178,8 +178,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-07T15:00:00",
-    "end": "2026-01-07T17:00:00",
+    "start": "2031-01-07T15:00:00",
+    "end": "2031-01-07T17:00:00",
     "format": "offline",
     "venue": "Nordkraft",
     "address": "Teglgårds Plads 1, 9000 Aalborg",
@@ -282,8 +282,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-15T09:00:00+01:00",
-    "end": "2026-01-15T11:00:00+01:00",
+    "start": "2031-01-15T09:00:00+01:00",
+    "end": "2031-01-15T11:00:00+01:00",
     "format": "offline",
     "venue": "Union Kitchen",
     "address": "Åboulevarden 18, 8000 Aarhus",
@@ -1062,8 +1062,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-11T18:00:00+01:00",
-    "end": "2026-01-11T20:00:00+01:00",
+    "start": "2031-01-11T18:00:00+01:00",
+    "end": "2031-01-11T20:00:00+01:00",
     "format": "offline",
     "venue": "Community Hub",
     "address": "Vesterbrogade 1, 1620 København",
@@ -1114,8 +1114,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-12T17:30:00+01:00",
-    "end": "2026-01-12T19:00:00+01:00",
+    "start": "2031-01-12T17:30:00+01:00",
+    "end": "2031-01-12T19:00:00+01:00",
     "format": "offline",
     "venue": "Aarhus Library Lounge",
     "address": "Hack Kampmanns Pl. 2, 8000 Aarhus",
@@ -1166,8 +1166,8 @@
         "status": "approved"
       }
     ],
-    "start": "2026-01-16T19:00:00+01:00",
-    "end": "2026-01-16T20:30:00+01:00",
+    "start": "2031-01-16T19:00:00+01:00",
+    "end": "2031-01-16T20:30:00+01:00",
     "format": "offline",
     "venue": "Odense Business Lab",
     "address": "Søndergade 19, 5000 Odense",

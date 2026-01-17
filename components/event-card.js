@@ -18,11 +18,22 @@ export const EventCard = (event, helpers) => {
     getLocalizedTag,
     getLocalizedEventTitle,
     getLocalizedCity,
+    getCitySlug,
+    isCityPart,
     formatDateRange,
     isPast,
     isArchived
   } = helpers;
   const normalizePart = (value) => String(value || '').trim().toLowerCase();
+  const normalizeLocationPart = (value) =>
+    String(value || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   const image = event.images && event.images.length ? event.images[0] : '';
   const priceInfo =
     event.priceType === 'free'
@@ -55,12 +66,30 @@ export const EventCard = (event, helpers) => {
   const ticketUrl = event.ticketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
-  const venue = event.venue || event.address || '';
-  let locationParts = [venue, cityLabel].filter((part) => part && String(part).trim());
-  if (venue && cityLabel && normalizePart(venue).includes(normalizePart(cityLabel))) {
-    locationParts = [venue];
+  const citySlug = getCitySlug ? getCitySlug(event.city) : '';
+  const venue = event.venue || '';
+  const address = event.address || '';
+  const rawParts = [venue, address].filter((part) => part && String(part).trim());
+  const filtered = citySlug && typeof isCityPart === 'function'
+    ? rawParts.filter((part) => !isCityPart(part, citySlug))
+    : rawParts;
+  const uniqueParts = [];
+  const seen = [];
+  filtered.forEach((part) => {
+    const key = normalizeLocationPart(part) || normalizePart(part);
+    if (!key) return;
+    if (seen.some((prev) => prev === key || prev.includes(key) || key.includes(prev))) return;
+    seen.push(key);
+    uniqueParts.push(part);
+  });
+  if (cityLabel) {
+    const cityKey = normalizeLocationPart(cityLabel) || normalizePart(cityLabel);
+    if (cityKey && !seen.some((prev) => prev === cityKey || prev.includes(cityKey) || cityKey.includes(prev))) {
+      uniqueParts.push(cityLabel);
+      seen.push(cityKey);
+    }
   }
-  const location = locationParts.join(' · ');
+  const location = uniqueParts.filter(Boolean).join(' · ');
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';
   return `
         <article class="${cardClass}" data-event-id="${event.id}" data-status="${statusLabel}" data-testid="event-card">

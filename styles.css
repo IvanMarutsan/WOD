@@ -608,6 +608,7 @@ button:disabled,
   background-position: center;
   background-repeat: no-repeat;
   background-color: var(--surface);
+  order: 1;
 }
 
 .hero-card__media--placeholder {
@@ -619,6 +620,11 @@ button:disabled,
   justify-content: space-between;
   font-size: 0.85rem;
   color: var(--muted);
+  order: 0;
+}
+
+.hero-card__body {
+  order: 2;
 }
 
 .status {
@@ -1142,6 +1148,10 @@ button:disabled,
   flex-wrap: wrap;
 }
 
+body:not(.is-admin) [data-admin-only] {
+  display: none !important;
+}
+
 .filters__actions .btn.ghost {
   background: transparent;
   color: var(--text);
@@ -1503,16 +1513,30 @@ button:disabled,
 }
 
 .highlights__title-wrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
   padding: 6px 10px;
   border-radius: 10px;
-  background: rgba(2, 6, 23, 0.35);
+  overflow: hidden;
   text-shadow: 0 1px 6px rgba(2, 6, 23, 0.5);
 }
 
+.highlights__title-wrap h3 {
+  position: relative;
+  z-index: 1;
+}
+
+.highlights__title-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.35);
+  z-index: 0;
+}
+
 @supports (backdrop-filter: blur(6px)) {
-  .highlights__title-wrap {
+  .highlights__title-wrap::before {
     background: rgba(2, 6, 23, 0.2);
     backdrop-filter: blur(6px);
   }

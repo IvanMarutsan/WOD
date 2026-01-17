@@ -56,7 +56,7 @@
         </nav>
         <div class="header-utils">
           <!-- Add event CTA disabled (admin-only for now). -->
-          <a class="btn ghost" href="./admin-page.html" data-admin-link data-i18n="admin_nav" hidden>Адмінка</a>
+          <a class="btn ghost" href="./admin-page.html" data-admin-link data-admin-only data-i18n="admin_nav">Адмінка</a>
           <!-- Language switcher disabled (Ukrainian-only for now). -->
         </div>
       </div>
@@ -223,15 +223,12 @@
               Повторити
             </button>
           </div>
-          <div class="catalog-nav" aria-label="Навігація списку подій">
+          <nav class="catalog-nav" aria-label="Навігація списку подій">
             <button class="btn ghost" type="button" data-action="events-reset" data-i18n="events_reset" hidden>
               Повернутися до актуальних подій
             </button>
             <div class="catalog-pages" data-catalog-pages hidden></div>
-            <button class="btn ghost" type="button" data-action="events-next" data-i18n="events_next">
-              Показати наступні події
-            </button>
-          </div>
+          </nav>
         </div>
       </section>
 
