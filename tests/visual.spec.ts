@@ -87,3 +87,24 @@ for (const route of routes) {
     }
   });
 }
+
+test.describe('visual: mobile', () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test('mobile events grid', async ({ page }) => {
+    await freezeTime(page);
+    await page.addInitScript(() => {
+      Math.random = () => 0.42;
+    });
+    await page.addInitScript(() => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    });
+    await page.goto('/main-page.html#events');
+    const catalog = page.locator('#events');
+    await catalog.scrollIntoViewIfNeeded();
+    await page.waitForSelector('[data-testid="event-card"]', { timeout: 10000 });
+    const grid = page.locator('.catalog-grid');
+    await expect(grid).toBeVisible();
+    expect(await grid.screenshot()).toMatchSnapshot('events-grid-mobile.png', { maxDiffPixels: 200 });
+  });
+});

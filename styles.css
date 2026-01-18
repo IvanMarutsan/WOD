@@ -1188,6 +1188,7 @@ body:not(.is-admin) [data-admin-only] {
   grid-template-rows: 160px 1fr;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
+  min-width: 0;
 }
 
 .event-card:hover {
@@ -1201,12 +1202,14 @@ body:not(.is-admin) [data-admin-only] {
   object-fit: cover;
   object-position: center;
   display: block;
+  aspect-ratio: 4 / 3;
 }
 
 .event-card__image--placeholder {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, rgba(17, 24, 39, 0.08), rgba(17, 24, 39, 0.2));
+  aspect-ratio: 4 / 3;
 }
 
 .event-card img {
@@ -1215,6 +1218,16 @@ body:not(.is-admin) [data-admin-only] {
   object-fit: cover;
   object-position: center;
   display: block;
+}
+
+@media (max-width: 720px) {
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .event-card {
+    grid-template-rows: 200px 1fr;
+  }
 }
 
 .event-card__body {
@@ -1259,7 +1272,11 @@ body:not(.is-admin) [data-admin-only] {
 }
 
 .event-card__price--paid {
-  color: var(--text);
+  background: var(--ua-blue);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
 }
 
 .event-card__title {
@@ -1415,6 +1432,7 @@ body:not(.is-admin) [data-admin-only] {
 
 .highlights {
   padding: calc(var(--space) * 2) 0;
+  position: relative;
 }
 
 .highlights__header {
@@ -1429,6 +1447,18 @@ body:not(.is-admin) [data-admin-only] {
 .highlights__controls {
   display: inline-flex;
   gap: 8px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.highlights__button {
+  pointer-events: auto;
 }
 
 .highlights__track {
@@ -1438,6 +1468,7 @@ body:not(.is-admin) [data-admin-only] {
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 8px;
+  padding-inline: 44px;
   scroll-behavior: smooth;
 }
 

@@ -1,7 +1,10 @@
 export const HighlightCard = (event, helpers) => {
-  const { formatShortDate, getLocalizedEventTitle, getLocalizedCity } = helpers;
+  const { formatShortDate, getLocalizedEventTitle, getLocalizedCity, formatMessage } = helpers;
   const title = getLocalizedEventTitle(event);
-  const city = getLocalizedCity(event.city, event);
+  const isOnline = String(event.format || '').toLowerCase() === 'online';
+  const city = isOnline
+    ? formatMessage('online', {})
+    : getLocalizedCity(event.city, event);
   const dateLabel = formatShortDate(event.start);
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const image =

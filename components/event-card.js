@@ -63,7 +63,9 @@ export const EventCard = (event, helpers) => {
   const tags = baseTags.map((tag) => buildTagMarkup(tag, helpers)).join('');
   const ticketKey = event.priceType === 'free' ? 'register_cta' : 'ticket_cta';
   const ticketLabel = formatMessage(ticketKey, {});
-  const ticketUrl = event.ticketUrl || '#';
+  const rawTicketUrl = event.ticketUrl || '';
+  const showTicketCta = event.priceType !== 'free' || Boolean(rawTicketUrl);
+  const ticketUrl = rawTicketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
   const citySlug = getCitySlug ? getCitySlug(event.city) : '';
@@ -108,7 +110,7 @@ export const EventCard = (event, helpers) => {
               ${tags}
             </div>
             <div class="event-card__actions">
-              <a class="event-card__cta event-card__cta--ticket" href="${ticketUrl}" rel="noopener" data-testid="ticket-cta" data-i18n="${ticketKey}">${ticketLabel}</a>
+              ${showTicketCta ? `<a class="event-card__cta event-card__cta--ticket" href="${ticketUrl}" rel="noopener" data-testid="ticket-cta" data-i18n="${ticketKey}">${ticketLabel}</a>` : ''}
               <a class="event-card__cta event-card__cta--details" href="${detailUrl}" data-i18n="cta_details">${formatMessage('cta_details', {})}</a>
             </div>
           </div>

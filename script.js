@@ -28,6 +28,8 @@ import {
   const heroKicker = document.querySelector('[data-hero-kicker]');
   const heroStatus = document.querySelector('[data-hero-status]');
   let refreshAdminData = null;
+  let scheduleHighlightsControls = () => {};
+  const heroImageCache = new Map();
   const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
   const queryParams = new URLSearchParams(window.location.search);
   const forceServerless = queryParams.get('serverless') === '1';
@@ -1383,6 +1385,7 @@ import {
 
     const highlightCardHelpers = {
       formatShortDate,
+      formatMessage,
       getLocalizedEventTitle,
       getLocalizedCity: (value, event) => {
         const localized = getLocalizedCity(value);
@@ -1425,6 +1428,7 @@ import {
 
       const selection = selectHighlights(upcomingWeek, 6);
       highlightsTrack.innerHTML = selection.map((event) => HighlightCard(event, highlightCardHelpers)).join('');
+      scheduleHighlightsControls();
     };
 
     const getNextUpcomingEvent = (filters) => {
@@ -1499,9 +1503,27 @@ import {
           (event.images && event.images.length ? event.images[0] : '') ||
           event.imageUrl ||
           event.image_url ||
+          heroImageCache.get(event.id) ||
           '';
         heroMedia.style.backgroundImage = image ? `url("${image}")` : '';
         heroMedia.classList.toggle('hero-card__media--placeholder', !image);
+        heroMedia.dataset.eventId = event.id || '';
+        if (!image && event.id) {
+          const currentId = event.id;
+          fetchPublicEventById(currentId).then((payload) => {
+            if (!payload) return;
+            const detailImage =
+              (payload.images && payload.images.length ? payload.images[0] : '') ||
+              payload.imageUrl ||
+              payload.image_url ||
+              '';
+            if (!detailImage) return;
+            heroImageCache.set(currentId, detailImage);
+            if (heroMedia.dataset.eventId !== currentId) return;
+            heroMedia.style.backgroundImage = `url("${detailImage}")`;
+            heroMedia.classList.remove('hero-card__media--placeholder');
+          });
+        }
       }
       const tagLabels = [];
       const firstTag = getTagList(event.tags)[0];
@@ -1804,7 +1826,7 @@ import {
         nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       setFilteredEvents(nextFilteredEvents);
-      renderTagFilters(nextFilteredEvents);
+      renderTagFilters(state.events);
       totalPages = getTotalPages(nextFilteredEvents.length, pageSize);
       currentPage = clampPage(currentPage, totalPages);
       if (nextEventsButton) {
@@ -2666,10 +2688,16 @@ import {
       eventPrice.dataset.priceMax = eventData.priceMax ?? '';
     }
     if (ticketCtas.length) {
+      const hasTicketLink = Boolean(eventData.ticketUrl);
+      const hideTicketCta = eventData.priceType === 'free' && !hasTicketLink;
       ticketCtas.forEach((cta) => {
         cta.href = eventData.ticketUrl || '#';
         cta.dataset.eventId = eventData.id || '';
+        cta.hidden = hideTicketCta;
       });
+      if (ticketNote) {
+        ticketNote.hidden = hideTicketCta;
+      }
     }
     const hasOrganizer =
       Boolean(eventData.contactPerson?.name) ||
@@ -2918,6 +2946,13 @@ import {
     const prevButton = document.querySelector('.highlights__button[data-action="prev"]');
     const nextButton = document.querySelector('.highlights__button[data-action="next"]');
     const getStep = () => highlightsTrack.clientWidth * 0.8;
+    const updateControls = () => {
+      if (!prevButton || !nextButton) return;
+      const hasOverflow = highlightsTrack.scrollWidth - highlightsTrack.clientWidth > 4;
+      prevButton.hidden = !hasOverflow;
+      nextButton.hidden = !hasOverflow;
+    };
+    scheduleHighlightsControls = () => requestAnimationFrame(updateControls);
 
     const scrollByStep = (direction) => {
       highlightsTrack.scrollBy({ left: direction * getStep(), behavior: 'smooth' });
@@ -2944,6 +2979,13 @@ import {
         event.preventDefault();
         scrollByStep(-1);
       }
+    });
+
+    window.addEventListener('resize', () => {
+      scheduleHighlightsControls();
+    });
+    highlightsTrack.addEventListener('scroll', () => {
+      scheduleHighlightsControls();
     });
   }
 })();
