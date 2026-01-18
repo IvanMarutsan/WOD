@@ -1116,6 +1116,13 @@ import {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
+    const syncShowPastToggle = () => {
+      if (!showPastField) return;
+      const label = showPastField.closest('.filters__toggle');
+      if (!label) return;
+      label.classList.toggle('filters__toggle--active', showPastField.checked);
+    };
+
     const matchesActiveFilters = (event) => {
       if (activeFilters.city) {
         if (getCitySlug(event.city) !== activeFilters.city) {
@@ -2162,6 +2169,7 @@ import {
           showPast.checked = params.get('past') === '1';
         }
         syncPresetButtons();
+        syncShowPastToggle();
       }
       if (searchInputs.length) {
         syncSearchInputs(params.get('q') || '');
@@ -2322,6 +2330,7 @@ import {
           }
           if (target === showPastField) {
             syncPastFilterState(true);
+            syncShowPastToggle();
           }
           syncPresetButtons();
         }
@@ -2353,6 +2362,7 @@ import {
           }
           syncPastFilterState(true);
           syncPresetButtons();
+          syncShowPastToggle();
           if (filtersForm) {
             filtersForm.elements.city.value = '';
             filtersForm.elements.price.value = '';

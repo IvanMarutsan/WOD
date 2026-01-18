@@ -954,23 +954,21 @@ button:disabled,
   pointer-events: none;
 }
 
-.filters__tag--selected,
-.filters__tag:has(input:checked) {
+.filters__tag--selected {
   background: var(--accent-2);
   color: #fff;
   border-color: var(--accent-2);
 }
 
-.filters__tag[data-tone='warm'].filters__tag--selected,
-.filters__tag[data-tone='warm']:has(input:checked) {
+.filters__tag[data-tone='warm'].filters__tag--selected {
   background: var(--accent-warm);
   color: #111;
   border-color: var(--accent-warm);
 }
 
-.filters__tag:not(.filters__tag--selected):not(:has(input:checked)):hover,
-.filters__tag:not(.filters__tag--selected):not(:has(input:checked)):focus-visible,
-.filters__tag:not(.filters__tag--selected):not(:has(input:checked)):has(input:focus-visible) {
+.filters__tag:not(.filters__tag--selected):hover,
+.filters__tag:not(.filters__tag--selected):focus-visible,
+.filters__tag:not(.filters__tag--selected):focus-within {
   outline: none;
   border-color: var(--accent-2);
   background: rgba(0, 87, 183, 0.08);
@@ -1057,15 +1055,22 @@ button:disabled,
   pointer-events: none;
 }
 
-.filters__toggle:has(input:checked),
+.filters__toggle--active,
 .filters__toggle[aria-pressed="true"] {
   background: var(--accent-2);
   color: #fff;
   border-color: rgba(0, 87, 183, 0.6);
 }
 
-.filters__toggle:has(input:focus-visible),
-.filters__toggle:focus-visible {
+.filters__toggle:hover,
+.filters__toggle:focus-visible,
+.filters__toggle:focus-within {
+  background: rgba(0, 87, 183, 0.08);
+  border-color: var(--accent-2);
+}
+
+.filters__toggle:focus-visible,
+.filters__toggle:focus-within {
   box-shadow: var(--focus-ring);
 }
 
@@ -1459,6 +1464,24 @@ body:not(.is-admin) [data-admin-only] {
 
 .highlights__button {
   pointer-events: auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(11, 16, 32, 0.12);
+  color: var(--text);
+  box-shadow: 0 8px 20px rgba(11, 16, 32, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.highlights__button:hover,
+.highlights__button:focus-visible {
+  background: var(--surface);
+  border-color: rgba(11, 16, 32, 0.2);
+  box-shadow: 0 10px 24px rgba(11, 16, 32, 0.18);
 }
 
 .highlights__track {
