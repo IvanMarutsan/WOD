@@ -1033,6 +1033,8 @@ button:disabled,
   padding: 8px 12px;
   border-radius: 999px;
   font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .filters__preset-input {
@@ -1067,6 +1069,17 @@ button:disabled,
 .filters__toggle:focus-within {
   background: rgba(0, 87, 183, 0.08);
   border-color: var(--accent-2);
+}
+
+.filters__toggle--active:hover,
+.filters__toggle--active:focus-visible,
+.filters__toggle--active:focus-within,
+.filters__toggle[aria-pressed="true"]:hover,
+.filters__toggle[aria-pressed="true"]:focus-visible,
+.filters__toggle[aria-pressed="true"]:focus-within {
+  background: var(--accent-2);
+  color: #fff;
+  border-color: rgba(0, 87, 183, 0.6);
 }
 
 .filters__toggle:focus-visible,
@@ -1208,6 +1221,7 @@ body:not(.is-admin) [data-admin-only] {
   object-position: center;
   display: block;
   aspect-ratio: 4 / 3;
+  min-height: 160px;
 }
 
 .event-card__image--placeholder {
@@ -1215,6 +1229,7 @@ body:not(.is-admin) [data-admin-only] {
   height: 100%;
   background: linear-gradient(135deg, rgba(17, 24, 39, 0.08), rgba(17, 24, 39, 0.2));
   aspect-ratio: 4 / 3;
+  min-height: 160px;
 }
 
 .event-card img {
@@ -1241,6 +1256,7 @@ body:not(.is-admin) [data-admin-only] {
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+  background: var(--card);
 }
 
 .event-card__meta {
@@ -1437,7 +1453,6 @@ body:not(.is-admin) [data-admin-only] {
 
 .highlights {
   padding: calc(var(--space) * 2) 0;
-  position: relative;
 }
 
 .highlights__header {
@@ -1449,6 +1464,11 @@ body:not(.is-admin) [data-admin-only] {
   margin-bottom: 12px;
 }
 
+.highlights__stage {
+  position: relative;
+  width: 100%;
+}
+
 .highlights__controls {
   display: inline-flex;
   gap: 8px;
@@ -1456,6 +1476,7 @@ body:not(.is-admin) [data-admin-only] {
   top: 50%;
   left: 0;
   right: 0;
+  padding: 0 8px;
   transform: translateY(-50%);
   justify-content: space-between;
   pointer-events: none;
@@ -1466,6 +1487,7 @@ body:not(.is-admin) [data-admin-only] {
   pointer-events: auto;
   width: 40px;
   height: 40px;
+  padding: 0;
   border-radius: 999px;
   background: #fff;
   border: 1px solid rgba(11, 16, 32, 0.12);
@@ -1491,8 +1513,13 @@ body:not(.is-admin) [data-admin-only] {
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 8px;
-  padding-inline: 44px;
+  padding-inline: 32px;
   scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.highlights__track::-webkit-scrollbar {
+  display: none;
 }
 
 .highlights__track:focus-visible {

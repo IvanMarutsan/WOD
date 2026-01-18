@@ -97,16 +97,18 @@
         <div class="container">
           <div class="highlights__header">
             <h2 id="highlights-title" data-i18n="highlights_title">Тижневі добірки</h2>
+          </div>
+          <div class="highlights__stage">
             <div class="highlights__controls">
-              <button class="btn ghost highlights__button" type="button" data-action="prev" aria-label="Previous highlights" data-i18n="highlights_prev" data-i18n-aria="highlights_prev_aria">
-                Назад
+              <button class="btn highlights__button" type="button" data-action="prev" aria-label="Previous highlights" data-i18n="highlights_prev" data-i18n-aria="highlights_prev_aria">
+                <span aria-hidden="true">&lt;</span>
               </button>
-              <button class="btn ghost highlights__button" type="button" data-action="next" aria-label="Next highlights" data-i18n="highlights_next" data-i18n-aria="highlights_next_aria">
-                Далі
+              <button class="btn highlights__button" type="button" data-action="next" aria-label="Next highlights" data-i18n="highlights_next" data-i18n-aria="highlights_next_aria">
+                <span aria-hidden="true">&gt;</span>
               </button>
             </div>
+            <div class="highlights__track" role="region" tabindex="0" aria-label="Список тижневих добірок" data-i18n-aria="highlights_list_aria"></div>
           </div>
-          <div class="highlights__track" role="region" tabindex="0" aria-label="Список тижневих добірок" data-i18n-aria="highlights_list_aria"></div>
         </div>
       </section>
 
