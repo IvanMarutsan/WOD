@@ -105,6 +105,20 @@ test.describe('visual: mobile', () => {
     await page.waitForSelector('[data-testid="event-card"]', { timeout: 10000 });
     const grid = page.locator('.catalog-grid');
     await expect(grid).toBeVisible();
+    await page.evaluate(async () => {
+      const images = Array.from(document.querySelectorAll('.event-card__image'));
+      images.forEach((img) => img.setAttribute('loading', 'eager'));
+      await Promise.all(
+        images.map(
+          (img) =>
+            img.complete ||
+            new Promise((resolve) => {
+              img.addEventListener('load', resolve, { once: true });
+              img.addEventListener('error', resolve, { once: true });
+            })
+        )
+      );
+    });
     expect(await grid.screenshot()).toMatchSnapshot('events-grid-mobile.png', { maxDiffPixels: 200 });
   });
 });
