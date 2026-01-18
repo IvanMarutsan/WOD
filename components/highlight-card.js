@@ -1,7 +1,11 @@
 export const HighlightCard = (event, helpers) => {
   const { formatShortDate, getLocalizedEventTitle, getLocalizedCity, formatMessage } = helpers;
   const title = getLocalizedEventTitle(event);
-  const isOnline = String(event.format || '').toLowerCase() === 'online';
+  const formatValue = String(event.format || '').toLowerCase();
+  const hasOnlineLocation = [event.address, event.venue].some((value) =>
+    /zoom|meet|teams|online|webinar/i.test(String(value || ''))
+  );
+  const isOnline = formatValue.includes('online') || hasOnlineLocation;
   const city = isOnline
     ? formatMessage('online', {})
     : getLocalizedCity(event.city, event);
