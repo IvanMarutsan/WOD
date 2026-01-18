@@ -1,4 +1,5 @@
 import { supabaseFetch } from './supabase';
+import { uploadEventImage } from './storage';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
@@ -159,6 +160,11 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const parsedPrice = parsePriceInput(payload.price);
     const resolvedMin = Number.isFinite(priceMin) ? priceMin : parsedPrice.min;
     const resolvedMax = Number.isFinite(priceMax) ? priceMax : parsedPrice.max;
+    let imageUrl = payload.imageUrl || payload.image_url || null;
+    if (typeof imageUrl === 'string' && imageUrl.trim().startsWith('data:')) {
+      const upload = await uploadEventImage(imageUrl.trim(), `events/${id}-${Date.now()}`);
+      imageUrl = upload?.url || null;
+    }
     const eventRow = (await supabaseFetch('events', {
       method: 'POST',
       body: [
@@ -178,7 +184,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
           price_min: Number.isFinite(resolvedMin) ? resolvedMin : null,
           price_max: Number.isFinite(resolvedMax) ? resolvedMax : null,
           registration_url: payload['ticket-url'] || '',
-          image_url: payload.imageUrl || payload.image_url || null,
+          image_url: imageUrl,
           status,
           organizer_id: organizerId
         }

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "seed:supabase": "node scripts/seed-supabase.mjs",
+    "migrate:event-images": "node scripts/migrate-event-images.mjs",
     "dev": "http-server . -p 5173 -c-1",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",

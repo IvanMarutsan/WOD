@@ -1,4 +1,5 @@
 import { supabaseFetch } from './supabase';
+import { uploadEventImage } from './storage';
 
 type HandlerEvent = { body?: string; headers?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { email?: string; app_metadata?: { roles?: string[] } } } };
@@ -93,7 +94,15 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
         updatePayload.price_max = Number.isFinite(max) ? max : null;
       }
     }
-    if (updates.imageUrl) updatePayload.image_url = String(updates.imageUrl);
+    if (updates.imageUrl !== undefined) {
+      const rawImage = String(updates.imageUrl || '');
+      if (rawImage.startsWith('data:')) {
+        const upload = await uploadEventImage(rawImage, `events/${existing.external_id || existing.id}-${Date.now()}`);
+        updatePayload.image_url = upload?.url || '';
+      } else {
+        updatePayload.image_url = rawImage;
+      }
+    }
     if (Object.keys(updatePayload).length) {
       await supabaseFetch('events', {
         method: 'PATCH',
