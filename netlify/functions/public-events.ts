@@ -26,6 +26,15 @@ const mapOrganizer = (organizer?: {
   };
 };
 
+const sanitizeImageUrl = (value?: string) => {
+  if (!value) return '';
+  const trimmed = String(value).trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('data:')) return '';
+  if (trimmed.length > 2048) return '';
+  return trimmed;
+};
+
 type HandlerEvent = { queryStringParameters?: Record<string, string> };
 type HandlerContext = { clientContext?: { user?: { app_metadata?: { roles?: string[] } } } };
 
@@ -94,6 +103,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
       const eventTags = tagsByEvent.get(event.id) || [];
       const organizer = organizersById.get(event.organizer_id);
       const contactPerson = mapOrganizer(organizer);
+      const imageUrl = sanitizeImageUrl(event.image_url);
       return {
         id: event.external_id || event.id,
         slug: event.slug || event.external_id || event.id,
@@ -111,7 +121,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
         priceMax: event.price_max ?? null,
         ticketUrl: event.registration_url || '',
         organizerId: event.organizer_id || '',
-        images: event.image_url ? [event.image_url] : [],
+        images: imageUrl ? [imageUrl] : [],
         status: event.status || 'published',
         language: event.language || '',
         forUkrainians: true,
