@@ -67,7 +67,17 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
 
     const updatePayload: Record<string, unknown> = {};
     if (updates.title) updatePayload.title = String(updates.title);
-    if (updates.description) updatePayload.description = String(updates.description);
+    if (updates.description !== undefined) {
+      const description = String(updates.description || '').trim();
+      if (!description) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ok: false, error: 'missing_description' })
+        };
+      }
+      updatePayload.description = description;
+    }
     if (updates.language) updatePayload.language = String(updates.language);
     if (updates.format) updatePayload.format = String(updates.format);
     if (updates.start) updatePayload.start_at = String(updates.start);
@@ -79,13 +89,17 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (updates['ticket-type']) updatePayload.price_type = String(updates['ticket-type']);
     const hasMin = updates['price-min'] !== undefined;
     const hasMax = updates['price-max'] !== undefined;
+    const parseNumericValue = (value: unknown) => {
+      const raw = String(value ?? '').trim();
+      if (!raw) return null;
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
     if (hasMin) {
-      const value = Number(updates['price-min']);
-      updatePayload.price_min = Number.isFinite(value) ? value : null;
+      updatePayload.price_min = parseNumericValue(updates['price-min']);
     }
     if (hasMax) {
-      const value = Number(updates['price-max']);
-      updatePayload.price_max = Number.isFinite(value) ? value : null;
+      updatePayload.price_max = parseNumericValue(updates['price-max']);
     }
     if (!hasMin && !hasMax) {
       const { min, max, hasValue } = parsePriceInput(updates.price);

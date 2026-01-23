@@ -17,6 +17,21 @@ test('highlight card shows online label for online events', () => {
   assert.match(html, /Онлайн/);
 });
 
+test('highlight card shows online label for events with online platform', () => {
+  const html = HighlightCard(
+    {
+      id: 'evt-3',
+      title: 'Meet Event',
+      format: 'offline',
+      start: '2026-01-18T10:00:00Z',
+      address: 'meet.google.com/abc',
+      city: 'Aarhus'
+    },
+    helpers
+  );
+  assert.match(html, /Онлайн/);
+});
+
 test('highlight card shows city for offline events', () => {
   const html = HighlightCard(
     { id: 'evt-2', title: 'Offline Event', format: 'offline', start: '2026-01-18T10:00:00Z', city: 'Aarhus' },

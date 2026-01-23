@@ -9,6 +9,7 @@ const helpers = {
   getLocalizedTag: (label) => label,
   getLocalizedEventTitle: (event) => event.title || '',
   getLocalizedCity: (value) => value || '',
+  getLanguageLabel: (value) => (value === 'uk' ? 'Українська' : value || ''),
   getCitySlug: () => '',
   isCityPart: () => false,
   formatDateRange: () => '18 Jan',
@@ -30,4 +31,12 @@ test('event card shows paid badge styling', () => {
     helpers
   );
   assert.match(html, /event-card__price--paid/);
+});
+
+test('event card renders language label when available', () => {
+  const html = EventCard(
+    { id: 'evt-3', title: 'Language Event', language: 'uk', priceType: 'free', tags: [] },
+    helpers
+  );
+  assert.match(html, /Українська/);
 });

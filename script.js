@@ -4,6 +4,7 @@ import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
+import { formatPriceRangeLabel } from './modules/price-detail.js';
 import {
   archiveLocalEvent,
   deleteLocalEvent,
@@ -49,7 +50,11 @@ import {
     if (!user || !hasAdminRole(user)) return null;
     return user;
   };
-  const getAdminIdentity = () => getAdminUser() || (hasLocalAdminSession() ? { app_metadata: { roles: ['admin'] } } : null);
+  const getAdminIdentity = () =>
+    getAdminUser() || (hasLocalAdminSession() ? { app_metadata: { roles: ['admin'] } } : null);
+  const hasAdminSession = () => Boolean(getAdminIdentity() || hasLocalAdminSession());
+  const hasAdminUiAccess = () =>
+    Boolean(document.body.classList.contains('is-admin') || hasAdminSession());
   const loadIdentityWidget = () => {
     if (window.netlifyIdentity) return Promise.resolve(window.netlifyIdentity);
     if (!document.querySelector('[data-identity-widget]')) {
@@ -93,7 +98,7 @@ import {
         refreshAdminData();
       }
     };
-    setAdminVisibility(Boolean(getAdminIdentity() || hasLocalAdminSession()));
+    setAdminVisibility(hasAdminSession());
     const identity = await loadIdentityWidget();
     if (!identity) return;
     identity.on('init', (user) => {
@@ -289,7 +294,12 @@ import {
         { headers }
       );
       if (payload && payload.ok && payload.event) {
-        return payload.event;
+        const event = payload.event;
+        const status = String(event?.status || '').toLowerCase();
+        if (event && (event.archived === true || status === 'archived')) {
+          return { ...event, archived: true, status: 'archived', __adminLoaded: true };
+        }
+        return { ...event, __adminLoaded: true };
       }
     } catch (error) {
       return null;
@@ -688,16 +698,22 @@ import {
     return !Number.isNaN(startDate.getTime()) && startDate < now;
   };
 
-  const isArchivedEvent = (event) => event?.archived === true || event?.status === 'archived';
+  const isArchivedEvent = (event) => {
+    const status = String(event?.status || '').toLowerCase();
+    return event?.archived === true || status === 'archived';
+  };
 
   const formatCurrency = (value) => `DKK ${value}`;
+
+  const normalizePriceValue = (value) =>
+    Number.isFinite(value) && value > 0 ? value : null;
 
   const formatPriceLabel = (priceType, min, max) => {
     if (priceType === 'free') {
       return formatMessage('price_free', {});
     }
-    const minValue = Number.isFinite(min) ? min : null;
-    const maxValue = Number.isFinite(max) ? max : null;
+    const minValue = normalizePriceValue(min);
+    const maxValue = normalizePriceValue(max);
     if (minValue !== null && maxValue !== null) {
       return `${formatCurrency(minValue)}–${maxValue}`;
     }
@@ -707,7 +723,7 @@ import {
     if (maxValue !== null) {
       return formatCurrency(maxValue);
     }
-    return 'DKK';
+    return formatMessage('price_tbd', {}) || 'Ціна уточнюється';
   };
 
   await loadTranslations();
@@ -1311,6 +1327,18 @@ import {
     workshop: { uk: 'воркшоп' }
     };
 
+    const LANGUAGE_LABELS = {
+      uk: 'Українська',
+      en: 'Англійська',
+      da: 'Данська'
+    };
+
+    const getLanguageLabel = (value) => {
+      const normalized = normalize(value);
+      if (!normalized) return '';
+      return LANGUAGE_LABELS[normalized] || value;
+    };
+
   const getLocalizedEventTitle = (event) =>
     EVENT_TITLES[event.id]?.uk || event.title;
 
@@ -1385,6 +1413,7 @@ import {
       getLocalizedTag,
       getLocalizedEventTitle,
       getLocalizedCity,
+      getLanguageLabel,
       formatDateRange,
       isPast,
       isArchived: isArchivedEvent
@@ -1766,14 +1795,18 @@ import {
       if (!(cityField instanceof HTMLSelectElement)) return;
       const currentValue = normalize(cityField.value);
       const cityMap = new Map();
-      (events || []).forEach((event) => {
+      const sourceEvents = getActiveEvents(events);
+      sourceEvents.forEach((event) => {
         if (!event || event.status !== 'published') return;
         if (isArchivedEvent(event)) return;
-        if (!event.city) return;
-        const slug = getCitySlug(event.city);
+        const cityValue = event.city || '';
+        const fallbackSource = [event.address, event.venue, event.description].filter(Boolean).join(' ');
+        const guessedSlug = guessCitySlug(fallbackSource);
+        const slug = getCitySlug(cityValue) || guessedSlug;
         if (!slug) return;
         if (!cityMap.has(slug)) {
-          cityMap.set(slug, getLocalizedCity(event.city) || event.city);
+          const labelSource = cityValue || slug;
+          cityMap.set(slug, getLocalizedCity(labelSource) || labelSource);
         }
       });
       const allLabel = formatMessage('filters_all_cities', {}) || 'Усі міста';
@@ -1805,6 +1838,14 @@ import {
       selectedTagOrder = [];
     };
 
+    const getActiveEvents = (events) =>
+      (events || []).filter((event) => {
+        if (!event || event.status !== 'published') return false;
+        if (isArchivedEvent(event)) return false;
+        if (isPast(event)) return false;
+        return true;
+      });
+
     const applyFilters = (options = {}) => {
       const preservePage = options.preservePage === true;
       if (!preservePage) {
@@ -1833,7 +1874,7 @@ import {
         nextFilteredEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
       }
       setFilteredEvents(nextFilteredEvents);
-      renderTagFilters(state.events);
+      renderTagFilters(getActiveEvents(state.events));
       totalPages = getTotalPages(nextFilteredEvents.length, pageSize);
       currentPage = clampPage(currentPage, totalPages);
       if (nextEventsButton) {
@@ -2250,10 +2291,17 @@ import {
       setLoading(true);
       try {
         const fetchedEvents = await fetchMergedEvents();
-        setEvents(fetchedEvents);
+        const normalizedEvents = (fetchedEvents || []).map((event) => {
+          if (!event || event.city) return event;
+          const fallbackSource = [event.address, event.venue, event.description].filter(Boolean).join(' ');
+          const guessedSlug = guessCitySlug(fallbackSource);
+          if (!guessedSlug) return event;
+          return { ...event, city: guessedSlug };
+        });
+        setEvents(normalizedEvents);
         setLoading(false);
         setErrorState(false);
-        updateCityOptions(fetchedEvents);
+        updateCityOptions(normalizedEvents);
         readQueryParams();
         applyFilters({ preservePage: true });
         syncAdvancedPanel();
@@ -2291,6 +2339,8 @@ import {
             if (nextState) {
               clearOtherDatePresets(key);
               applyDatePreset(key);
+            } else {
+              setDateRange(null, null);
             }
           }
           syncPresetButtons();
@@ -2314,18 +2364,33 @@ import {
             clearOtherDatePresets('today');
             applyDatePreset('today');
           }
+          if (target === today && !today.checked) {
+            setDateRange(null, null);
+          }
           if (target === tomorrow && tomorrow.checked) {
             clearOtherDatePresets('tomorrow');
             applyDatePreset('tomorrow');
+          }
+          if (target === tomorrow && !tomorrow.checked) {
+            setDateRange(null, null);
           }
           if (target === weekend && weekend.checked) {
             clearOtherDatePresets('weekend');
             applyDatePreset('weekend');
           }
+          if (target === weekend && !weekend.checked) {
+            setDateRange(null, null);
+          }
           if (target === online && online.checked) {
             const formatField = filtersForm.elements.format;
             if (formatField) {
               formatField.value = 'online';
+            }
+          }
+          if (target === online && !online.checked) {
+            const formatField = filtersForm.elements.format;
+            if (formatField) {
+              formatField.value = '';
             }
           }
           if (target === showPastField) {
@@ -2537,6 +2602,16 @@ import {
   const adminArchiveButton = document.querySelector('[data-action="admin-archive"]');
   const adminRestoreButton = document.querySelector('[data-action="admin-restore"]');
   const adminDeleteButton = document.querySelector('[data-action="admin-delete"]');
+  const setAdminArchiveState = (archived) => {
+    if (adminArchivedBadge) adminArchivedBadge.hidden = !archived;
+    if (adminArchiveButton) adminArchiveButton.hidden = archived;
+    if (adminRestoreButton) adminRestoreButton.hidden = !archived;
+  };
+  const syncAdminArchiveState = () => {
+    if (!adminControls || !activeEventData) return;
+    const archived = isArchivedEvent(activeEventData) || activeEventData.__adminLoaded === true;
+    setAdminArchiveState(archived);
+  };
   let activeEventData = null;
 
   const updateDescriptionToggle = (text) => {
@@ -2602,9 +2677,12 @@ import {
     const type = eventPrice.dataset.priceType;
     const min = Number(eventPrice.dataset.priceMin);
     const max = Number(eventPrice.dataset.priceMax);
-    const minValue = Number.isNaN(min) ? null : min;
-    const maxValue = Number.isNaN(max) ? null : max;
-    const priceLabel = formatPriceLabel(type, minValue, maxValue);
+    const priceLabel = formatPriceRangeLabel(
+      type,
+      Number.isNaN(min) ? null : min,
+      Number.isNaN(max) ? null : max,
+      formatMessage
+    );
     eventPrice.textContent = priceLabel;
     if (ticketNote && eventMeta) {
       const start = eventMeta.dataset.eventStart;
@@ -2637,12 +2715,13 @@ import {
     if (!eventData) return;
     activeEventData = eventData;
     if (eventTitleEl) eventTitleEl.textContent = eventData.title;
-    if (eventDescriptionEl && eventData.description) {
-      eventDescriptionEl.textContent = eventData.description;
+    if (eventDescriptionEl) {
+      const description = String(eventData.description || '').trim();
+      eventDescriptionEl.textContent = description;
       if (eventDescriptionToggle) {
         eventDescriptionToggle.setAttribute('aria-expanded', 'false');
       }
-      updateDescriptionToggle(eventData.description);
+      updateDescriptionToggle(description);
     }
     if (eventLocationEl) {
       const parts = getUniqueParts([eventData.venue, eventData.address, eventData.city]);
@@ -2668,8 +2747,9 @@ import {
       }
     }
     if (eventLanguageEl) {
-      eventLanguageEl.textContent = eventData.language || '';
-      eventLanguageEl.hidden = !eventData.language;
+      const languageLabel = getLanguageLabel(eventData.language);
+      eventLanguageEl.textContent = languageLabel;
+      eventLanguageEl.hidden = !languageLabel;
     }
     if (eventMeta) {
       eventMeta.dataset.eventStart = eventData.start || '';
@@ -2786,17 +2866,23 @@ import {
       }
     }
     if (adminControls) {
-      const archived = isArchivedEvent(eventData);
-      adminControls.hidden = !getAdminIdentity();
-      if (adminArchivedBadge) adminArchivedBadge.hidden = !archived;
-      if (adminArchiveButton) adminArchiveButton.hidden = archived;
-      if (adminRestoreButton) adminRestoreButton.hidden = !archived;
+      const status = String(eventData.status || '').toLowerCase();
+      const archived = isArchivedEvent(eventData) || eventData.__adminLoaded === true;
+      setAdminArchiveState(archived);
       if (adminEditLink) {
         adminEditLink.href = `./new-event.html?id=${encodeURIComponent(eventData.id)}`;
       }
     }
     updateEventPrice();
     updateEventMeta();
+  };
+  const safeRenderEventDetail = (eventData) => {
+    try {
+      renderEventDetail(eventData);
+    } catch (error) {
+      activeEventData = eventData;
+    }
+    syncAdminArchiveState();
   };
 
   if (document.body.classList.contains('event-page')) {
@@ -2843,20 +2929,28 @@ import {
     if (adminArchiveButton) {
       adminArchiveButton.addEventListener('click', () => {
         if (!activeEventData) return;
+        setAdminArchiveState(true);
         sendAdminAction('archive').then((ok) => {
-          if (!ok) return;
+          if (!ok) {
+            setAdminArchiveState(isArchivedEvent(activeEventData));
+            return;
+          }
           activeEventData = { ...activeEventData, status: 'archived', archived: true };
-          renderEventDetail(activeEventData);
+          safeRenderEventDetail(activeEventData);
         });
       });
     }
     if (adminRestoreButton) {
       adminRestoreButton.addEventListener('click', () => {
         if (!activeEventData) return;
+        setAdminArchiveState(false);
         sendAdminAction('restore').then((ok) => {
-          if (!ok) return;
+          if (!ok) {
+            setAdminArchiveState(isArchivedEvent(activeEventData));
+            return;
+          }
           activeEventData = { ...activeEventData, status: 'published', archived: false };
-          renderEventDetail(activeEventData);
+          safeRenderEventDetail(activeEventData);
         });
       });
     }
@@ -2881,7 +2975,7 @@ import {
         updateDescriptionToggle();
         return;
       }
-      const isAdmin = Boolean(getAdminIdentity());
+      const isAdmin = hasAdminSession();
       fetchMergedEvents()
         .then((data) => {
           const eventData = data.find((item) => item.id === eventId);
@@ -2890,11 +2984,11 @@ import {
               window.location.replace('./404.html');
               return;
             }
-            renderEventDetail(eventData);
+            safeRenderEventDetail(eventData);
             if (!eventData.description) {
               fetchPublicEventById(eventId).then((publicEvent) => {
                 if (!publicEvent) return;
-                renderEventDetail({ ...eventData, ...publicEvent });
+                safeRenderEventDetail({ ...eventData, ...publicEvent });
               });
             }
             return;
@@ -2908,7 +3002,7 @@ import {
               window.location.replace('./404.html');
               return;
             }
-            renderEventDetail(adminEvent);
+            safeRenderEventDetail(adminEvent);
           });
         })
         .catch(() => {
@@ -2925,12 +3019,16 @@ import {
               updateDescriptionToggle();
               return;
             }
-            renderEventDetail(adminEvent);
+            safeRenderEventDetail(adminEvent);
           });
         });
     };
     refreshAdminData = () => loadEventDetail();
-    loadEventDetail();
+    if (hasAdminSession() || document.body.classList.contains('is-admin')) {
+      refreshAdminData();
+    } else {
+      loadEventDetail();
+    }
   }
 
   document.addEventListener('click', async (event) => {

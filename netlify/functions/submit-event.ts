@@ -96,6 +96,8 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
     const errors: string[] = [];
     if (!isNonEmptyString(payload.title)) errors.push('title');
+    const description = String(payload.description || '').trim();
+    if (!isNonEmptyString(description)) errors.push('description');
     if (!isValidDate(payload.start)) errors.push('start');
     if (!['offline', 'online'].includes(String(payload.format || ''))) errors.push('format');
     if (!isNonEmptyString(payload.address)) errors.push('address');
@@ -172,7 +174,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
           external_id: id,
           slug: payload.slug || id,
           title,
-          description: payload.description || '',
+          description,
           city: payload.city || payload.eventCity || '',
           address: payload.address || '',
           venue: payload.venue || payload.address || '',

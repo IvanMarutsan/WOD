@@ -23,6 +23,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const imageInput = multiStepForm.querySelector('input[name="image"]');
   const imageAltInput = multiStepForm.querySelector('input[name="image-alt"]');
   const contactNameField = multiStepForm.querySelector('input[name="contact-name"]');
+  const descriptionField = multiStepForm.querySelector('textarea[name="description"]');
   const tagsInput = multiStepForm.querySelector('.tags-input__field');
   const tagsList = multiStepForm.querySelector('.tags-input__list');
   const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
@@ -606,6 +607,22 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
       const formData = new FormData(multiStepForm);
       const payload = Object.fromEntries(formData.entries());
+      payload.description = String(payload.description || '').trim();
+      if (!payload.description) {
+        const message = formatMessage('form_description_required', {}) || 'Опис події обовʼязковий.';
+        if (descriptionField) {
+          descriptionField.setCustomValidity(message);
+          descriptionField.reportValidity();
+          descriptionField.focus();
+        }
+        if (submitStatus) {
+          submitStatus.textContent = message;
+        }
+        return;
+      }
+      if (descriptionField) {
+        descriptionField.setCustomValidity('');
+      }
       const tagsForPayload = Array.from(pendingTags);
       const tagsPayload = tagsForPayload.join(', ');
       payload.tags = tagsPayload;

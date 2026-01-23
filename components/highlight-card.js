@@ -3,11 +3,13 @@ export const HighlightCard = (event, helpers) => {
   const title = getLocalizedEventTitle(event);
   const formatValue = String(event.format || '').toLowerCase();
   const hasOnlineLocation = [event.address, event.venue].some((value) =>
-    /zoom|meet|teams|online|webinar/i.test(String(value || ''))
+    /zoom|google meet|meet\.google|teams\.microsoft|teams|online|webinar/i.test(
+      String(value || '')
+    )
   );
   const isOnline = formatValue.includes('online') || hasOnlineLocation;
   const city = isOnline
-    ? formatMessage('online', {})
+    ? formatMessage('online', {}) || 'Онлайн'
     : getLocalizedCity(event.city, event);
   const dateLabel = formatShortDate(event.start);
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;

@@ -49,6 +49,9 @@ export const EventCard = (event, helpers) => {
   const pastEvent = isPast(event);
   const archivedEvent = isArchived ? isArchived(event) : false;
   const title = getLocalizedEventTitle(event);
+  const languageLabel = typeof helpers.getLanguageLabel === 'function'
+    ? helpers.getLanguageLabel(event.language)
+    : event.language || '';
   const imageMarkup = image
     ? `<img class="event-card__image" src="${image}" alt="${title}" loading="lazy" width="800" height="540" />`
     : '<div class="event-card__image event-card__image--placeholder" aria-hidden="true"></div>';
@@ -92,6 +95,7 @@ export const EventCard = (event, helpers) => {
     }
   }
   const location = uniqueParts.filter(Boolean).join(' · ');
+  const languageMarkup = languageLabel ? `<p class="event-card__language">${languageLabel}</p>` : '';
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';
   return `
         <article class="${cardClass}" data-event-id="${event.id}" data-status="${statusLabel}" data-testid="event-card">
@@ -106,6 +110,7 @@ export const EventCard = (event, helpers) => {
               <a class="event-card__link" href="${detailUrl}">${title}</a>
             </h3>
             <p class="event-card__location">${location}</p>
+            ${languageMarkup}
             <div class="event-card__tags">
               ${tags}
             </div>

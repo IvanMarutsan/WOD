@@ -1170,6 +1170,10 @@ body:not(.is-admin) [data-admin-only] {
   display: none !important;
 }
 
+body:not(.is-admin) [data-admin-controls] {
+  display: none !important;
+}
+
 .filters__actions .btn.ghost {
   background: transparent;
   color: var(--text);
@@ -1329,6 +1333,12 @@ body:not(.is-admin) [data-admin-only] {
   color: var(--muted);
 }
 
+.event-card__language {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .event-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -1476,7 +1486,7 @@ body:not(.is-admin) [data-admin-only] {
   top: 50%;
   left: 0;
   right: 0;
-  padding: 0 8px;
+  padding: 0;
   transform: translateY(-50%);
   justify-content: space-between;
   pointer-events: none;
