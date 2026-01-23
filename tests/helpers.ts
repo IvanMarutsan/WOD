@@ -1,5 +1,5 @@
 export async function gotoHome(page) {
-  await page.goto('/main-page.html');
+  await page.goto('/');
 }
 
 export async function waitForEventsRendered(page) {

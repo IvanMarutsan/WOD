@@ -4,7 +4,7 @@ import { waitForEventsRendered } from './helpers';
 
 test('main page renders key sections and hides add-event CTA', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -16,7 +16,7 @@ test('main page renders key sections and hides add-event CTA', async ({ page }) 
 
 test('hero card shows background image when available', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const heroMedia = page.locator('[data-hero-media]');
@@ -27,7 +27,7 @@ test('hero card shows background image when available', async ({ page }) => {
 
 test('hero CTA navigates to catalog anchor', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
 
   const cta = page.getByRole('link', { name: /Переглянути події/i });
   await cta.click();
@@ -36,7 +36,7 @@ test('hero CTA navigates to catalog anchor', async ({ page }) => {
 
 test('advanced filters toggle is controlled only by the button', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
 
   const advancedToggle = page.locator('[data-action="filters-advanced"]');
   const advancedPanel = page.locator('#filters-advanced');
@@ -55,7 +55,7 @@ test('advanced filters toggle is controlled only by the button', async ({ page }
 
 test('quick presets do not auto-open advanced filters', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
 
   const advancedPanel = page.locator('#filters-advanced');
   const advancedToggle = page.locator('[data-action="filters-advanced"]');
@@ -69,7 +69,7 @@ test('quick presets do not auto-open advanced filters', async ({ page }) => {
 
 test('filters update URL and reset clears selections', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   await page.getByRole('combobox', { name: /Місто/i }).selectOption({ value: 'aarhus' });
@@ -87,7 +87,7 @@ test('filters update URL and reset clears selections', async ({ page }) => {
 
 test('reset filters clears selected tags and keeps advanced panel open', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const advancedToggle = page.locator('[data-action="filters-advanced"]');
@@ -126,7 +126,7 @@ test('reset filters clears selected tags and keeps advanced panel open', async (
 
 test('reset filters keeps advanced panel closed when collapsed', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const advancedToggle = page.locator('[data-action="filters-advanced"]');
@@ -151,7 +151,7 @@ test('reset filters keeps advanced panel closed when collapsed', async ({ page }
 
 test('catalog pagination shows page numbers and switches pages', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const pages = page.locator('[data-catalog-pages] .catalog-page');
@@ -169,7 +169,7 @@ test('catalog pagination shows page numbers and switches pages', async ({ page }
 
 test('tag filter pulls events from later pages and resets to page 1', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const pages = page.locator('[data-catalog-pages] .catalog-page');
@@ -199,7 +199,7 @@ test('tag filter pulls events from later pages and resets to page 1', async ({ p
 
 test('tag filters reorder on selection and keep URL in sync', async ({ page }) => {
   await freezeTime(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const advancedToggle = page.locator('[data-action="filters-advanced"]');

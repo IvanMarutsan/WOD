@@ -4,7 +4,7 @@ import { waitForEventsRendered } from './helpers';
 
 test('past events hidden by default and banner on detail', async ({ page }) => {
   await setupPage(page);
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   // Ensure there is a toggle to show past events and it is off

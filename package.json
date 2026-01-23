@@ -1,5 +1,6 @@
 {
   "name": "whats-on-dk",
+  "type": "module",
   "private": true,
   "scripts": {
     "seed:supabase": "node scripts/seed-supabase.mjs",

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { freezeTime } from './setup.freeze-time';
 
-const pages = ['/main-page.html', '/event-card.html'];
+const pages = ['/', '/event-card.html'];
 
 for (const url of pages) {
   test(`a11y: ${url} has no serious violations`, async ({ page }) => {

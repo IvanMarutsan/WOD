@@ -123,7 +123,7 @@ import {
     }
     const path = window.location.pathname;
     if (path.includes('admin-login')) return;
-    if (!path.endsWith('/') && !path.endsWith('/main-page.html')) return;
+    if (!path.endsWith('/') && !path.endsWith('/index.html')) return;
     window.location.replace(`./admin-login.html${hash}`);
   };
 
@@ -155,7 +155,7 @@ import {
   }
 
   if (document.body.classList.contains('organizer-dashboard-page')) {
-    window.location.replace('./main-page.html');
+    window.location.replace('./');
     return;
   }
 
@@ -1495,7 +1495,7 @@ import {
           heroKicker.textContent = formatMessage('hero_next_up', {});
         }
         if (heroLink) {
-          heroLink.setAttribute('href', './main-page.html#events');
+          heroLink.setAttribute('href', './#events');
           heroLink.setAttribute('aria-disabled', 'true');
         }
         return;

@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { freezeTime } from './setup.freeze-time';
 
 const routes = [
-  { url: '/main-page.html', key: 'home' },
-  { url: '/main-page.html#events', key: 'events' },
+  { url: '/', key: 'home' },
+  { url: '/#events', key: 'events' },
   { url: '/new-event.html', key: 'new-event' },
   { url: '/event-card.html?id=evt-006', key: 'event-card' }
 ];
@@ -99,7 +99,7 @@ test.describe('visual: mobile', () => {
     await page.addInitScript(() => {
       document.documentElement.style.scrollBehavior = 'auto';
     });
-    await page.goto('/main-page.html#events');
+    await page.goto('/#events');
     const catalog = page.locator('#events');
     await catalog.scrollIntoViewIfNeeded();
     await page.waitForSelector('[data-testid="event-card"]', { timeout: 10000 });

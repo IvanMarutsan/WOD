@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { waitForEventsRendered } from './helpers';
 
 test('filters update URL and back/forward restores state', async ({ page }) => {
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
   await page.getByTestId('search-input').fill('music');
   await page.keyboard.press('Enter');
@@ -20,12 +20,12 @@ test('filters update URL and back/forward restores state', async ({ page }) => {
 });
 
 test('page query param opens requested catalog page', async ({ page }) => {
-  await page.goto('/main-page.html');
+  await page.goto('/');
   await waitForEventsRendered(page);
 
   const firstTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();
 
-  await page.goto('/main-page.html?page=2');
+  await page.goto('/?page=2');
   await waitForEventsRendered(page);
 
   const secondTitle = await page.getByTestId('event-card').first().locator('.event-card__title a').innerText();

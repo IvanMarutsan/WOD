@@ -552,7 +552,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   if (verificationBannerButton) {
     verificationBannerButton.addEventListener('click', () => {
-      window.location.href = 'main-page.html#settings';
+      window.location.href = './#settings';
     });
   }
 
