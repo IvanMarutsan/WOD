@@ -1509,6 +1509,11 @@ body:not(.is-admin) [data-admin-controls] {
   font-size: 1.1rem;
 }
 
+.highlights__button[data-action="next"] {
+  margin-right: -32px; /* або -8px, якщо треба ближче до картки */
+}
+
+
 .highlights__button:hover,
 .highlights__button:focus-visible {
   background: var(--surface);
