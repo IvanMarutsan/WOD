@@ -50,6 +50,7 @@ create table if not exists admin_audit_log (
   event_id uuid references events(id) on delete set null,
   action text not null,
   actor text,
+  reason text,
   payload jsonb,
   created_at timestamptz default now()
 );

@@ -35,6 +35,24 @@ test('admin-update uses external_id lookup for non-uuid ids', () => {
   assert.match(content, /id\.eq/);
 });
 
+test('admin-update enforces roles', () => {
+  const content = readFile('../../netlify/functions/admin-update.ts');
+  assert.match(content, /error:\s*'forbidden'/);
+  assert.match(content, /statusCode:\s*403/);
+});
+
+test('submit-event validates required fields', () => {
+  const content = readFile('../../netlify/functions/submit-event.ts');
+  assert.match(content, /errors\.push\('title'\)/);
+  assert.match(content, /errors\.push\('description'\)/);
+  assert.match(content, /errors\.push\('start'\)/);
+  assert.match(content, /errors\.push\('format'\)/);
+  assert.match(content, /errors\.push\('address'\)/);
+  assert.match(content, /errors\.push\('ticket-type'\)/);
+  assert.match(content, /errors\.push\('contact-name'\)/);
+  assert.match(content, /errors\.push\('tags'\)/);
+});
+
 test('admin-event fetches by id or external_id and enforces admin access', () => {
   const content = readFile('../../netlify/functions/admin-event.ts');
   assert.match(content, /error:\s*'forbidden'/);
