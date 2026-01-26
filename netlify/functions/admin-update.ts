@@ -9,6 +9,10 @@ const getRoles = (context: HandlerContext) => {
 };
 
 const hasAdminRole = (roles: string[]) => roles.includes('admin') || roles.includes('super_admin');
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+const buildEventLookupQuery = (value: string) =>
+  isUuid(value) ? `(id.eq.${value},external_id.eq.${value})` : `(external_id.eq.${value})`;
 
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
@@ -51,7 +55,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
 
     const records = (await supabaseFetch('events', {
-      query: { or: `(id.eq.${id},external_id.eq.${id})`, limit: '1' }
+      query: { or: buildEventLookupQuery(id), limit: '1' }
     })) as any[];
     const eventRecord = records?.[0];
     if (!eventRecord) {

@@ -27,10 +27,19 @@ test('public-events uses published-only select queries', () => {
   assert.doesNotMatch(content, /includeArchived/);
 });
 
+test('admin-update uses external_id lookup for non-uuid ids', () => {
+  const content = readFile('../../netlify/functions/admin-update.ts');
+  assert.match(content, /isUuid/);
+  assert.match(content, /buildEventLookupQuery/);
+  assert.match(content, /external_id\.eq/);
+  assert.match(content, /id\.eq/);
+});
+
 test('admin-event fetches by id or external_id and enforces admin access', () => {
   const content = readFile('../../netlify/functions/admin-event.ts');
   assert.match(content, /error:\s*'forbidden'/);
-  assert.match(content, /or:\s*`\(id\.eq\.\$\{requestedId\},external_id\.eq\.\$\{requestedId\}\)`/);
+  assert.match(content, /buildEventLookupQuery/);
+  assert.match(content, /external_id\.eq/);
   assert.match(
     content,
     /select:\s*'id,external_id,slug,title,description,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'/
@@ -40,7 +49,8 @@ test('admin-event fetches by id or external_id and enforces admin access', () =>
 test('public-event fetches published event by id or external_id', () => {
   const content = readFile('../../netlify/functions/public-event.ts');
   assert.match(content, /status:\s*'eq\.published'/);
-  assert.match(content, /or:\s*`\(id\.eq\.\$\{requestedId\},external_id\.eq\.\$\{requestedId\}\)`/);
+  assert.match(content, /buildEventLookupQuery/);
+  assert.match(content, /external_id\.eq/);
   assert.match(
     content,
     /select:\s*'id,external_id,slug,title,description,start_at,end_at,format,venue,address,city,price_type,price_min,price_max,registration_url,organizer_id,image_url,status,language'/
