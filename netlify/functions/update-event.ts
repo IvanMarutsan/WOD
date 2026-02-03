@@ -35,6 +35,16 @@ const normalizeDateValue = (value: unknown) => {
   return text;
 };
 
+const normalizeLanguage = (value: unknown) => {
+  if (value === undefined || value === null) return '';
+  const raw = String(value).trim().toLowerCase();
+  if (!raw) return '';
+  if (raw.includes('/')) return 'mixed';
+  if (raw.includes('mix')) return 'mixed';
+  const allowed = new Set(['uk', 'en', 'da', 'mixed']);
+  return allowed.has(raw) ? raw : '';
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const roles = getRoles(context);
@@ -87,7 +97,8 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       }
       updatePayload.description = description;
     }
-    if (updates.language) updatePayload.language = String(updates.language);
+    const languageValue = normalizeLanguage(updates.language);
+    if (languageValue) updatePayload.language = languageValue;
     if (updates.format) updatePayload.format = String(updates.format);
     const startValue = normalizeDateValue(updates.start);
     if (startValue) updatePayload.start_at = startValue;
