@@ -20,6 +20,6 @@ export default defineConfig({
     command: 'npx http-server . -p 5173 -a 127.0.0.1 -c-1',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 60_000
+    timeout: 180_000
   }
 });

@@ -4,13 +4,13 @@ import { eventMatchesFilters } from '../../modules/filters.mjs';
 
 const helpers = {
   normalize: (value) => String(value || '').toLowerCase(),
+  normalizeCity: (value) =>
+    String(value || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toLowerCase(),
   isPast: (event) => Boolean(event.past),
   isArchivedEvent: (event) => Boolean(event.archived),
-  getCitySlug: (value) => {
-    const normalized = String(value || '').toLowerCase();
-    if (normalized === 'копенгаген') return 'copenhagen';
-    return normalized;
-  },
   getTagList: (tags) => (tags || []).map((label) => ({ label })),
   getLocalizedEventTitle: (event) => event.title,
   getLocalizedCity: (value) => value,
@@ -27,8 +27,8 @@ test('tags filter matches any selected tag', () => {
   assert.equal(eventMatchesFilters(miss, filters, helpers), false);
 });
 
-test('city filter matches slugged city', () => {
-  const event = { status: 'published', city: 'Копенгаген' };
+test('city filter matches normalized city', () => {
+  const event = { status: 'published', city: 'Copenhagen' };
   const filters = { city: 'copenhagen' };
   assert.equal(eventMatchesFilters(event, filters, helpers), true);
 });

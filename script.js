@@ -1,10 +1,18 @@
 import { state, setEvents, setFilteredEvents, setLoading } from './store.js';
-import { buildFilters, eventMatchesFilters, getAvailableTags } from './modules/filters.mjs';
+import {
+  buildCityOptions,
+  buildFilters,
+  eventMatchesFilters,
+  getAvailableTags,
+  matchCityFromQuery,
+  defaultNormalizeCity
+} from './modules/filters.mjs';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
 import { formatPriceRangeLabel } from './modules/price-detail.js';
+import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
 import {
   archiveLocalEvent,
   deleteLocalEvent,
@@ -698,11 +706,6 @@ import {
     return !Number.isNaN(startDate.getTime()) && startDate < now;
   };
 
-  const isArchivedEvent = (event) => {
-    const status = String(event?.status || '').toLowerCase();
-    return event?.archived === true || status === 'archived';
-  };
-
   const formatCurrency = (value) => `DKK ${value}`;
 
   const normalizePriceValue = (value) =>
@@ -727,6 +730,11 @@ import {
   };
 
   const normalize = (value) => String(value || '').toLowerCase();
+  const normalizeCity = (value) => defaultNormalizeCity(value);
+  const getDisplayCity = (value) =>
+    String(value || '')
+      .trim()
+      .replace(/\s+/g, ' ');
 
   const EVENT_TITLES = {
     'evt-001': { uk: 'Тиждень дизайну в Копенгагені: Open Studio' },
@@ -874,29 +882,9 @@ import {
     return record.uk || value;
   };
 
-  const getLocalizedCity = (value) => {
-    if (!value) return value;
-    const normalized = normalize(value);
-    const keyMap = {
-      copenhagen: 'filters_city_copenhagen',
-      aarhus: 'filters_city_aarhus',
-      odense: 'filters_city_odense',
-      aalborg: 'filters_city_aalborg',
-      esbjerg: 'filters_city_esbjerg'
-    };
-    const key = keyMap[normalized];
-    if (key) {
-      const translated = formatMessage(key, {});
-      return translated || value;
-    }
-    return localizeByMap(value, CITY_TRANSLATIONS);
-  };
+  const getLocalizedCity = (value) => getDisplayCity(value);
 
-  const getCitySlug = (value) => {
-    const normalized = normalize(value);
-    if (!normalized) return '';
-    return CITY_ALIASES[normalized] || normalized;
-  };
+  const getCitySlug = (value) => normalizeCity(value);
 
   const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
 
@@ -1321,7 +1309,7 @@ import {
 
     const matchesActiveFilters = (event) => {
       if (activeFilters.city) {
-        if (getCitySlug(event.city) !== activeFilters.city) {
+        if (normalizeCity(event.city) !== activeFilters.city) {
           return false;
         }
       }
@@ -1356,9 +1344,10 @@ import {
 
     const filterHelpers = {
       normalize,
+      normalizeCity,
       isPast,
       isArchivedEvent,
-      getCitySlug,
+      getCitySlug: normalizeCity,
       getTagList,
       getLocalizedEventTitle,
       getLocalizedCity,
@@ -1395,19 +1384,7 @@ import {
       formatShortDate,
       formatMessage,
       getLocalizedEventTitle,
-      getLocalizedCity: (value, event) => {
-        const localized = getLocalizedCity(value);
-        const slug = getCitySlug(value);
-        if (CITY_TRANSLATIONS[slug]) {
-          return getLocalizedCity(slug);
-        }
-        const fallbackSource = [event?.address, event?.venue, value].filter(Boolean).join(' ');
-        const guessedSlug = guessCitySlug(fallbackSource);
-        if (guessedSlug) {
-          return getLocalizedCity(guessedSlug);
-        }
-        return localized;
-      }
+      getLocalizedCity: (value) => getLocalizedCity(value)
     };
 
     const renderHighlights = (list) => {
@@ -1557,7 +1534,11 @@ import {
 
     const renderApp = () => {
       const payload =
-        currentFilters || buildFilters(filtersForm ? new FormData(filtersForm) : null, activeFilters.searchQuery, { normalize });
+        currentFilters ||
+        buildFilters(filtersForm ? new FormData(filtersForm) : null, activeFilters.searchQuery, {
+          normalize,
+          normalizeCity
+        });
       const pageSlice = getPageSlice(state.filteredEvents, currentPage, pageSize);
       currentPage = pageSlice.currentPage;
       totalPages = pageSlice.totalPages;
@@ -1722,7 +1703,7 @@ import {
     };
 
     const setCityFilter = (value) => {
-      activeFilters.city = normalize(value);
+      activeFilters.city = normalizeCity(value);
     };
 
     const setPriceFilter = (value) => {
@@ -1763,23 +1744,16 @@ import {
       activeFilters.tags = new Set(selectedTagOrder);
     };
 
+    let cityOptionsData = [];
     const updateCityOptions = (events) => {
       if (!(cityField instanceof HTMLSelectElement)) return;
-      const currentValue = normalize(cityField.value);
-      const cityMap = new Map();
+      const currentValue = normalizeCity(cityField.value);
       const sourceEvents = getActiveEvents(events);
-      sourceEvents.forEach((event) => {
-        if (!event || event.status !== 'published') return;
-        if (isArchivedEvent(event)) return;
-        const cityValue = event.city || '';
-        const fallbackSource = [event.address, event.venue, event.description].filter(Boolean).join(' ');
-        const guessedSlug = guessCitySlug(fallbackSource);
-        const slug = getCitySlug(cityValue) || guessedSlug;
-        if (!slug) return;
-        if (!cityMap.has(slug)) {
-          const labelSource = cityValue || slug;
-          cityMap.set(slug, getLocalizedCity(labelSource) || labelSource);
-        }
+      cityOptionsData = buildCityOptions(sourceEvents, {
+        normalizeCity,
+        isArchivedEvent,
+        isPast,
+        getLang: () => document.documentElement.lang || 'uk'
       });
       const allLabel = formatMessage('filters_all_cities', {}) || 'Усі міста';
       cityField.innerHTML = '';
@@ -1787,14 +1761,14 @@ import {
       allOption.value = '';
       allOption.textContent = allLabel;
       cityField.appendChild(allOption);
-      const sorted = [...cityMap.entries()].sort((a, b) => a[1].localeCompare(b[1], 'uk'));
-      sorted.forEach(([value, label]) => {
+      cityOptionsData.forEach(({ value, label }) => {
         const option = document.createElement('option');
         option.value = value;
-        option.textContent = label;
+        option.textContent = label || value;
         cityField.appendChild(option);
       });
-      if (currentValue && !cityMap.has(currentValue)) {
+      const hasCurrent = cityOptionsData.some((item) => item.value === currentValue);
+      if (currentValue && !hasCurrent) {
         cityField.value = '';
         setCityFilter('');
       } else if (currentValue) {
@@ -1828,7 +1802,10 @@ import {
       updateCityOptions(state.events);
       const formData = filtersForm ? new FormData(filtersForm) : null;
       syncSelectedTags();
-      const filters = buildFilters(formData, activeFilters.searchQuery, { normalize });
+      const filters = buildFilters(formData, activeFilters.searchQuery, {
+        normalize,
+        normalizeCity
+      });
       currentFilters = filters;
       updateCatalogQueryParams();
       const baseList = state.events.filter((event) =>
@@ -2027,7 +2004,17 @@ import {
       if (!tokens.length) return false;
       let changed = false;
 
-      changed = setSelectFromTokens(filtersForm.elements.city, tokens) || changed;
+      if (cityField instanceof HTMLSelectElement) {
+        const matchedCity = matchCityFromQuery(query, cityOptionsData, {
+          normalize,
+          normalizeCity
+        });
+        if (matchedCity && cityField.value !== matchedCity) {
+          cityField.value = matchedCity;
+          setCityFilter(matchedCity);
+          changed = true;
+        }
+      }
       changed = setSelectFromTokens(filtersForm.elements.price, tokens) || changed;
       changed = setSelectFromTokens(filtersForm.elements.format, tokens) || changed;
 
@@ -2106,7 +2093,7 @@ import {
           priceField.value = priceParam;
         }
       }
-      activeFilters.city = normalize(cityParam);
+      activeFilters.city = normalizeCity(cityParam);
       activeFilters.priceCategory = normalize(priceParam);
       activeFilters.searchQuery = normalizeSearchValue(searchParam);
       activeFilters.tags.clear();
@@ -2263,13 +2250,7 @@ import {
       setLoading(true);
       try {
         const fetchedEvents = await fetchMergedEvents();
-        const normalizedEvents = (fetchedEvents || []).map((event) => {
-          if (!event || event.city) return event;
-          const fallbackSource = [event.address, event.venue, event.description].filter(Boolean).join(' ');
-          const guessedSlug = guessCitySlug(fallbackSource);
-          if (!guessedSlug) return event;
-          return { ...event, city: guessedSlug };
-        });
+        const normalizedEvents = (fetchedEvents || []).map((event) => event);
         setEvents(normalizedEvents);
         setLoading(false);
         setErrorState(false);
@@ -2581,7 +2562,7 @@ import {
   };
   const syncAdminArchiveState = () => {
     if (!adminControls || !activeEventData) return;
-    const archived = isArchivedEvent(activeEventData) || activeEventData.__adminLoaded === true;
+    const archived = isArchivedEvent(activeEventData);
     setAdminArchiveState(archived);
   };
   let activeEventData = null;
@@ -2694,10 +2675,10 @@ import {
     if (isOnlineEvent(eventData)) {
       return { label: onlineLabel, mapQuery: '' };
     }
-    const cityLabel = getLocalizedCity(eventData.city);
-    const parts = getUniqueParts([eventData.venue, eventData.address, cityLabel]);
+    const cityLabel = getDisplayCity(eventData.city);
+    const parts = getUniqueParts([cityLabel, eventData.venue, eventData.address]);
     const label = parts.join(', ');
-    return { label, mapQuery: label || eventData.city || '' };
+    return { label, mapQuery: label || cityLabel || '' };
   };
   const resetEventDetail = () => {
     if (eventTitleEl) eventTitleEl.textContent = '';
@@ -2788,7 +2769,7 @@ import {
     if (eventMeta) {
       const cityLabel = isOnlineEvent(eventData)
         ? formatMessage('online', {}) || 'Онлайн'
-        : getLocalizedCity(eventData.city);
+        : getDisplayCity(eventData.city);
       eventMeta.dataset.eventStart = eventData.start || '';
       eventMeta.dataset.eventEnd = eventData.end || '';
       eventMeta.dataset.eventCity = cityLabel || '';
@@ -2901,7 +2882,7 @@ import {
     }
     if (adminControls) {
       const status = String(eventData.status || '').toLowerCase();
-      const archived = isArchivedEvent(eventData) || eventData.__adminLoaded === true;
+      const archived = isArchivedEvent(eventData);
       setAdminArchiveState(archived);
       if (adminEditLink) {
         adminEditLink.href = `./new-event.html?id=${encodeURIComponent(eventData.id)}`;
@@ -2911,10 +2892,11 @@ import {
     updateEventMeta();
   };
   const safeRenderEventDetail = (eventData) => {
+    const nextEventData = activeEventData ? mergeEventData(activeEventData, eventData) : eventData;
     try {
-      renderEventDetail(eventData);
+      renderEventDetail(nextEventData);
     } catch (error) {
-      activeEventData = eventData;
+      activeEventData = nextEventData;
     }
     syncAdminArchiveState();
   };

@@ -1,14 +1,20 @@
 export const defaultNormalize = (value) => String(value || '').toLowerCase();
+export const defaultNormalizeCity = (value) =>
+  String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
 
 export const buildFilters = (formData, searchQuery, helpers = {}) => {
   const normalize = helpers.normalize || defaultNormalize;
+  const normalizeCity = helpers.normalizeCity || normalize;
   const getValue = (key) => (formData && typeof formData.get === 'function' ? formData.get(key) : '');
   const getAll = (key) => (formData && typeof formData.getAll === 'function' ? formData.getAll(key) : []);
 
   return {
     dateFrom: getValue('date-from') || '',
     dateTo: getValue('date-to') || '',
-    city: normalize(getValue('city')),
+    city: normalizeCity(getValue('city')),
     price: normalize(getValue('price')),
     format: normalize(getValue('format')),
     quickToday: Boolean(getValue('quick-today')),
@@ -25,7 +31,7 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   const normalize = helpers.normalize || defaultNormalize;
   const isPast = helpers.isPast || (() => false);
   const isArchivedEvent = helpers.isArchivedEvent || (() => false);
-  const getCitySlug = helpers.getCitySlug || ((value) => normalize(value));
+  const normalizeCity = helpers.normalizeCity || defaultNormalizeCity;
   const getTagList = helpers.getTagList || ((tags) => (tags || []).map((label) => ({ label })));
   const getLocalizedEventTitle = helpers.getLocalizedEventTitle || ((data) => data?.title || '');
   const getLocalizedCity = helpers.getLocalizedCity || ((value) => value || '');
@@ -87,7 +93,7 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   if (filters.quickOnline && normalize(event.format) !== 'online') {
     return false;
   }
-  if (filters.city && getCitySlug(event.city) !== filters.city) return false;
+  if (filters.city && normalizeCity(event.city) !== filters.city) return false;
   if (filters.price && normalize(event.priceType) !== filters.price) return false;
   if (filters.format && normalize(event.format) !== filters.format) return false;
   if (filters.tags && filters.tags.length) {
@@ -137,4 +143,46 @@ export const getAvailableTags = (events, helpers = {}) => {
   });
   const locale = getLang();
   return Array.from(tagMap.values()).sort((a, b) => a.label.localeCompare(b.label, locale));
+};
+
+export const buildCityOptions = (events, helpers = {}) => {
+  const normalizeCity = helpers.normalizeCity || defaultNormalizeCity;
+  const isArchivedEvent = helpers.isArchivedEvent || (() => false);
+  const isPast = helpers.isPast || (() => false);
+  const locale = helpers.getLang ? helpers.getLang() : 'da';
+  const cityMap = new Map();
+  (events || []).forEach((event) => {
+    if (!event || event.status !== 'published') return;
+    if (isArchivedEvent(event)) return;
+    if (isPast(event)) return;
+    const rawCity = String(event.city || '').trim();
+    const normalized = normalizeCity(rawCity);
+    if (!normalized) return;
+    if (!cityMap.has(normalized)) {
+      cityMap.set(normalized, rawCity);
+    }
+  });
+  return Array.from(cityMap.entries())
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
+};
+
+export const matchCityFromQuery = (query, cityOptions = [], helpers = {}) => {
+  const normalize = helpers.normalize || defaultNormalize;
+  const normalizeCity = helpers.normalizeCity || defaultNormalizeCity;
+  const tokens = String(query || '')
+    .split(/[\s,]+/)
+    .map((token) => normalize(token))
+    .filter(Boolean);
+  if (!tokens.length) return '';
+  for (const option of cityOptions) {
+    const rawLabel = option?.label || '';
+    const rawValue = option?.value || '';
+    const label = normalize(rawLabel);
+    const value = normalizeCity(rawValue || rawLabel);
+    if (tokens.includes(label) || tokens.includes(value)) {
+      return rawValue || rawLabel;
+    }
+  }
+  return '';
 };

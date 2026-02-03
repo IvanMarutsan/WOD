@@ -177,6 +177,19 @@ export const fetchMergedLocalEvents = async () => {
 
 export const findMergedEventById = async (id) => {
   if (!id) return null;
+  const local = getLocalEvents().find((event) => event?.id === id);
+  if (local) return local;
+  try {
+    const response = await fetch(`/.netlify/functions/public-event?id=${encodeURIComponent(id)}`);
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload?.ok && payload?.event) {
+        return payload.event;
+      }
+    }
+  } catch (error) {
+    // Ignore and fall back to merged list.
+  }
   const list = await fetchMergedLocalEvents();
   return list.find((event) => event.id === id) || null;
 };

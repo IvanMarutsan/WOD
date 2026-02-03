@@ -18,8 +18,6 @@ export const EventCard = (event, helpers) => {
     getLocalizedTag,
     getLocalizedEventTitle,
     getLocalizedCity,
-    getCitySlug,
-    isCityPart,
     formatDateRange,
     isPast,
     isArchived
@@ -71,29 +69,18 @@ export const EventCard = (event, helpers) => {
   const ticketUrl = rawTicketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
-  const citySlug = getCitySlug ? getCitySlug(event.city) : '';
   const venue = event.venue || '';
   const address = event.address || '';
-  const rawParts = [venue, address].filter((part) => part && String(part).trim());
-  const filtered = citySlug && typeof isCityPart === 'function'
-    ? rawParts.filter((part) => !isCityPart(part, citySlug))
-    : rawParts;
+  const rawParts = [cityLabel, venue, address].filter((part) => part && String(part).trim());
   const uniqueParts = [];
   const seen = [];
-  filtered.forEach((part) => {
+  rawParts.forEach((part) => {
     const key = normalizeLocationPart(part) || normalizePart(part);
     if (!key) return;
     if (seen.some((prev) => prev === key || prev.includes(key) || key.includes(prev))) return;
     seen.push(key);
     uniqueParts.push(part);
   });
-  if (cityLabel) {
-    const cityKey = normalizeLocationPart(cityLabel) || normalizePart(cityLabel);
-    if (cityKey && !seen.some((prev) => prev === cityKey || prev.includes(cityKey) || cityKey.includes(prev))) {
-      uniqueParts.push(cityLabel);
-      seen.push(cityKey);
-    }
-  }
   const location = uniqueParts.filter(Boolean).join(' · ');
   const languageMarkup = languageLabel ? `<p class="event-card__language">${languageLabel}</p>` : '';
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';

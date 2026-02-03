@@ -252,7 +252,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('end', formatInputDateTime(eventData.end));
     setValue('format', eventData.format || '');
     setValue('language', eventData.language || '');
-    setValue('address', eventData.address || [eventData.city, eventData.venue].filter(Boolean).join(', '));
+    setValue('address', eventData.address || eventData.venue || '');
     setValue('ticket-type', eventData.priceType || '');
     setValue('price', formatPriceInput(eventData.priceMin, eventData.priceMax));
     setValue('ticket-url', eventData.ticketUrl || '');
@@ -629,7 +629,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
       }
-      const city = guessCity(payload.address);
+      const derivedCity = payload.city || editingEventData?.city || guessCity(payload.address);
       const eventId = editingEventId;
       const priceInput = payload.price ? String(payload.price).trim() : '';
       const { min: priceMin, max: priceMax } = parsePriceInput(priceInput);
@@ -649,7 +649,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
           language: payload.language || '',
           venue: payload.address || '',
           address: payload.address || '',
-          city: city || editingEventData?.city || '',
+          city: derivedCity || '',
           priceType: payload['ticket-type'] || '',
           priceMin: Number.isFinite(priceMin) ? priceMin : null,
           priceMax: Number.isFinite(priceMax) ? priceMax : null,
@@ -681,7 +681,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         }
         return;
       }
-      payload.city = city || editingEventData?.city || '';
+      payload.city = derivedCity || '';
       payload.imageUrl = previewImageUrl || editingEventData?.images?.[0] || '';
       if (priceInput) {
         payload['price-min'] = Number.isFinite(priceMin) ? String(priceMin) : '';

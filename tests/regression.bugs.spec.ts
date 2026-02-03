@@ -64,7 +64,9 @@ test('editing a published event updates description on detail page', async ({ pa
   await page.goto(`/new-event.html?id=${eventId}`);
   await page.locator('.multi-step[data-ready="true"]').waitFor({ state: 'attached' });
 
-  await page.getByLabel(/Опис|Description|Beskrivelse/i).fill('Updated description after edit.');
+  const descriptionField = page.getByLabel(/Опис|Description|Beskrivelse/i);
+  await expect(descriptionField).toHaveValue('Short event description for preview.');
+  await descriptionField.fill('Updated description after edit.');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
   await page.getByLabel(/Початок|Start/i).waitFor({ state: 'visible' });
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();

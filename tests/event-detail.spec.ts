@@ -71,3 +71,57 @@ test('event detail shows real data and edit link', async ({ page }) => {
   await page.locator('[data-action="admin-edit"]').click();
   await expect(page).toHaveURL(new RegExp(`new-event\\.html\\?id=${eventId}`));
 });
+
+test('non-archived event does not show archived admin controls', async ({ page }) => {
+  const eventId = 'evt-1770121644767';
+  const payload = {
+    ok: true,
+    event: {
+      id: eventId,
+      title: 'Active Event',
+      description: 'Active event description.',
+      tags: [],
+      start: '2026-02-05T18:00:00+01:00',
+      end: '2026-02-05T20:00:00+01:00',
+      format: 'offline',
+      venue: 'Venue',
+      address: 'Main St 10',
+      city: 'Copenhagen',
+      priceType: 'free',
+      priceMin: null,
+      priceMax: null,
+      ticketUrl: '',
+      organizerId: '',
+      images: [],
+      status: 'published',
+      language: 'uk',
+      contactPerson: {
+        name: '',
+        email: '',
+        phone: '',
+        website: '',
+        instagram: '',
+        facebook: '',
+        meta: ''
+      }
+    }
+  };
+
+  await enableAdminSession(page);
+  await page.route('**/.netlify/functions/public-events*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  );
+  await page.route('**/.netlify/functions/public-event*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
+  );
+  await page.route('**/.netlify/functions/admin-event*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
+  );
+
+  await page.goto(`/event-card.html?id=${eventId}&serverless=1`);
+  await page.waitForSelector('[data-event-title]');
+
+  await expect(page.locator('[data-admin-archived-badge]')).toBeHidden();
+  await expect(page.locator('[data-action="admin-restore"]')).toBeHidden();
+  await expect(page.locator('[data-action="admin-archive"]')).toBeVisible();
+});
