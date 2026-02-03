@@ -35,6 +35,14 @@ test('admin-update uses external_id lookup for non-uuid ids', () => {
   assert.match(content, /id\.eq/);
 });
 
+test('update-event uses external_id lookup for non-uuid ids', () => {
+  const content = readFile('../../netlify/functions/update-event.ts');
+  assert.match(content, /isUuid/);
+  assert.match(content, /buildEventLookupQuery/);
+  assert.match(content, /external_id\.eq/);
+  assert.match(content, /id\.eq/);
+});
+
 test('admin-update enforces roles', () => {
   const content = readFile('../../netlify/functions/admin-update.ts');
   assert.match(content, /error:\s*'forbidden'/);

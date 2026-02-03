@@ -26,6 +26,11 @@ const parsePriceInput = (value: unknown) => {
   return { min, max, hasValue: true };
 };
 
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+const buildEventLookupQuery = (value: string) =>
+  isUuid(value) ? `(id.eq.${value},external_id.eq.${value})` : `(external_id.eq.${value})`;
+
 const normalizeDateValue = (value: unknown) => {
   if (value === undefined || value === null) return null;
   const text = String(value).trim();
@@ -73,7 +78,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
 
     const records = (await supabaseFetch('events', {
-      query: { or: `(id.eq.${id},external_id.eq.${id})`, limit: '1' }
+      query: { or: buildEventLookupQuery(id), limit: '1' }
     })) as any[];
     const existing = records?.[0];
     if (!existing) {
