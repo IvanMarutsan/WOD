@@ -174,7 +174,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   const toOffsetISO = (value) => {
     const date = parseDateTime(value);
-    if (!date) return value || '';
+    if (!date) return '';
     const pad = (num) => String(num).padStart(2, '0');
     const year = date.getFullYear();
     const month = pad(date.getMonth() + 1);

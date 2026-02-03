@@ -26,6 +26,15 @@ const parsePriceInput = (value: unknown) => {
   return { min, max, hasValue: true };
 };
 
+const normalizeDateValue = (value: unknown) => {
+  if (value === undefined || value === null) return null;
+  const text = String(value).trim();
+  if (!text) return null;
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return null;
+  return text;
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const roles = getRoles(context);
@@ -80,8 +89,10 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     }
     if (updates.language) updatePayload.language = String(updates.language);
     if (updates.format) updatePayload.format = String(updates.format);
-    if (updates.start) updatePayload.start_at = String(updates.start);
-    if (updates.end) updatePayload.end_at = String(updates.end);
+    const startValue = normalizeDateValue(updates.start);
+    if (startValue) updatePayload.start_at = startValue;
+    const endValue = normalizeDateValue(updates.end);
+    if (endValue) updatePayload.end_at = endValue;
     if (updates.address) updatePayload.address = String(updates.address);
     if (updates.venue) updatePayload.venue = String(updates.venue);
     if (updates.city) updatePayload.city = String(updates.city);
