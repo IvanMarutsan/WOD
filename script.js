@@ -726,6 +726,187 @@ import {
     return formatMessage('price_tbd', {}) || 'Ціна уточнюється';
   };
 
+  const normalize = (value) => String(value || '').toLowerCase();
+
+  const EVENT_TITLES = {
+    'evt-001': { uk: 'Тиждень дизайну в Копенгагені: Open Studio' },
+    'evt-002': { uk: 'Зимовий фестиваль їжі в Орхусі' },
+    'evt-003': { uk: 'Нічний забіг в Оденсе біля річки' },
+    'evt-004': { uk: 'Творчий coding jam в Ольборзі' },
+    'evt-005': { uk: "Сімейний кіновечір в Есб'єрзі" },
+    'evt-006': { uk: 'Спільний сніданок для новоприбулих' },
+    'evt-007': { uk: 'Концертний вечір у Копенгагені' },
+    'evt-008': { uk: 'Показ українського фільму' },
+    'evt-009': { uk: 'Клуб данської мови' },
+    'evt-010': { uk: 'Нетворкінг-ланч для стартапів' },
+    'evt-011': { uk: 'Маркет ремесел та мейкерів у Колдингу' },
+    'evt-012': { uk: 'Історична прогулянка в Роскілле' },
+    'evt-013': { uk: 'День каякінгу на озері в Сількеборзі' },
+    'evt-014': { uk: 'Сімейний день науки у Вайле' },
+    'evt-015': { uk: 'День волонтера: прибирання міста' },
+    'evt-016': { uk: 'Сімейний день у музеї Копенгагена' },
+    'evt-017': { uk: "Кар'єрна консультація для новоприбулих" },
+    'evt-018': { uk: 'Вечір арт-терапії' },
+    'evt-019': { uk: 'День спадщини в Хельсінгёрі' },
+    'evt-020': { uk: 'Форум української спільноти' }
+  };
+
+  const CITY_TRANSLATIONS = {
+    copenhagen: { uk: 'Копенгаген' },
+    aarhus: { uk: 'Орхус' },
+    odense: { uk: 'Оденсе' },
+    aalborg: { uk: 'Ольборг' },
+    esbjerg: { uk: "Есб'єрг" },
+    kolding: { uk: 'Колдинг' },
+    roskilde: { uk: 'Роскілле' },
+    silkeborg: { uk: 'Сількеборг' },
+    vejle: { uk: 'Вайле' },
+    fredericia: { uk: 'Фредерісія' },
+    helsingør: { uk: 'Хельсінгёр' },
+    helsingor: { uk: 'Хельсінгёр' }
+  };
+
+  const CITY_ALIASES = Object.entries(CITY_TRANSLATIONS).reduce((acc, [slug, labels]) => {
+    acc[slug] = slug;
+    if (labels?.uk) {
+      acc[normalize(labels.uk)] = slug;
+    }
+    return acc;
+  }, {});
+
+  const CITY_HINTS = {
+    copenhagen: ['copenhagen', 'københavn', 'kobenhavn'],
+    aarhus: ['aarhus', 'århus'],
+    odense: ['odense'],
+    aalborg: ['aalborg', 'ålborg'],
+    esbjerg: ['esbjerg']
+  };
+
+  const guessCitySlug = (text) => {
+    const normalized = normalize(text);
+    if (!normalized) return '';
+    for (const [slug, aliases] of Object.entries(CITY_HINTS)) {
+      if (normalized.includes(slug)) return slug;
+      if (aliases.some((alias) => normalized.includes(alias))) return slug;
+    }
+    for (const [alias, slug] of Object.entries(CITY_ALIASES)) {
+      if (normalized.includes(alias)) return slug;
+    }
+    return '';
+  };
+
+  const TAG_TRANSLATIONS = {
+    adventure: { uk: 'пригоди' },
+    art: { uk: 'мистецтво' },
+    career: { uk: "кар'єра" },
+    castle: { uk: 'замок' },
+    cinema: { uk: 'кіно' },
+    coding: { uk: 'кодинг' },
+    community: { uk: 'спільнота' },
+    craft: { uk: 'ремесла' },
+    creative: { uk: 'креатив' },
+    culture: { uk: 'культура' },
+    danish: { uk: 'данська' },
+    design: { uk: 'дизайн' },
+    discussion: { uk: 'обговорення' },
+    family: { uk: 'родина' },
+    festival: { uk: 'фестиваль' },
+    food: { uk: 'їжа' },
+    heritage: { uk: 'спадщина' },
+    history: { uk: 'історія' },
+    indie: { uk: 'інді' },
+    kayak: { uk: 'каяк' },
+    kids: { uk: 'діти' },
+    language: { uk: 'мова' },
+    live: { uk: 'лайв' },
+    lunch: { uk: 'обід' },
+    market: { uk: 'маркет' },
+    museum: { uk: 'музей' },
+    music: { uk: 'музика' },
+    networking: { uk: 'нетворкінг' },
+    night: { uk: 'ніч' },
+    outdoors: { uk: 'на природі' },
+    science: { uk: 'наука' },
+    sports: { uk: 'спорт' },
+    startup: { uk: 'стартап' },
+    studio: { uk: 'студія' },
+    support: { uk: 'підтримка' },
+    talk: { uk: 'розмова' },
+    ua: { uk: 'UA' },
+    volunteer: { uk: 'волонтерство' },
+    volunteers: { uk: 'волонтери' },
+    walking: { uk: 'пішохідна' },
+    welcome: { uk: 'вітання' },
+    wellbeing: { uk: 'добробут' },
+    workshop: { uk: 'воркшоп' }
+  };
+
+  const LANGUAGE_LABELS = {
+    uk: 'Українська',
+    ua: 'Українська',
+    uk_ua: 'Українська',
+    en: 'Англійська',
+    en_gb: 'Англійська',
+    da: 'Данська',
+    uk_en: 'Українська / Англійська',
+    en_uk: 'Українська / Англійська'
+  };
+
+  const getLanguageLabel = (value) => {
+    const normalized = normalize(value);
+    if (!normalized) return '';
+    const compact = normalized.replace(/\s+/g, '');
+    if (compact.includes('/')) {
+      const parts = compact.split('/').filter(Boolean);
+      const labels = parts.map((part) => LANGUAGE_LABELS[part] || part);
+      return labels.join(' / ');
+    }
+    return LANGUAGE_LABELS[compact] || value;
+  };
+
+  const getLocalizedEventTitle = (event) =>
+    EVENT_TITLES[event.id]?.uk || event.title;
+
+  const localizeByMap = (value, map) => {
+    const key = normalize(value);
+    const record = map[key];
+    if (!record) return value;
+    return record.uk || value;
+  };
+
+  const getLocalizedCity = (value) => {
+    if (!value) return value;
+    const normalized = normalize(value);
+    const keyMap = {
+      copenhagen: 'filters_city_copenhagen',
+      aarhus: 'filters_city_aarhus',
+      odense: 'filters_city_odense',
+      aalborg: 'filters_city_aalborg',
+      esbjerg: 'filters_city_esbjerg'
+    };
+    const key = keyMap[normalized];
+    if (key) {
+      const translated = formatMessage(key, {});
+      return translated || value;
+    }
+    return localizeByMap(value, CITY_TRANSLATIONS);
+  };
+
+  const getCitySlug = (value) => {
+    const normalized = normalize(value);
+    if (!normalized) return '';
+    return CITY_ALIASES[normalized] || normalized;
+  };
+
+  const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
+
+  const getTagLabel = (tag) => (typeof tag === 'string' ? tag : tag?.label || '');
+  const getTagStatus = (tag) => (typeof tag === 'string' ? 'approved' : tag?.status || 'approved');
+  const getTagList = (tags) =>
+    (tags || [])
+      .map((tag) => ({ label: getTagLabel(tag), status: getTagStatus(tag) }))
+      .filter((tag) => tag.label);
+
   await loadTranslations();
   applyTranslations();
   injectEventJsonLd();
@@ -1117,7 +1298,6 @@ import {
         applyFilters();
       });
     }
-    const normalize = (value) => String(value || '').toLowerCase();
     const getTokens = (value) =>
       normalize(value)
         .split(/[\s,]+/)
@@ -1173,214 +1353,6 @@ import {
       }
       return true;
     };
-
-    const EVENT_TITLES = {
-      'evt-001': {
-        uk: 'Тиждень дизайну в Копенгагені: Open Studio',
-      },
-      'evt-002': {
-        uk: 'Зимовий фестиваль їжі в Орхусі',
-      },
-      'evt-003': {
-        uk: 'Нічний забіг в Оденсе біля річки',
-      },
-      'evt-004': {
-        uk: 'Творчий coding jam в Ольборзі',
-      },
-      'evt-005': {
-        uk: "Сімейний кіновечір в Есб'єрзі",
-      },
-      'evt-006': {
-        uk: 'Спільний сніданок для новоприбулих',
-      },
-      'evt-007': {
-        uk: 'Концертний вечір у Копенгагені',
-      },
-      'evt-008': {
-        uk: 'Показ українського фільму',
-      },
-      'evt-009': {
-        uk: 'Клуб данської мови',
-      },
-      'evt-010': {
-        uk: 'Нетворкінг-ланч для стартапів',
-      },
-      'evt-011': {
-        uk: 'Маркет ремесел та мейкерів у Колдингу',
-      },
-      'evt-012': {
-        uk: 'Історична прогулянка в Роскілле',
-      },
-      'evt-013': {
-        uk: 'День каякінгу на озері в Сількеборзі',
-      },
-      'evt-014': {
-        uk: 'Сімейний день науки у Вайле',
-      },
-      'evt-015': {
-        uk: 'День волонтера: прибирання міста',
-      },
-      'evt-016': {
-        uk: 'Сімейний день у музеї Копенгагена',
-      },
-      'evt-017': {
-        uk: "Кар'єрна консультація для новоприбулих",
-      },
-      'evt-018': {
-        uk: 'Вечір арт-терапії',
-      },
-      'evt-019': {
-        uk: 'День спадщини в Хельсінгёрі',
-      },
-      'evt-020': {
-        uk: 'Форум української спільноти',
-      }
-    };
-
-    const CITY_TRANSLATIONS = {
-    copenhagen: { uk: 'Копенгаген' },
-    aarhus: { uk: 'Орхус' },
-    odense: { uk: 'Оденсе' },
-    aalborg: { uk: 'Ольборг' },
-    esbjerg: { uk: "Есб'єрг" },
-    kolding: { uk: 'Колдинг' },
-    roskilde: { uk: 'Роскілле' },
-    silkeborg: { uk: 'Сількеборг' },
-    vejle: { uk: 'Вайле' },
-    fredericia: { uk: 'Фредерісія' },
-    helsingør: { uk: 'Хельсінгёр' },
-    helsingor: { uk: 'Хельсінгёр' }
-    };
-
-    const CITY_ALIASES = Object.entries(CITY_TRANSLATIONS).reduce((acc, [slug, labels]) => {
-      acc[slug] = slug;
-      if (labels?.uk) {
-        acc[normalize(labels.uk)] = slug;
-      }
-      return acc;
-    }, {});
-
-    const CITY_HINTS = {
-      copenhagen: ['copenhagen', 'københavn', 'kobenhavn'],
-      aarhus: ['aarhus', 'århus'],
-      odense: ['odense'],
-      aalborg: ['aalborg', 'ålborg'],
-      esbjerg: ['esbjerg']
-    };
-
-    const guessCitySlug = (text) => {
-      const normalized = normalize(text);
-      if (!normalized) return '';
-      for (const [slug, aliases] of Object.entries(CITY_HINTS)) {
-        if (normalized.includes(slug)) return slug;
-        if (aliases.some((alias) => normalized.includes(alias))) return slug;
-      }
-      for (const [alias, slug] of Object.entries(CITY_ALIASES)) {
-        if (normalized.includes(alias)) return slug;
-      }
-      return '';
-    };
-
-    const TAG_TRANSLATIONS = {
-    adventure: { uk: 'пригоди' },
-    art: { uk: 'мистецтво' },
-    career: { uk: "кар'єра" },
-    castle: { uk: 'замок' },
-    cinema: { uk: 'кіно' },
-    coding: { uk: 'кодинг' },
-    community: { uk: 'спільнота' },
-    craft: { uk: 'ремесла' },
-    creative: { uk: 'креатив' },
-    culture: { uk: 'культура' },
-    danish: { uk: 'данська' },
-    design: { uk: 'дизайн' },
-    discussion: { uk: 'обговорення' },
-    family: { uk: 'родина' },
-    festival: { uk: 'фестиваль' },
-    food: { uk: 'їжа' },
-    heritage: { uk: 'спадщина' },
-    history: { uk: 'історія' },
-    indie: { uk: 'інді' },
-    kayak: { uk: 'каяк' },
-    kids: { uk: 'діти' },
-    language: { uk: 'мова' },
-    live: { uk: 'лайв' },
-    lunch: { uk: 'обід' },
-    market: { uk: 'маркет' },
-    museum: { uk: 'музей' },
-    music: { uk: 'музика' },
-    networking: { uk: 'нетворкінг' },
-    night: { uk: 'ніч' },
-    outdoors: { uk: 'на природі' },
-    science: { uk: 'наука' },
-    sports: { uk: 'спорт' },
-    startup: { uk: 'стартап' },
-    studio: { uk: 'студія' },
-    support: { uk: 'підтримка' },
-    talk: { uk: 'розмова' },
-    ua: { uk: 'UA' },
-    volunteer: { uk: 'волонтерство' },
-    volunteers: { uk: 'волонтери' },
-    walking: { uk: 'пішохідна' },
-    welcome: { uk: 'вітання' },
-    wellbeing: { uk: 'добробут' },
-    workshop: { uk: 'воркшоп' }
-    };
-
-    const LANGUAGE_LABELS = {
-      uk: 'Українська',
-      en: 'Англійська',
-      da: 'Данська'
-    };
-
-    const getLanguageLabel = (value) => {
-      const normalized = normalize(value);
-      if (!normalized) return '';
-      return LANGUAGE_LABELS[normalized] || value;
-    };
-
-  const getLocalizedEventTitle = (event) =>
-    EVENT_TITLES[event.id]?.uk || event.title;
-
-  const localizeByMap = (value, map) => {
-      const key = normalize(value);
-      const record = map[key];
-      if (!record) return value;
-    return record.uk || value;
-    };
-
-  const getLocalizedCity = (value) => {
-      if (!value) return value;
-      const normalized = normalize(value);
-      const keyMap = {
-        copenhagen: 'filters_city_copenhagen',
-        aarhus: 'filters_city_aarhus',
-        odense: 'filters_city_odense',
-        aalborg: 'filters_city_aalborg',
-        esbjerg: 'filters_city_esbjerg'
-      };
-      const key = keyMap[normalized];
-      if (key) {
-        const translated = formatMessage(key, {});
-        return translated || value;
-      }
-    return localizeByMap(value, CITY_TRANSLATIONS);
-    };
-
-    const getCitySlug = (value) => {
-      const normalized = normalize(value);
-      if (!normalized) return '';
-      return CITY_ALIASES[normalized] || normalized;
-    };
-
-  const getLocalizedTag = (value) => localizeByMap(value, TAG_TRANSLATIONS);
-
-    const getTagLabel = (tag) => (typeof tag === 'string' ? tag : tag?.label || '');
-    const getTagStatus = (tag) => (typeof tag === 'string' ? 'approved' : tag?.status || 'approved');
-    const getTagList = (tags) =>
-      (tags || [])
-        .map((tag) => ({ label: getTagLabel(tag), status: getTagStatus(tag) }))
-        .filter((tag) => tag.label);
 
     const filterHelpers = {
       normalize,
@@ -2710,6 +2682,67 @@ import {
       return true;
     });
   };
+  const ONLINE_PATTERN = /zoom|google meet|meet\.google|teams\.microsoft|teams|online|webinar/i;
+  const isOnlineEvent = (eventData) => {
+    if (!eventData) return false;
+    const formatValue = normalize(eventData.format);
+    const locationText = [eventData.address, eventData.venue, eventData.city].filter(Boolean).join(' ');
+    return formatValue.includes('online') || ONLINE_PATTERN.test(locationText);
+  };
+  const buildEventLocation = (eventData) => {
+    const onlineLabel = formatMessage('online', {}) || 'Онлайн';
+    if (isOnlineEvent(eventData)) {
+      return { label: onlineLabel, mapQuery: '' };
+    }
+    const cityLabel = getLocalizedCity(eventData.city);
+    const parts = getUniqueParts([eventData.venue, eventData.address, cityLabel]);
+    const label = parts.join(', ');
+    return { label, mapQuery: label || eventData.city || '' };
+  };
+  const resetEventDetail = () => {
+    if (eventTitleEl) eventTitleEl.textContent = '';
+    if (eventDescriptionEl) eventDescriptionEl.textContent = '';
+    if (eventDescriptionToggle) eventDescriptionToggle.hidden = true;
+    if (eventMeta) {
+      eventMeta.dataset.eventStart = '';
+      eventMeta.dataset.eventEnd = '';
+      eventMeta.dataset.eventCity = '';
+      eventMeta.textContent = '';
+    }
+    if (eventLocationEl) {
+      eventLocationEl.textContent = '';
+      eventLocationEl.removeAttribute('href');
+      eventLocationEl.removeAttribute('target');
+      eventLocationEl.removeAttribute('rel');
+    }
+    if (eventImageEl) {
+      eventImageEl.hidden = true;
+      eventImageEl.removeAttribute('src');
+      eventImageEl.removeAttribute('alt');
+    }
+    if (eventLanguageEl) {
+      eventLanguageEl.textContent = '';
+      eventLanguageEl.hidden = true;
+    }
+    if (eventTagsEl) {
+      eventTagsEl.innerHTML = '';
+    }
+    if (eventPrice) {
+      eventPrice.dataset.priceType = '';
+      eventPrice.dataset.priceMin = '';
+      eventPrice.dataset.priceMax = '';
+      eventPrice.textContent = '';
+    }
+    ticketCtas.forEach((cta) => {
+      cta.hidden = true;
+      cta.removeAttribute('href');
+      cta.removeAttribute('data-event-id');
+    });
+    if (ticketNote) {
+      ticketNote.hidden = true;
+      ticketNote.textContent = '';
+    }
+  };
 
   const renderEventDetail = (eventData) => {
     if (!eventData) return;
@@ -2724,16 +2757,17 @@ import {
       updateDescriptionToggle(description);
     }
     if (eventLocationEl) {
-      const parts = getUniqueParts([eventData.venue, eventData.address, eventData.city]);
-      const location = parts.length ? parts.join(', ') : '';
-      eventLocationEl.textContent = location || '—';
-      const mapQuery = encodeURIComponent(location || eventData.city || '');
+      const { label, mapQuery } = buildEventLocation(eventData);
+      eventLocationEl.textContent = label || '—';
       if (mapQuery) {
-        eventLocationEl.setAttribute('href', `https://www.google.com/maps/search/?api=1&query=${mapQuery}`);
+        const query = encodeURIComponent(mapQuery);
+        eventLocationEl.setAttribute('href', `https://www.google.com/maps/search/?api=1&query=${query}`);
         eventLocationEl.setAttribute('target', '_blank');
         eventLocationEl.setAttribute('rel', 'noopener');
       } else {
         eventLocationEl.removeAttribute('href');
+        eventLocationEl.removeAttribute('target');
+        eventLocationEl.removeAttribute('rel');
       }
     }
     if (eventImageEl) {
@@ -2752,22 +2786,22 @@ import {
       eventLanguageEl.hidden = !languageLabel;
     }
     if (eventMeta) {
+      const cityLabel = isOnlineEvent(eventData)
+        ? formatMessage('online', {}) || 'Онлайн'
+        : getLocalizedCity(eventData.city);
       eventMeta.dataset.eventStart = eventData.start || '';
       eventMeta.dataset.eventEnd = eventData.end || '';
-      eventMeta.dataset.eventCity = eventData.city || '';
+      eventMeta.dataset.eventCity = cityLabel || '';
     }
     if (eventTagsEl) {
-      const tags = (eventData.tags || []).map((tag) => ({
-        label: tag.label,
-        status: tag.status || 'approved',
-        type: 'tag'
-      }));
+      const tags = getTagList(eventData.tags);
       eventTagsEl.innerHTML = tags
         .map((tag) => {
           const isPending = tag.status === 'pending';
           const pendingClass = isPending ? ' event-tag--pending' : '';
           const pendingAttrs = isPending ? ` data-i18n-title="pending_tooltip"` : '';
-          return `<span class="event-tag${pendingClass}" data-tag-label="${tag.label}"${pendingAttrs}>${tag.label}</span>`;
+          const label = getLocalizedTag(tag.label);
+          return `<span class="event-tag${pendingClass}" data-tag-label="${label}"${pendingAttrs}>${label}</span>`;
         })
         .join('');
       updateStaticTagAria();
@@ -2926,6 +2960,16 @@ import {
         updateDescriptionToggle();
       });
     }
+    if (adminEditLink) {
+      adminEditLink.addEventListener('click', (event) => {
+        if (adminEditLink.getAttribute('href') && adminEditLink.getAttribute('href') !== '#') {
+          return;
+        }
+        if (!activeEventData?.id) return;
+        event.preventDefault();
+        window.location.href = `./new-event.html?id=${encodeURIComponent(activeEventData.id)}`;
+      });
+    }
     if (adminArchiveButton) {
       adminArchiveButton.addEventListener('click', () => {
         if (!activeEventData) return;
@@ -2968,60 +3012,55 @@ import {
     }
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('id');
-    const loadEventDetail = () => {
+    const loadEventDetail = async () => {
       if (!eventId) {
         updateEventMeta();
         updateEventPrice();
         updateDescriptionToggle();
         return;
       }
+      resetEventDetail();
       const isAdmin = hasAdminSession();
-      fetchMergedEvents()
-        .then((data) => {
+      if (!hasServerlessSupport) {
+        try {
+          const data = await fetchMergedEvents();
           const eventData = data.find((item) => item.id === eventId);
-          if (eventData) {
-            if (isArchivedEvent(eventData) && !isAdmin) {
-              window.location.replace('./404.html');
-              return;
-            }
-            safeRenderEventDetail(eventData);
-            if (!eventData.description) {
-              fetchPublicEventById(eventId).then((publicEvent) => {
-                if (!publicEvent) return;
-                safeRenderEventDetail({ ...eventData, ...publicEvent });
-              });
-            }
-            return;
-          }
-          if (!isAdmin) {
+          if (!eventData) {
             window.location.replace('./404.html');
             return;
           }
-          fetchAdminEventById(eventId).then((adminEvent) => {
-            if (!adminEvent) {
-              window.location.replace('./404.html');
-              return;
-            }
+          safeRenderEventDetail(eventData);
+        } catch (error) {
+          updateDescriptionToggle();
+        }
+        return;
+      }
+      try {
+        if (isAdmin) {
+          const adminEvent = await fetchAdminEventById(eventId);
+          if (adminEvent) {
             safeRenderEventDetail(adminEvent);
-          });
-        })
-        .catch(() => {
-          if (!isAdmin) {
-            updateEventMeta();
-            updateEventPrice();
-            updateDescriptionToggle();
             return;
           }
-          fetchAdminEventById(eventId).then((adminEvent) => {
-            if (!adminEvent) {
-              updateEventMeta();
-              updateEventPrice();
-              updateDescriptionToggle();
-              return;
-            }
-            safeRenderEventDetail(adminEvent);
-          });
-        });
+        }
+        const publicEvent = await fetchPublicEventById(eventId);
+        if (publicEvent) {
+          safeRenderEventDetail(publicEvent);
+          return;
+        }
+        window.location.replace('./404.html');
+      } catch (error) {
+        if (!isAdmin) {
+          window.location.replace('./404.html');
+          return;
+        }
+        const adminEvent = await fetchAdminEventById(eventId);
+        if (!adminEvent) {
+          window.location.replace('./404.html');
+          return;
+        }
+        safeRenderEventDetail(adminEvent);
+      }
     };
     refreshAdminData = () => loadEventDetail();
     if (hasAdminSession() || document.body.classList.contains('is-admin')) {

@@ -1,0 +1,73 @@
+import { test, expect } from '@playwright/test';
+import { enableAdminSession } from './helpers';
+
+test('event detail shows real data and edit link', async ({ page }) => {
+  const eventId = 'evt-1770121644766';
+  const payload = {
+    ok: true,
+    event: {
+      id: eventId,
+      title: 'Design Systems Meetup',
+      description: 'Real event description for detail page.',
+      tags: [
+        { label: 'Design', status: 'approved' },
+        { label: 'Community', status: 'pending' }
+      ],
+      start: '2026-02-04T18:00:00+01:00',
+      end: '2026-02-04T20:00:00+01:00',
+      format: 'online',
+      venue: '',
+      address: 'Zoom',
+      city: 'Copenhagen',
+      priceType: 'paid',
+      priceMin: 350,
+      priceMax: 520,
+      ticketUrl: 'https://tickets.example.com',
+      organizerId: '',
+      images: [],
+      status: 'published',
+      language: 'uk',
+      contactPerson: {
+        name: '',
+        email: '',
+        phone: '',
+        website: '',
+        instagram: '',
+        facebook: '',
+        meta: ''
+      }
+    }
+  };
+
+  await enableAdminSession(page);
+  await page.route('**/.netlify/functions/public-events*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  );
+  await page.route('**/.netlify/functions/public-event*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
+  );
+  await page.route('**/.netlify/functions/admin-event*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
+  );
+
+  await page.goto(`/event-card.html?id=${eventId}&serverless=1`);
+  await page.waitForSelector('[data-event-title]');
+
+  await expect(page.locator('[data-event-title]')).toHaveText(payload.event.title);
+  await expect(page.locator('[data-event-language]')).toHaveText('Українська');
+
+  const tags = page.locator('[data-event-tags] .event-tag');
+  await expect(tags).toHaveCount(2);
+  await expect(tags.nth(0)).toHaveText('дизайн');
+  await expect(tags.nth(1)).toHaveText('спільнота');
+
+  const meta = page.locator('[data-event-start]');
+  await expect(meta).toContainText('04.02.2026');
+  await expect(meta).toContainText('Онлайн');
+
+  await expect(page.locator('[data-event-location]')).toHaveText('Онлайн');
+  await expect(page.locator('[data-price-type]')).toContainText('від DKK 350 до DKK 520');
+
+  await page.locator('[data-action="admin-edit"]').click();
+  await expect(page).toHaveURL(new RegExp(`new-event\\.html\\?id=${eventId}`));
+});
