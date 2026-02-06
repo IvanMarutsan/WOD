@@ -56,6 +56,7 @@ export async function createEventToPreview(page) {
   await page.locator('select[name="format"]').selectOption({ value: 'offline' });
   await page.locator('select[name="language"]').selectOption({ value: 'uk' });
   await page.getByLabel(/Адреса|Address|Adresse/i).fill('Copenhagen, Main St 10');
+  await page.locator('input[name="city"]').fill('Copenhagen');
   await page.getByRole('button', { name: /Далі|Next|Næste/i }).click();
 
   // Step 3: tickets

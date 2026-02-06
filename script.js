@@ -13,6 +13,7 @@ import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/aut
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
 import { formatPriceRangeLabel } from './modules/price-detail.js';
 import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
+import { buildGoogleMapsLink } from './modules/maps.mjs';
 import {
   archiveLocalEvent,
   deleteLocalEvent,
@@ -2675,10 +2676,12 @@ import {
     if (isOnlineEvent(eventData)) {
       return { label: onlineLabel, mapQuery: '' };
     }
+    const address = String(eventData.address || '').trim();
+    if (address) {
+      return { label: address, mapQuery: address };
+    }
     const cityLabel = getDisplayCity(eventData.city);
-    const parts = getUniqueParts([cityLabel, eventData.venue, eventData.address]);
-    const label = parts.join(', ');
-    return { label, mapQuery: label || cityLabel || '' };
+    return { label: cityLabel || '—', mapQuery: cityLabel || '' };
   };
   const resetEventDetail = () => {
     if (eventTitleEl) eventTitleEl.textContent = '';
@@ -2737,14 +2740,13 @@ import {
       }
       updateDescriptionToggle(description);
     }
-    if (eventLocationEl) {
+      if (eventLocationEl) {
       const { label, mapQuery } = buildEventLocation(eventData);
       eventLocationEl.textContent = label || '—';
       if (mapQuery) {
-        const query = encodeURIComponent(mapQuery);
-        eventLocationEl.setAttribute('href', `https://www.google.com/maps/search/?api=1&query=${query}`);
+        eventLocationEl.setAttribute('href', buildGoogleMapsLink(mapQuery));
         eventLocationEl.setAttribute('target', '_blank');
-        eventLocationEl.setAttribute('rel', 'noopener');
+        eventLocationEl.setAttribute('rel', 'noopener noreferrer');
       } else {
         eventLocationEl.removeAttribute('href');
         eventLocationEl.removeAttribute('target');

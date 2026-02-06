@@ -24,6 +24,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const imageAltInput = multiStepForm.querySelector('input[name="image-alt"]');
   const contactNameField = multiStepForm.querySelector('input[name="contact-name"]');
   const descriptionField = multiStepForm.querySelector('textarea[name="description"]');
+  const cityField = multiStepForm.querySelector('input[name="city"]');
   const tagsInput = multiStepForm.querySelector('.tags-input__field');
   const tagsList = multiStepForm.querySelector('.tags-input__list');
   const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
@@ -252,6 +253,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('end', formatInputDateTime(eventData.end));
     setValue('format', eventData.format || '');
     setValue('language', eventData.language || '');
+    setValue('city', eventData.city || '');
     setValue('address', eventData.address || eventData.venue || '');
     setValue('ticket-type', eventData.priceType || '');
     setValue('price', formatPriceInput(eventData.priceMin, eventData.priceMax));
@@ -620,6 +622,23 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         }
         return;
       }
+      const rawCity = String(payload.city || '').trim().replace(/\s+/g, ' ');
+      payload.city = rawCity;
+      if (!payload.city) {
+        const message = formatMessage('form_city_required', {}) || 'Місто обовʼязкове.';
+        if (cityField) {
+          cityField.setCustomValidity(message);
+          cityField.reportValidity();
+          cityField.focus();
+        }
+        if (submitStatus) {
+          submitStatus.textContent = message;
+        }
+        return;
+      }
+      if (cityField) {
+        cityField.setCustomValidity('');
+      }
       if (descriptionField) {
         descriptionField.setCustomValidity('');
       }
@@ -629,7 +648,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
       }
-      const derivedCity = payload.city || editingEventData?.city || guessCity(payload.address);
+      const derivedCity = payload.city || editingEventData?.city || '';
       const eventId = editingEventId;
       const priceInput = payload.price ? String(payload.price).trim() : '';
       const { min: priceMin, max: priceMax } = parsePriceInput(priceInput);

@@ -125,3 +125,57 @@ test('non-archived event does not show archived admin controls', async ({ page }
   await expect(page.locator('[data-action="admin-restore"]')).toBeHidden();
   await expect(page.locator('[data-action="admin-archive"]')).toBeVisible();
 });
+
+test('event detail shows address as google maps link', async ({ page }) => {
+  const eventId = 'evt-1770121644768';
+  const address = 'Sankt Ansgar Kirke, Bredgade 64, Copenhagen';
+  const payload = {
+    ok: true,
+    event: {
+      id: eventId,
+      title: 'Address Event',
+      description: 'Address event description.',
+      tags: [],
+      start: '2026-02-06T18:00:00+01:00',
+      end: '2026-02-06T20:00:00+01:00',
+      format: 'offline',
+      venue: '',
+      address,
+      city: 'Copenhagen',
+      priceType: 'free',
+      priceMin: null,
+      priceMax: null,
+      ticketUrl: '',
+      organizerId: '',
+      images: [],
+      status: 'published',
+      language: 'en',
+      contactPerson: {
+        name: '',
+        email: '',
+        phone: '',
+        website: '',
+        instagram: '',
+        facebook: '',
+        meta: ''
+      }
+    }
+  };
+
+  await enableAdminSession(page);
+  await page.route('**/.netlify/functions/public-events*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  );
+  await page.route('**/.netlify/functions/public-event*', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
+  );
+
+  await page.goto(`/event-card.html?id=${eventId}&serverless=1`);
+  const location = page.locator('[data-event-location]');
+  await expect(location).toHaveText(address);
+  await expect(location).toHaveAttribute(
+    'href',
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  );
+  await expect(location).toHaveAttribute('target', '_blank');
+});

@@ -155,3 +155,38 @@ test('highlights show online label for online events', async ({ page }) => {
   await expect(highlightCard).toBeVisible();
   await expect(highlightCard.locator('.highlights__city')).toContainText(/Онлайн/i);
 });
+
+test('catalog shows only city and not full address', async ({ page }) => {
+  await freezeTime(page);
+  await page.addInitScript(() => {
+    const localEvents = [
+      {
+        id: 'evt-city-only-1',
+        title: 'City Only Event',
+        description: 'Test',
+        start: '2026-01-10T10:00:00+01:00',
+        end: '2026-01-10T11:00:00+01:00',
+        format: 'offline',
+        venue: '',
+        address: 'Sankt Ansgar Kirke, Bredgade 64, Copenhagen',
+        city: 'Copenhagen',
+        priceType: 'free',
+        priceMin: null,
+        priceMax: null,
+        ticketUrl: '',
+        tags: [],
+        status: 'published',
+        images: []
+      }
+    ];
+    localStorage.setItem('wodLocalEvents', JSON.stringify(localEvents));
+    localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
+  });
+
+  await page.goto('/#events');
+  await page.waitForSelector('[data-testid="event-card"]');
+  const card = page.locator('[data-testid="event-card"]', { hasText: 'City Only Event' });
+  const location = card.locator('.event-card__location');
+  await expect(location).toHaveText('Copenhagen');
+  await expect(location).not.toContainText('Bredgade');
+});

@@ -101,6 +101,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (!isValidDate(payload.start)) errors.push('start');
     if (!['offline', 'online'].includes(String(payload.format || ''))) errors.push('format');
     if (!isNonEmptyString(payload.address)) errors.push('address');
+    if (!isNonEmptyString(payload.city)) errors.push('city');
     if (!['free', 'paid'].includes(String(payload['ticket-type'] || ''))) errors.push('ticket-type');
     if (!isNonEmptyString(payload['contact-name'])) errors.push('contact-name');
     if (payload['contact-email'] && !isValidEmail(payload['contact-email'])) {

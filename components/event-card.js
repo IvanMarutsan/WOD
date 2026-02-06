@@ -69,19 +69,7 @@ export const EventCard = (event, helpers) => {
   const ticketUrl = rawTicketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
   const cityLabel = getLocalizedCity(event.city);
-  const venue = event.venue || '';
-  const address = event.address || '';
-  const rawParts = [cityLabel, venue, address].filter((part) => part && String(part).trim());
-  const uniqueParts = [];
-  const seen = [];
-  rawParts.forEach((part) => {
-    const key = normalizeLocationPart(part) || normalizePart(part);
-    if (!key) return;
-    if (seen.some((prev) => prev === key || prev.includes(key) || key.includes(prev))) return;
-    seen.push(key);
-    uniqueParts.push(part);
-  });
-  const location = uniqueParts.filter(Boolean).join(' · ');
+  const location = cityLabel ? cityLabel : '';
   const languageMarkup = languageLabel ? `<p class="event-card__language">${languageLabel}</p>` : '';
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';
   return `
