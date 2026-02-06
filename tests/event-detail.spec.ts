@@ -128,7 +128,9 @@ test('non-archived event does not show archived admin controls', async ({ page }
 
 test('event detail shows address as google maps link', async ({ page }) => {
   const eventId = 'evt-1770121644768';
-  const address = 'Sankt Ansgar Kirke, Bredgade 64, Copenhagen';
+  const address = 'Sankt Ansgar Kirke, Bredgade 64';
+  const city = 'Copenhagen';
+  const expectedLocation = `${address}, ${city}`;
   const payload = {
     ok: true,
     event: {
@@ -141,7 +143,7 @@ test('event detail shows address as google maps link', async ({ page }) => {
       format: 'offline',
       venue: '',
       address,
-      city: 'Copenhagen',
+      city,
       priceType: 'free',
       priceMin: null,
       priceMax: null,
@@ -172,10 +174,10 @@ test('event detail shows address as google maps link', async ({ page }) => {
 
   await page.goto(`/event-card.html?id=${eventId}&serverless=1`);
   const location = page.locator('[data-event-location]');
-  await expect(location).toHaveText(address);
+  await expect(location).toHaveText(expectedLocation);
   await expect(location).toHaveAttribute(
     'href',
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(expectedLocation)}`
   );
   await expect(location).toHaveAttribute('target', '_blank');
 });

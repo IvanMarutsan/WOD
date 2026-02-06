@@ -2677,10 +2677,16 @@ import {
       return { label: onlineLabel, mapQuery: '' };
     }
     const address = String(eventData.address || '').trim();
+    const cityLabel = getDisplayCity(eventData.city);
     if (address) {
+      if (cityLabel) {
+        const addressKey = address.toLowerCase();
+        const cityKey = cityLabel.toLowerCase();
+        const combined = addressKey.includes(cityKey) ? address : `${address}, ${cityLabel}`;
+        return { label: combined, mapQuery: combined };
+      }
       return { label: address, mapQuery: address };
     }
-    const cityLabel = getDisplayCity(eventData.city);
     return { label: cityLabel || '—', mapQuery: cityLabel || '' };
   };
   const resetEventDetail = () => {
