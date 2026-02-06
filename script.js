@@ -897,6 +897,20 @@ import {
       .map((tag) => ({ label: getTagLabel(tag), status: getTagStatus(tag) }))
       .filter((tag) => tag.label);
 
+  const buildTagSuggestions = (events) => {
+    const tagMap = new Map();
+    (events || []).forEach((event) => {
+      getTagList(event?.tags).forEach((tag) => {
+        const rawLabel = tag?.label ? String(tag.label).trim() : '';
+        if (!rawLabel) return;
+        const key = normalize(rawLabel);
+        if (!key || tagMap.has(key)) return;
+        tagMap.set(key, rawLabel);
+      });
+    });
+    return Array.from(tagMap.values());
+  };
+
   await loadTranslations();
   applyTranslations();
   injectEventJsonLd();
@@ -1738,6 +1752,20 @@ import {
     };
 
     let cityOptionsData = [];
+    const updateTagSuggestions = (events) => {
+      const lists = document.querySelectorAll('[data-tag-suggestions]');
+      if (!lists.length) return;
+      const sourceEvents = getActiveEvents(events);
+      const suggestions = buildTagSuggestions(sourceEvents);
+      lists.forEach((list) => {
+        list.innerHTML = '';
+        suggestions.forEach((label) => {
+          const option = document.createElement('option');
+          option.value = label;
+          list.appendChild(option);
+        });
+      });
+    };
     const updateCityOptions = (events) => {
       if (!(cityField instanceof HTMLSelectElement)) return;
       const currentValue = normalizeCity(cityField.value);
@@ -1793,6 +1821,7 @@ import {
       syncPastFilterState(false);
       setErrorState(false);
       updateCityOptions(state.events);
+      updateTagSuggestions(state.events);
       const formData = filtersForm ? new FormData(filtersForm) : null;
       syncSelectedTags();
       const filters = buildFilters(formData, activeFilters.searchQuery, {
@@ -2248,6 +2277,7 @@ import {
         setLoading(false);
         setErrorState(false);
         updateCityOptions(normalizedEvents);
+        updateTagSuggestions(normalizedEvents);
         readQueryParams();
         applyFilters({ preservePage: true });
         syncAdvancedPanel();

@@ -104,11 +104,13 @@
                     type="text"
                     class="tags-input__field"
                     name="tags-input"
+                    list="tag-suggestions"
                     aria-label="Додати тег"
                     data-i18n-aria="form_tags_input_label"
                     placeholder="дизайн"
                     data-i18n-placeholder="form_tags_placeholder"
                   />
+                  <datalist id="tag-suggestions" data-tag-suggestions></datalist>
                   <input type="hidden" name="tags" required />
                 </div>
                 <small id="tags-help" data-i18n="form_tags_help">Натисніть Enter, щоб додати тег.</small>
