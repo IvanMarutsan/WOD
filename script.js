@@ -5,7 +5,8 @@ import {
   eventMatchesFilters,
   getAvailableTags,
   matchCityFromQuery,
-  defaultNormalizeCity
+  defaultNormalizeCity,
+  filterWeeklyEvents
 } from './modules/filters.mjs';
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
@@ -1391,21 +1392,12 @@ import {
     const renderHighlights = (list) => {
       if (!highlightsTrack) return;
       const now = new Date();
-      const weekEnd = new Date(now);
-      weekEnd.setDate(weekEnd.getDate() + 7);
-      const upcomingWeek = list.filter((event) => {
-        if (event.status !== 'published') return false;
-        if (isArchivedEvent(event)) return false;
-        if (isPast(event)) return false;
-        const startDate = new Date(event.start);
-        if (Number.isNaN(startDate.getTime())) return false;
-        return startDate >= now && startDate <= weekEnd;
-      });
+      const upcomingWeek = filterWeeklyEvents(list, now, { isArchivedEvent, isPast });
 
       if (!upcomingWeek.length) {
         highlightsTrack.innerHTML = `
           <div class="highlights__empty">
-            <p class="highlights__empty-title">Немає подій на найближчий тиждень.</p>
+            <p class="highlights__empty-title">Немає подій на цьому тижні.</p>
             <p class="highlights__empty-text">Перевірте каталог або поверніться пізніше — ми додаємо нові події регулярно.</p>
           </div>
         `;

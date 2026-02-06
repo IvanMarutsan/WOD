@@ -15,7 +15,12 @@ test('price detail shows single paid amount without range', () => {
 
 test('price detail shows paid range for min and max', () => {
   const label = formatPriceRangeLabel('paid', 120, 200, formatMessage);
-  assert.equal(label, 'від DKK 120 до DKK 200');
+  assert.equal(label, 'Ціна: 120 - 200 DKK');
+});
+
+test('price detail treats equal min and max as single price', () => {
+  const label = formatPriceRangeLabel('paid', 120, 120, formatMessage);
+  assert.equal(label, 'DKK 120');
 });
 
 test('price detail shows tbd when no paid values', () => {

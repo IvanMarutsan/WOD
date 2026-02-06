@@ -131,8 +131,8 @@ test('highlights show online label for online events', async ({ page }) => {
         id: 'evt-online-1',
         title: 'Online Workshop',
         description: 'Remote session.',
-        start: '2026-01-05T10:00:00+01:00',
-        end: '2026-01-05T11:00:00+01:00',
+        start: '2026-01-04T10:00:00+01:00',
+        end: '2026-01-04T11:00:00+01:00',
         format: 'online',
         venue: '',
         address: 'Google Meet',
@@ -154,6 +154,56 @@ test('highlights show online label for online events', async ({ page }) => {
   const highlightCard = page.locator('.highlights__card', { hasText: 'Online Workshop' });
   await expect(highlightCard).toBeVisible();
   await expect(highlightCard.locator('.highlights__city')).toContainText(/Онлайн/i);
+});
+
+test('highlights only include events through Sunday of current week', async ({ page }) => {
+  await freezeTime(page);
+  await page.addInitScript(() => {
+    const localEvents = [
+      {
+        id: 'evt-sun-week',
+        title: 'Sunday Event',
+        description: 'Within current week.',
+        start: '2026-01-04T10:00:00+01:00',
+        end: '2026-01-04T11:00:00+01:00',
+        format: 'offline',
+        venue: '',
+        address: 'Copenhagen',
+        city: 'Copenhagen',
+        priceType: 'free',
+        priceMin: null,
+        priceMax: null,
+        ticketUrl: '',
+        tags: [],
+        status: 'published',
+        images: []
+      },
+      {
+        id: 'evt-next-week',
+        title: 'Next Monday Event',
+        description: 'Next week event.',
+        start: '2026-01-05T10:00:00+01:00',
+        end: '2026-01-05T11:00:00+01:00',
+        format: 'offline',
+        venue: '',
+        address: 'Copenhagen',
+        city: 'Copenhagen',
+        priceType: 'free',
+        priceMin: null,
+        priceMax: null,
+        ticketUrl: '',
+        tags: [],
+        status: 'published',
+        images: []
+      }
+    ];
+    localStorage.setItem('wodLocalEvents', JSON.stringify(localEvents));
+    localStorage.setItem('wodDeletedEvents', JSON.stringify([]));
+  });
+
+  await page.goto('/');
+  await expect(page.locator('.highlights__card', { hasText: 'Sunday Event' })).toBeVisible();
+  await expect(page.locator('.highlights__card', { hasText: 'Next Monday Event' })).toHaveCount(0);
 });
 
 test('catalog shows only city and not full address', async ({ page }) => {

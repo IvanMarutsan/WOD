@@ -66,7 +66,7 @@ test('event detail shows real data and edit link', async ({ page }) => {
   await expect(meta).toContainText('Онлайн');
 
   await expect(page.locator('[data-event-location]')).toHaveText('Онлайн');
-  await expect(page.locator('[data-price-type]')).toContainText('від DKK 350 до DKK 520');
+  await expect(page.locator('[data-price-type]')).toContainText('Ціна: 350 - 520 DKK');
 
   await page.locator('[data-action="admin-edit"]').click();
   await expect(page).toHaveURL(new RegExp(`new-event\\.html\\?id=${eventId}`));

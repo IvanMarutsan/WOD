@@ -186,3 +186,32 @@ export const matchCityFromQuery = (query, cityOptions = [], helpers = {}) => {
   }
   return '';
 };
+
+export const getWeekRange = (now = new Date()) => {
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const day = start.getDay();
+  const daysFromMonday = (day + 6) % 7;
+  start.setDate(start.getDate() - daysFromMonday);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+};
+
+export const filterWeeklyEvents = (events, now = new Date(), helpers = {}) => {
+  const isArchivedEvent = helpers.isArchivedEvent || (() => false);
+  const isPast = helpers.isPast || (() => false);
+  const { start: weekStart, end } = getWeekRange(now);
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const start = todayStart > weekStart ? todayStart : weekStart;
+  return (events || []).filter((event) => {
+    if (!event || event.status !== 'published') return false;
+    if (isArchivedEvent(event)) return false;
+    if (isPast(event)) return false;
+    const startDate = new Date(event.start);
+    if (Number.isNaN(startDate.getTime())) return false;
+    return startDate >= start && startDate <= end;
+  });
+};
