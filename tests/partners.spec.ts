@@ -15,23 +15,22 @@ test('homepage renders partners section and carousel arrows move cards', async (
   await expect(prev).toBeEnabled();
 });
 
-test('partner with external link opens in new tab', async ({ page }) => {
+test('partner logo opens internal partner page', async ({ page }) => {
   await page.goto('/');
-  const externalLink = page.locator('.partner-card__logo-link[target="_blank"]').first();
-  await expect(externalLink).toBeVisible();
-  const [popup] = await Promise.all([page.waitForEvent('popup'), externalLink.click()]);
-  await popup.waitForLoadState('domcontentloaded');
-  expect(popup.url()).toMatch(/^https?:\/\//);
+  const partnerLink = page.locator('.partner-card__logo-link').first();
+  await expect(partnerLink).toBeVisible();
+  await partnerLink.click();
+  await expect(page).toHaveURL(/partner\.html\?slug=/);
 });
 
-test('detail button opens partner page with content', async ({ page }) => {
+test('partner page opens and renders base content', async ({ page }) => {
   await page.goto('/');
   const detailLink = page.locator('.partner-card a[href*="partner.html?slug="]').first();
   await expect(detailLink).toBeVisible();
   await detailLink.click();
   await expect(page).toHaveURL(/partner\.html\?slug=/);
   await expect(page.locator('[data-partner-title]')).not.toHaveText('');
-  await expect(page.locator('[data-partner-description]')).toBeVisible();
+  await expect(page.locator('[data-partner-article]')).toBeVisible();
 });
 
 test('admin can create active partner with logo and it appears on homepage', async ({ page }) => {

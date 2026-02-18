@@ -3425,15 +3425,49 @@ body[data-admin-auth="denied"] [data-admin-protected] {
 
 .admin-partners-form .filters__toggle {
   display: grid;
-  gap: 0.3rem;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.55rem;
   align-content: start;
+  align-items: start;
   border-radius: 14px;
 }
 
+.admin-partners-form .filters__toggle input {
+  position: static;
+  opacity: 1;
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.admin-partners-form .filters__toggle span {
+  grid-column: 2;
+}
+
 .admin-partners-form .filters__toggle small {
+  grid-column: 2;
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.25;
+}
+
+.admin-partners-details {
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-partners-details legend {
+  padding: 0 0.35rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.admin-partners-details:disabled {
+  opacity: 0.6;
 }
 
 .admin-partners-form__actions {

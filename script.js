@@ -2716,18 +2716,11 @@ import {
           const name = String(partner?.name || '').trim();
           const slug = normalizePartnerSlug(partner?.slug || name);
           const logoUrl = getPartnerLogoUrl(partner);
-          const hasDetail = partner?.hasDetailPage === true || partner?.has_detail_page === true;
-          const externalUrl = String(partner?.websiteUrl || partner?.website_url || '').trim();
-          const linkHref = hasDetail
-            ? `partner.html?slug=${encodeURIComponent(slug)}`
-            : externalUrl || '#';
-          const linkAttrs = hasDetail
-            ? ''
-            : ' target="_blank" rel="noopener"';
+          const linkHref = `partner.html?slug=${encodeURIComponent(slug)}`;
           return `
             <article class="partner-card" data-partner-id="${partner?.id || slug}">
               <div class="partner-card__inner">
-                <a class="partner-card__logo-link" href="${linkHref}"${linkAttrs}>
+                <a class="partner-card__logo-link" href="${linkHref}">
                   ${logoUrl ? `<img class="partner-card__logo" src="${logoUrl}" alt="${name}" loading="lazy" />` : `<div class="partner-card__logo" aria-hidden="true"></div>`}
                 </a>
               </div>
@@ -3679,7 +3672,7 @@ import {
         const merged = await fetchMergedPartners();
         partner = merged.find((item) => normalizePartnerSlug(item?.slug || item?.name) === slug) || null;
       }
-      if (!partner || !(partner?.hasDetailPage === true || partner?.has_detail_page === true)) {
+      if (!partner) {
         window.location.replace('./404.html');
         return;
       }

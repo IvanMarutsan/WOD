@@ -28,7 +28,6 @@ export const handler = async (event: HandlerEvent) => {
       query: {
         slug: `eq.${slug}`,
         is_active: 'eq.true',
-        has_detail_page: 'eq.true',
         limit: '1',
         select:
           'id,name,slug,logo_url,website_url,has_detail_page,is_active,sort_order,detail_content'

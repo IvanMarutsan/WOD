@@ -24,6 +24,20 @@ const buildOrigin = (event: HandlerEvent) => {
   return `${proto}://${host}`;
 };
 
+const fetchPublishedEventFromPublicApi = async (id: string, origin: string) => {
+  try {
+    const response = await fetch(
+      `${origin}/.netlify/functions/public-event?id=${encodeURIComponent(id)}`
+    );
+    if (!response.ok) return null;
+    const payload = (await response.json()) as { ok?: boolean; event?: any };
+    if (!payload?.ok || !payload?.event) return null;
+    return payload.event;
+  } catch (error) {
+    return null;
+  }
+};
+
 const fetchPublishedEvent = async (id: string) => {
   const query: Record<string, string> = {
     status: 'eq.published',
@@ -53,7 +67,8 @@ export const handler = async (event: HandlerEvent) => {
   const eventUrl = `${origin}/event-card.html?id=${encodeURIComponent(id)}`;
 
   try {
-    const row = await fetchPublishedEvent(id);
+    const apiEvent = await fetchPublishedEventFromPublicApi(id, origin);
+    const row = apiEvent || (await fetchPublishedEvent(id));
     if (!row) {
       return {
         statusCode: 302,
@@ -64,7 +79,7 @@ export const handler = async (event: HandlerEvent) => {
 
     const title = `${String(row.title || 'Подія').trim()} — What's on DK?`;
     const description = String(row.description || '').trim() || 'Деталі події в Данії.';
-    const image = String(row.image_url || '').trim() || DEFAULT_IMAGE;
+    const image = String(row.images?.[0] || row.image_url || '').trim() || DEFAULT_IMAGE;
 
     const html = `<!doctype html>
 <html lang="uk">
@@ -106,4 +121,3 @@ export const handler = async (event: HandlerEvent) => {
     };
   }
 };
-

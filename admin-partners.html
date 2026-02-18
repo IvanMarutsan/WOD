@@ -89,38 +89,41 @@
               </label>
               <label class="filters__toggle">
                 <input type="checkbox" name="is_active" checked />
-                <span>Активний</span>
-                <small>Увімкнено: партнер показується на головній. Вимкнено: прихований.</small>
+                <span>Показувати на головній</span>
+                <small>Увімкнено: партнер видимий у секції “Партнери”.</small>
               </label>
               <label class="filters__toggle">
                 <input type="checkbox" name="has_detail_page" />
-                <span>Є detail-сторінка</span>
-                <small>Увімкнено: клік по банеру відкриває `partner.html`. Вимкнено: відкривається зовнішній сайт.</small>
+                <span>Розширена сторінка партнера</span>
+                <small>Увімкнено: можна заповнити детальний контент нижче.</small>
               </label>
-              <label class="form-field form-field--full">
-                <span>Короткий опис</span>
-                <textarea name="detail_description" rows="3"></textarea>
-              </label>
-              <label class="form-field form-field--full">
-                <span>Кому корисно (кожен пункт з нового рядка)</span>
-                <textarea name="detail_for_whom" rows="3"></textarea>
-              </label>
-              <label class="form-field form-field--full">
-                <span>CTA текст</span>
-                <input type="text" name="detail_cta_label" />
-              </label>
-              <label class="form-field form-field--full">
-                <span>CTA URL</span>
-                <input type="url" name="detail_cta_url" />
-              </label>
-              <label class="form-field form-field--full">
-                <span>Бонус</span>
-                <textarea name="detail_bonus" rows="2"></textarea>
-              </label>
-              <label class="form-field form-field--full">
-                <span>FAQ (формат: Питання? || Відповідь, один блок на рядок)</span>
-                <textarea name="detail_faq" rows="4"></textarea>
-              </label>
+              <fieldset class="admin-partners-details form-field--full" data-partner-detail-fields disabled hidden>
+                <legend>Контент для розширеної сторінки</legend>
+                <label class="form-field form-field--full">
+                  <span>Короткий опис</span>
+                  <textarea name="detail_description" rows="3"></textarea>
+                </label>
+                <label class="form-field form-field--full">
+                  <span>Кому корисно (кожен пункт з нового рядка)</span>
+                  <textarea name="detail_for_whom" rows="3"></textarea>
+                </label>
+                <label class="form-field form-field--full">
+                  <span>CTA текст</span>
+                  <input type="text" name="detail_cta_label" />
+                </label>
+                <label class="form-field form-field--full">
+                  <span>CTA URL</span>
+                  <input type="url" name="detail_cta_url" />
+                </label>
+                <label class="form-field form-field--full">
+                  <span>Бонус</span>
+                  <textarea name="detail_bonus" rows="2"></textarea>
+                </label>
+                <label class="form-field form-field--full">
+                  <span>FAQ (формат: Питання? || Відповідь, один блок на рядок)</span>
+                  <textarea name="detail_faq" rows="4"></textarea>
+                </label>
+              </fieldset>
               <div class="admin-partners-form__actions form-field--full">
                 <button class="btn primary" type="submit">Зберегти партнера</button>
                 <button class="btn ghost" type="button" data-admin-partner-reset>Очистити</button>

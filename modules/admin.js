@@ -31,6 +31,8 @@ export const initAdmin = ({ formatMessage }) => {
     const partnersContainer = document.querySelector('[data-admin-partners-list]');
     const partnerForm = document.querySelector('[data-admin-partner-form]');
     const partnerResetButton = document.querySelector('[data-admin-partner-reset]');
+    const partnerDetailToggle = partnerForm?.elements?.namedItem?.('has_detail_page');
+    const partnerDetailFields = document.querySelector('[data-partner-detail-fields]');
     if (!partnersContainer && !(partnerForm instanceof HTMLFormElement)) return;
     if (partnersContainer?.dataset.ready === 'true') return;
     if (partnersContainer) {
@@ -75,7 +77,13 @@ export const initAdmin = ({ formatMessage }) => {
       if (sortField instanceof HTMLInputElement) sortField.value = '0';
       const activeField = partnerForm.elements.namedItem('is_active');
       if (activeField instanceof HTMLInputElement) activeField.checked = true;
+      const detailField = partnerForm.elements.namedItem('has_detail_page');
+      if (detailField instanceof HTMLInputElement) detailField.checked = false;
       activePartnerId = null;
+      if (partnerDetailFields instanceof HTMLFieldSetElement) {
+        partnerDetailFields.disabled = true;
+        partnerDetailFields.hidden = true;
+      }
     };
 
     const mapPartnerFromForm = async () => {
@@ -94,7 +102,8 @@ export const initAdmin = ({ formatMessage }) => {
         .split('\n')
         .map((line) => line.trim())
         .filter(Boolean);
-      const detailContent = {
+      const detailContent = hasDetailPage
+        ? {
         title: name,
         description: String(formData.get('detail_description') || '').trim(),
         forWhom,
@@ -102,7 +111,8 @@ export const initAdmin = ({ formatMessage }) => {
         ctaUrl: String(formData.get('detail_cta_url') || '').trim(),
         bonus: String(formData.get('detail_bonus') || '').trim(),
         faq: parseFaqRows(formData.get('detail_faq') || '')
-      };
+      }
+        : {};
       const logoFile = formData.get('logo_file');
       let logoDataUrl = '';
       if (logoFile instanceof File && logoFile.size > 0) {
@@ -170,6 +180,11 @@ export const initAdmin = ({ formatMessage }) => {
       if (activeField instanceof HTMLInputElement) activeField.checked = partner.isActive !== false;
       const detailField = partnerForm.elements.namedItem('has_detail_page');
       if (detailField instanceof HTMLInputElement) detailField.checked = partner.hasDetailPage === true;
+      if (partnerDetailFields instanceof HTMLFieldSetElement) {
+        const enabled = detailField instanceof HTMLInputElement && detailField.checked;
+        partnerDetailFields.disabled = !enabled;
+        partnerDetailFields.hidden = !enabled;
+      }
       const detail = partner.detailContent || {};
       setValue('detail_description', detail.description || '');
       setValue('detail_for_whom', Array.isArray(detail.forWhom) ? detail.forWhom.join('\n') : '');
@@ -326,6 +341,17 @@ export const initAdmin = ({ formatMessage }) => {
       partnerResetButton.addEventListener('click', () => {
         resetPartnerForm();
       });
+    }
+
+    if (partnerDetailToggle instanceof HTMLInputElement) {
+      const syncDetailFieldsState = () => {
+        if (partnerDetailFields instanceof HTMLFieldSetElement) {
+          partnerDetailFields.disabled = !partnerDetailToggle.checked;
+          partnerDetailFields.hidden = !partnerDetailToggle.checked;
+        }
+      };
+      partnerDetailToggle.addEventListener('change', syncDetailFieldsState);
+      syncDetailFieldsState();
     }
 
     loadPartners();
