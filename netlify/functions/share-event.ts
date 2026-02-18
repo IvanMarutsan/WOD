@@ -36,6 +36,42 @@ const buildShareUrl = (event: HandlerEvent, origin: string) => {
   return `${origin}/.netlify/functions/share-event${qs ? `?${qs}` : ''}`;
 };
 
+const SHARE_BOT_UA_PATTERNS = [
+  /facebookexternalhit/i,
+  /facebot/i,
+  /linkedinbot/i,
+  /twitterbot/i,
+  /telegrambot/i,
+  /whatsapp/i,
+  /slackbot/i,
+  /discordbot/i,
+  /skypeuripreview/i,
+  /pinterest/i,
+  /vkshare/i
+];
+
+const isCrawlerRequest = (event: HandlerEvent) => {
+  const userAgent = String(event.headers?.['user-agent'] || '').trim();
+  if (!userAgent) return false;
+  return SHARE_BOT_UA_PATTERNS.some((pattern) => pattern.test(userAgent));
+};
+
+const buildEventPageUrl = (event: HandlerEvent, origin: string, id: string) => {
+  const params = new URLSearchParams();
+  if (id) {
+    params.set('id', id);
+  }
+  const query = event.queryStringParameters || {};
+  Object.entries(query).forEach(([key, value]) => {
+    if (!value || key === 'id') return;
+    if (key.startsWith('utm_') || key === 'fbclid') {
+      params.set(key, String(value));
+    }
+  });
+  const qs = params.toString();
+  return `${origin}/event-card.html${qs ? `?${qs}` : ''}`;
+};
+
 const fetchPublishedEvent = async (id: string) => {
   const query: Record<string, string> = {
     status: 'eq.published',
@@ -58,9 +94,18 @@ export const handler = async (event: HandlerEvent) => {
   const fallbackImage = String(event.queryStringParameters?.i || '').trim();
   const origin = buildOrigin(event);
   const shareUrl = buildShareUrl(event, origin);
-  const eventUrl = id
-    ? `${origin}/event-card.html?id=${encodeURIComponent(id)}`
-    : `${origin}/event-card.html`;
+  const eventUrl = buildEventPageUrl(event, origin, id);
+
+  if (!isCrawlerRequest(event)) {
+    return {
+      statusCode: 302,
+      headers: {
+        Location: eventUrl,
+        'Cache-Control': 'no-store'
+      },
+      body: ''
+    };
+  }
 
   try {
     let row: any = null;

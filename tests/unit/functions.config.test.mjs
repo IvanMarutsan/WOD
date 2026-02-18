@@ -113,3 +113,21 @@ test('auto-archive runs weekly and archives past events', () => {
   assert.match(content, /end_at:\s*'is\.null'/);
   assert.match(content, /start_at:\s*`lt\.\$\{cutoffStart\}`/);
 });
+
+test('share-event redirects non-crawler requests to event page', () => {
+  const content = readFile('../../netlify/functions/share-event.ts');
+  assert.match(content, /isCrawlerRequest/);
+  assert.match(content, /statusCode:\s*302/);
+  assert.match(content, /Location:\s*eventUrl/);
+  assert.match(content, /buildEventPageUrl/);
+  assert.match(content, /key\.startsWith\('utm_'\)/);
+});
+
+test('share-event keeps OG HTML response for crawler requests', () => {
+  const content = readFile('../../netlify/functions/share-event.ts');
+  assert.match(content, /facebookexternalhit/i);
+  assert.match(content, /linkedinbot/i);
+  assert.match(content, /<meta property="og:title"/);
+  assert.match(content, /<meta property="og:image"/);
+  assert.match(content, /<meta property="og:url"/);
+});
