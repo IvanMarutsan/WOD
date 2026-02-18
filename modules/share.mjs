@@ -72,8 +72,10 @@ const fetchShareImageFile = async (event) => {
   }
 };
 
-export const tryShareWithWebApi = async (event, shareUrl) => {
+export const tryShareWithWebApi = async (event, shareUrl, options = {}) => {
   if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') return false;
+  const opts = options && typeof options === 'object' ? options : {};
+  const preferUrlOnly = Boolean(opts.preferUrlOnly);
   const url = shareUrl || '';
   const payload = {
     title: String(event?.title || ''),
@@ -81,14 +83,16 @@ export const tryShareWithWebApi = async (event, shareUrl) => {
     url
   };
   try {
-    const file = await fetchShareImageFile(event);
-    if (
-      file &&
-      typeof navigator.canShare === 'function' &&
-      navigator.canShare({ files: [file] })
-    ) {
-      await navigator.share({ ...payload, files: [file] });
-      return true;
+    if (!preferUrlOnly) {
+      const file = await fetchShareImageFile(event);
+      if (
+        file &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({ ...payload, files: [file] });
+        return true;
+      }
     }
     await navigator.share(payload);
     return true;

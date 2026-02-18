@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { buildShareText, getShareUrl } from '../../modules/share.mjs';
 
 test('getShareUrl supports all channels with stable base and UTM', () => {
-  const channels = ['instagram', 'facebook', 'linkedin', 'telegram', 'whatsapp', 'copy'];
+  const channels = ['instagram', 'facebook', 'linkedin', 'telegram', 'whatsapp', 'copy', 'other'];
   channels.forEach((channel) => {
     const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1&ref=a b';
     const url = new URL(getShareUrl({ id: 'evt-1' }, channel, base));

@@ -3056,23 +3056,6 @@ import {
     return window.matchMedia('(max-width: 767px)').matches;
   };
 
-  const openExternalShareUrl = (href) => {
-    const url = String(href || '').trim();
-    if (!url || typeof window === 'undefined') return false;
-    try {
-      const popup = window.open(url, '_blank', 'noopener');
-      if (popup) return true;
-    } catch (error) {
-      // Fall back to same-tab navigation.
-    }
-    try {
-      window.location.assign(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
   const syncShareActions = (eventData) => {
     if (!shareContainer) return;
     if (!eventData?.id) {
@@ -3407,7 +3390,8 @@ import {
       });
     }
     if (shareNativeButton) {
-      shareNativeButton.addEventListener('click', async () => {
+      shareNativeButton.addEventListener('click', async (event) => {
+        event.preventDefault();
         if (!activeEventData) return;
         const shareUrl =
           shareNativeButton.dataset.shareUrl ||
@@ -3473,7 +3457,8 @@ import {
       });
     }
     if (shareInstagramButton) {
-      shareInstagramButton.addEventListener('click', async () => {
+      shareInstagramButton.addEventListener('click', async (event) => {
+        event.preventDefault();
         if (!activeEventData) return;
         if (!isMobileShareViewport()) {
           showToast('Instagram Stories доступно лише на телефоні');
@@ -3483,7 +3468,9 @@ import {
         const shareUrl =
           shareInstagramButton.dataset.shareUrl ||
           getShareUrl(activeEventData, 'instagram', buildEventPageUrl(activeEventData));
-        const shared = await tryShareWithWebApi(activeEventData, shareUrl);
+        const shared = await tryShareWithWebApi(activeEventData, shareUrl, {
+          preferUrlOnly: true
+        });
         if (shared) {
           setShareMenuOpen(false);
           return;
@@ -3499,20 +3486,7 @@ import {
     }
     shareChannelLinks.forEach((link) => {
       if (!(link instanceof HTMLAnchorElement)) return;
-      link.addEventListener('click', async (event) => {
-        const channel = String(link.dataset.shareChannel || '').toLowerCase();
-        if (channel === 'facebook' && isMobileShareViewport() && activeEventData) {
-          event.preventDefault();
-          const nativeUrl = getShareUrl(
-            activeEventData,
-            'facebook',
-            buildEventPageUrl(activeEventData)
-          );
-          const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
-          if (!shared) {
-            openExternalShareUrl(link.href);
-          }
-        }
+      link.addEventListener('click', () => {
         setShareMenuOpen(false);
       });
     });

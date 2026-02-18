@@ -106,7 +106,7 @@ test('desktop share fallback menu works and builds network links', async ({ page
 test.describe('mobile share behavior', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('instagram stories is visible, falls back to copy, and facebook tries native first', async ({
+  test('instagram stories is visible with fallback copy and facebook uses stable sharer href', async ({
     page
   }) => {
     const eventId = 'evt-share-002';
@@ -149,8 +149,6 @@ test.describe('mobile share behavior', () => {
       window.__copiedText = '';
       // @ts-ignore
       window.__nativeShareCalls = 0;
-      // @ts-ignore
-      window.__openedExternal = '';
       Object.defineProperty(window.navigator, 'share', {
         value: async () => {
           // @ts-ignore
@@ -166,14 +164,6 @@ test.describe('mobile share behavior', () => {
             // @ts-ignore
             window.__copiedText = value;
           }
-        },
-        configurable: true
-      });
-      Object.defineProperty(window, 'open', {
-        value: (url: string) => {
-          // @ts-ignore
-          window.__openedExternal = url;
-          return {};
         },
         configurable: true
       });
@@ -205,18 +195,16 @@ test.describe('mobile share behavior', () => {
     expect(copiedInstagram).toContain('utm_content=instagram');
 
     await page.getByRole('button', { name: /Поділитися/i }).click();
-    await page.locator('[data-share-channel="facebook"]').click();
+    const facebookHref = await page
+      .locator('[data-share-channel="facebook"]')
+      .getAttribute('href');
 
     const nativeShareCalls = await page.evaluate(() => {
       // @ts-ignore
       return window.__nativeShareCalls || 0;
     });
-    const openedExternal = await page.evaluate(() => {
-      // @ts-ignore
-      return window.__openedExternal || '';
-    });
     expect(nativeShareCalls).toBeGreaterThan(0);
-    expect(openedExternal).toContain('https://www.facebook.com/sharer/sharer.php?u=');
-    expect(openedExternal).toContain('utm_content%3Dfacebook');
+    expect(facebookHref || '').toContain('https://www.facebook.com/sharer/sharer.php?u=');
+    expect(facebookHref || '').toContain('utm_content%3Dfacebook');
   });
 });
