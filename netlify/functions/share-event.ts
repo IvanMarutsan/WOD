@@ -24,6 +24,18 @@ const buildOrigin = (event: HandlerEvent) => {
   return `${proto}://${host}`;
 };
 
+const buildShareUrl = (event: HandlerEvent, origin: string) => {
+  const params = new URLSearchParams();
+  const query = event.queryStringParameters || {};
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && String(value).length > 0) {
+      params.set(key, String(value));
+    }
+  });
+  const qs = params.toString();
+  return `${origin}/.netlify/functions/share-event${qs ? `?${qs}` : ''}`;
+};
+
 const fetchPublishedEventFromPublicApi = async (id: string, origin: string) => {
   try {
     const response = await fetch(
@@ -59,6 +71,7 @@ export const handler = async (event: HandlerEvent) => {
   const fallbackDescription = String(event.queryStringParameters?.d || '').trim();
   const fallbackImage = String(event.queryStringParameters?.i || '').trim();
   const origin = buildOrigin(event);
+  const shareUrl = buildShareUrl(event, origin);
   const eventUrl = id
     ? `${origin}/event-card.html?id=${encodeURIComponent(id)}`
     : `${origin}/event-card.html`;
@@ -90,13 +103,13 @@ export const handler = async (event: HandlerEvent) => {
     <meta property="og:image:secure_url" content="${escapeHtml(image)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="${escapeHtml(eventUrl)}" />
+    <meta property="og:url" content="${escapeHtml(shareUrl)}" />
     <meta property="og:locale" content="uk_UA" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(description)}" />
     <meta name="twitter:image" content="${escapeHtml(image)}" />
-    <link rel="canonical" href="${escapeHtml(eventUrl)}" />
+    <link rel="canonical" href="${escapeHtml(shareUrl)}" />
   </head>
   <body>
     <main>
@@ -125,12 +138,12 @@ export const handler = async (event: HandlerEvent) => {
     <meta property="og:description" content="Деталі події в Данії." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="${escapeHtml(DEFAULT_IMAGE)}" />
-    <meta property="og:url" content="${escapeHtml(eventUrl)}" />
+    <meta property="og:url" content="${escapeHtml(shareUrl)}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Подія — What's on DK?" />
     <meta name="twitter:description" content="Деталі події в Данії." />
     <meta name="twitter:image" content="${escapeHtml(DEFAULT_IMAGE)}" />
-    <link rel="canonical" href="${escapeHtml(eventUrl)}" />
+    <link rel="canonical" href="${escapeHtml(shareUrl)}" />
   </head>
   <body></body>
 </html>`;
