@@ -116,6 +116,77 @@
           <button class="btn ghost moderation__more" type="button" data-admin-more="archive" data-i18n="admin_show_more" hidden>Показати ще 5</button>
         </section>
 
+        <section class="moderation moderation--partners" aria-labelledby="partners-admin-title">
+          <header class="section-header">
+            <h2 id="partners-admin-title">Партнери</h2>
+            <p class="section-summary">Керування логотипами, посиланнями та detail-сторінками партнерів.</p>
+          </header>
+          <form class="admin-partners-form" data-admin-partner-form>
+            <input type="hidden" name="id" />
+            <label class="form-field">
+              <span>Назва</span>
+              <input type="text" name="name" required />
+            </label>
+            <label class="form-field">
+              <span>Slug</span>
+              <input type="text" name="slug" />
+            </label>
+            <label class="form-field">
+              <span>Сайт</span>
+              <input type="url" name="website_url" />
+            </label>
+            <label class="form-field">
+              <span>Порядок</span>
+              <input type="number" name="sort_order" value="0" />
+            </label>
+            <label class="form-field">
+              <span>Логотип</span>
+              <input type="file" name="logo_file" accept="image/*" />
+            </label>
+            <label class="form-field">
+              <span>URL логотипа</span>
+              <input type="url" name="logo_url" />
+            </label>
+            <label class="filters__toggle">
+              <input type="checkbox" name="is_active" checked />
+              <span>Активний</span>
+            </label>
+            <label class="filters__toggle">
+              <input type="checkbox" name="has_detail_page" />
+              <span>Є detail-сторінка</span>
+            </label>
+            <label class="form-field form-field--full">
+              <span>Короткий опис</span>
+              <textarea name="detail_description" rows="3"></textarea>
+            </label>
+            <label class="form-field form-field--full">
+              <span>Кому корисно (кожен пункт з нового рядка)</span>
+              <textarea name="detail_for_whom" rows="3"></textarea>
+            </label>
+            <label class="form-field form-field--full">
+              <span>CTA текст</span>
+              <input type="text" name="detail_cta_label" />
+            </label>
+            <label class="form-field form-field--full">
+              <span>CTA URL</span>
+              <input type="url" name="detail_cta_url" />
+            </label>
+            <label class="form-field form-field--full">
+              <span>Бонус</span>
+              <textarea name="detail_bonus" rows="2"></textarea>
+            </label>
+            <label class="form-field form-field--full">
+              <span>FAQ (формат: Питання? || Відповідь, один блок на рядок)</span>
+              <textarea name="detail_faq" rows="4"></textarea>
+            </label>
+            <div class="admin-partners-form__actions form-field--full">
+              <button class="btn primary" type="submit">Зберегти партнера</button>
+              <button class="btn ghost" type="button" data-admin-partner-reset>Очистити</button>
+            </div>
+          </form>
+          <div class="moderation-list" data-admin-partners-list></div>
+        </section>
+
         <section class="moderation moderation--audit" aria-labelledby="audit-title">
           <header class="section-header">
             <h2 id="audit-title" data-i18n="admin_audit_title">Журнал рішень</h2>

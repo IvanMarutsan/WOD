@@ -1,0 +1,38 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  getPublicPartners,
+  normalizePartnerSlug,
+  sortPartners
+} from '../../modules/partners.mjs';
+
+test('getPublicPartners returns only active partners sorted by sort_order', () => {
+  const list = [
+    { id: '3', name: 'C', is_active: true, sort_order: 3 },
+    { id: '2', name: 'B', is_active: false, sort_order: 1 },
+    { id: '1', name: 'A', is_active: true, sort_order: 2 }
+  ];
+  const result = getPublicPartners(list);
+  assert.deepEqual(
+    result.map((item) => item.id),
+    ['1', '3']
+  );
+});
+
+test('sortPartners falls back to name when sort_order is equal', () => {
+  const list = [
+    { id: '2', name: 'Бета', sort_order: 0 },
+    { id: '1', name: 'Альфа', sort_order: 0 }
+  ];
+  const result = sortPartners(list);
+  assert.deepEqual(
+    result.map((item) => item.id),
+    ['1', '2']
+  );
+});
+
+test('normalizePartnerSlug handles spaces, symbols and cyrillic', () => {
+  assert.equal(normalizePartnerSlug('  Waylight Partner  '), 'waylight-partner');
+  assert.equal(normalizePartnerSlug('Партнер Дія'), 'partner-diia');
+  assert.equal(normalizePartnerSlug('A&B / C'), 'a-b-c');
+});

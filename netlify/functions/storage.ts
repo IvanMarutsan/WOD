@@ -26,10 +26,17 @@ const mimeToExtension = (mime: string) => {
 };
 
 export const uploadEventImage = async (dataUrl: string, objectKey: string) => {
+  return uploadDataUrlImage(dataUrl, objectKey, process.env.SUPABASE_STORAGE_BUCKET || 'event-images');
+};
+
+export const uploadDataUrlImage = async (
+  dataUrl: string,
+  objectKey: string,
+  bucket: string
+) => {
   const parsed = parseDataUrl(dataUrl);
   if (!parsed) return null;
   const { url, serviceKey } = getSupabaseConfig();
-  const bucket = process.env.SUPABASE_STORAGE_BUCKET || 'event-images';
   const ext = mimeToExtension(parsed.mime);
   const objectPath = `${objectKey}.${ext}`;
   const buffer = Buffer.from(parsed.data, 'base64');

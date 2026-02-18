@@ -67,18 +67,36 @@ create table if not exists organizer_verification_requests (
   rejected_at timestamptz
 );
 
+create table if not exists partners (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  logo_url text,
+  website_url text,
+  has_detail_page boolean not null default false,
+  detail_content jsonb not null default '{}'::jsonb,
+  is_active boolean not null default true,
+  sort_order integer not null default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 create index if not exists events_start_at_idx on events (start_at);
 create index if not exists events_status_idx on events (status);
 create index if not exists events_city_idx on events (city);
 create index if not exists events_language_idx on events (language);
 create index if not exists organizer_verification_status_idx on organizer_verification_requests (status);
 create index if not exists organizer_verification_link_idx on organizer_verification_requests (link_key);
+create index if not exists partners_is_active_idx on partners (is_active);
+create index if not exists partners_sort_order_idx on partners (sort_order);
+create index if not exists partners_slug_idx on partners (slug);
 
 alter table organizers enable row level security;
 alter table events enable row level security;
 alter table event_tags enable row level security;
 alter table admin_audit_log enable row level security;
 alter table organizer_verification_requests enable row level security;
+alter table partners enable row level security;
 
 drop policy if exists "public_read_events" on events;
 create policy "public_read_events"
@@ -115,6 +133,13 @@ using (
   )
 );
 
+drop policy if exists "public_read_partners" on partners;
+create policy "public_read_partners"
+on partners
+for select
+to public
+using (is_active = true);
+
 create or replace function set_updated_at()
 returns trigger
 language plpgsql
@@ -141,5 +166,11 @@ execute function set_updated_at();
 drop trigger if exists organizer_verification_set_updated_at on organizer_verification_requests;
 create trigger organizer_verification_set_updated_at
 before update on organizer_verification_requests
+for each row
+execute function set_updated_at();
+
+drop trigger if exists partners_set_updated_at on partners;
+create trigger partners_set_updated_at
+before update on partners
 for each row
 execute function set_updated_at();

@@ -1,0 +1,60 @@
+[
+  {
+    "id": "partner-waylight",
+    "name": "Waylight",
+    "slug": "waylight",
+    "logoUrl": "https://dummyimage.com/360x180/0b1f3a/ffffff&text=Waylight",
+    "websiteUrl": "https://example.com/waylight",
+    "hasDetailPage": true,
+    "isActive": true,
+    "sortOrder": 1,
+    "detailContent": {
+      "title": "Waylight — підтримка адаптації в Данії",
+      "description": "Waylight допомагає українцям у Данії орієнтуватися в сервісах, навчанні та працевлаштуванні. Команда поєднує практичні консультації та зрозумілі інструкції.",
+      "forWhom": [
+        "Для новоприбулих українців у Данії",
+        "Для тих, хто шукає роботу або навчання",
+        "Для сімей, яким потрібна структурована підтримка"
+      ],
+      "ctaLabel": "Перейти на сайт Waylight",
+      "ctaUrl": "https://example.com/waylight",
+      "bonus": "Бонус від What’s on DK: добірка перевірених локальних сервісів адаптації.",
+      "faq": [
+        {
+          "question": "Чи є консультації українською?",
+          "answer": "Так, основна комунікація доступна українською мовою."
+        },
+        {
+          "question": "Чи можна отримати допомогу онлайн?",
+          "answer": "Так, частина сервісів і консультацій доступні дистанційно."
+        },
+        {
+          "question": "З чого почати?",
+          "answer": "Почніть із короткої форми на сайті та оберіть напрям підтримки."
+        }
+      ]
+    }
+  },
+  {
+    "id": "partner-jobbridge",
+    "name": "JobBridge DK",
+    "slug": "jobbridge-dk",
+    "logoUrl": "https://dummyimage.com/360x180/1f4f2a/ffffff&text=JobBridge+DK",
+    "websiteUrl": "https://example.com/jobbridge",
+    "hasDetailPage": false,
+    "isActive": true,
+    "sortOrder": 2,
+    "detailContent": {}
+  },
+  {
+    "id": "partner-legal-care",
+    "name": "Legal Care",
+    "slug": "legal-care",
+    "logoUrl": "https://dummyimage.com/360x180/4a2f1a/ffffff&text=Legal+Care",
+    "websiteUrl": "https://example.com/legal",
+    "hasDetailPage": false,
+    "isActive": true,
+    "sortOrder": 3,
+    "detailContent": {}
+  }
+]

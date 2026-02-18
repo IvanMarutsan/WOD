@@ -1,6 +1,12 @@
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './auth.js';
+import { isArchivedEvent } from './event-status.mjs';
 import { normalizeEventLanguage } from './language.mjs';
-import { buildLocalEventId, findMergedEventById, upsertLocalEvent } from './local-events.js';
+import {
+  buildLocalEventId,
+  findMergedEventById,
+  getLocalEvents,
+  upsertLocalEvent
+} from './local-events.js';
 
 export const initEventForm = ({ formatMessage, getVerificationState, publishState }) => {
   const multiStepForm = document.querySelector('.multi-step');
@@ -658,6 +664,13 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       payload.end = toOffsetISO(payload.end);
       if (isLocalHost) {
         const localId = eventId || buildLocalEventId();
+        const storedEvent =
+          eventId && Array.isArray(getLocalEvents())
+            ? getLocalEvents().find((item) => item?.id === eventId) || null
+            : null;
+        const keepArchived = Boolean(
+          eventId && (isArchivedEvent(editingEventData) || isArchivedEvent(storedEvent))
+        );
         const nextEvent = {
           id: localId,
           title: payload.title || editingEventData?.title || '—',
@@ -687,8 +700,8 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
             facebook: payload['contact-facebook'] || '',
             telegram: payload['contact-telegram'] || ''
           },
-          status: 'published',
-          archived: false,
+          status: keepArchived ? 'archived' : 'published',
+          archived: keepArchived,
           forUkrainians: editingEventData?.forUkrainians ?? true,
           familyFriendly: editingEventData?.familyFriendly ?? false,
           volunteer: editingEventData?.volunteer ?? false

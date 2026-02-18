@@ -6,6 +6,13 @@ import {
   getAuditLog,
   restoreLocalEvent
 } from './local-events.js';
+import {
+  deleteLocalPartner,
+  getLocalPartners,
+  normalizePartnerSlug,
+  sortPartners,
+  upsertLocalPartner
+} from './partners.mjs';
 
 export const initAdmin = ({ formatMessage }) => {
   const moderationList = document.querySelector('.moderation-list');
@@ -239,6 +246,9 @@ export const initAdmin = ({ formatMessage }) => {
     const verificationTemplate = document.querySelector('#verification-card-template');
     const auditTemplate = document.querySelector('#audit-row-template');
     const archiveTemplate = document.querySelector('#archive-card-template');
+    const partnersContainer = document.querySelector('[data-admin-partners-list]');
+    const partnerForm = document.querySelector('[data-admin-partner-form]');
+    const partnerResetButton = document.querySelector('[data-admin-partner-reset]');
     const loadingEl = pendingContainer?.querySelector('[data-admin-loading]');
     const emptyEl = pendingContainer?.querySelector('[data-admin-empty]');
     const verificationEmptyEl = verificationContainer?.querySelector('[data-admin-verifications-empty]');
@@ -268,6 +278,8 @@ export const initAdmin = ({ formatMessage }) => {
     let lastEditTrigger = null;
     const pendingById = new Map();
     const archiveById = new Map();
+    let partnersById = new Map();
+    let activePartnerId = null;
     const PAGE_SIZE = 5;
     const listLimits = {
       pending: PAGE_SIZE,
@@ -812,6 +824,165 @@ export const initAdmin = ({ formatMessage }) => {
       return `${dateLabel} · ${city}`;
     };
 
+    const fileToDataUrl = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('file_read_error'));
+        reader.readAsDataURL(file);
+      });
+
+    const parseFaqRows = (value) =>
+      String(value || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [question, answer] = line.split('||').map((item) => item.trim());
+          return { question: question || '', answer: answer || '' };
+        })
+        .filter((entry) => entry.question || entry.answer);
+
+    const resetPartnerForm = () => {
+      if (!(partnerForm instanceof HTMLFormElement)) return;
+      partnerForm.reset();
+      const idField = partnerForm.elements.namedItem('id');
+      if (idField instanceof HTMLInputElement) idField.value = '';
+      const sortField = partnerForm.elements.namedItem('sort_order');
+      if (sortField instanceof HTMLInputElement) sortField.value = '0';
+      const activeField = partnerForm.elements.namedItem('is_active');
+      if (activeField instanceof HTMLInputElement) activeField.checked = true;
+      activePartnerId = null;
+    };
+
+    const mapPartnerFromForm = async () => {
+      if (!(partnerForm instanceof HTMLFormElement)) return null;
+      const formData = new FormData(partnerForm);
+      const id = String(formData.get('id') || '').trim();
+      const name = String(formData.get('name') || '').trim();
+      const slugInput = String(formData.get('slug') || '').trim();
+      const slug = normalizePartnerSlug(slugInput || name);
+      const websiteUrl = String(formData.get('website_url') || '').trim();
+      const logoUrl = String(formData.get('logo_url') || '').trim();
+      const sortOrder = Number(formData.get('sort_order') || 0);
+      const hasDetailPage = formData.get('has_detail_page') === 'on';
+      const isActive = formData.get('is_active') === 'on';
+      const forWhom = String(formData.get('detail_for_whom') || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+      const detailContent = {
+        title: name,
+        description: String(formData.get('detail_description') || '').trim(),
+        forWhom,
+        ctaLabel: String(formData.get('detail_cta_label') || '').trim(),
+        ctaUrl: String(formData.get('detail_cta_url') || '').trim(),
+        bonus: String(formData.get('detail_bonus') || '').trim(),
+        faq: parseFaqRows(formData.get('detail_faq') || '')
+      };
+      const logoFile = formData.get('logo_file');
+      let logoDataUrl = '';
+      if (logoFile instanceof File && logoFile.size > 0) {
+        logoDataUrl = await fileToDataUrl(logoFile);
+      }
+      return {
+        id,
+        name,
+        slug,
+        websiteUrl,
+        logoUrl,
+        logoDataUrl,
+        sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+        hasDetailPage,
+        isActive,
+        detailContent
+      };
+    };
+
+    const renderPartnersList = (partners) => {
+      if (!partnersContainer) return;
+      const sorted = sortPartners(Array.isArray(partners) ? partners : []);
+      partnersById = new Map(sorted.map((partner) => [partner.id, partner]));
+      partnersContainer.innerHTML = sorted
+        .map((partner) => {
+          const logoUrl = partner.logoUrl || '';
+          const activeLabel = partner.isActive ? 'Активний' : 'Неактивний';
+          const detailLabel = partner.hasDetailPage ? 'Є detail' : 'Без detail';
+          return `
+            <article class="admin-partner-card" data-admin-partner-id="${partner.id}">
+              <div>
+                <strong>${partner.name || '—'}</strong>
+                <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel} · sort ${partner.sortOrder ?? 0}</p>
+                <p>${partner.websiteUrl || ''}</p>
+              </div>
+              <div>
+                ${logoUrl ? `<img class="admin-partner-card__logo" src="${logoUrl}" alt="${partner.name || ''}" />` : ''}
+                <div class="admin-partner-card__actions">
+                  <button class="btn ghost" type="button" data-action="edit-partner">Редагувати</button>
+                  <button class="btn ghost" type="button" data-action="toggle-partner">${partner.isActive ? 'Деактивувати' : 'Активувати'}</button>
+                  <button class="btn ghost" type="button" data-action="delete-partner">Видалити</button>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+    };
+
+    const setPartnerFormValues = (partner) => {
+      if (!(partnerForm instanceof HTMLFormElement)) return;
+      const setValue = (name, value) => {
+        const field = partnerForm.elements.namedItem(name);
+        if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+          field.value = value ?? '';
+        }
+      };
+      setValue('id', partner.id || '');
+      setValue('name', partner.name || '');
+      setValue('slug', partner.slug || '');
+      setValue('website_url', partner.websiteUrl || '');
+      setValue('logo_url', partner.logoUrl || '');
+      setValue('sort_order', String(partner.sortOrder ?? 0));
+      const activeField = partnerForm.elements.namedItem('is_active');
+      if (activeField instanceof HTMLInputElement) activeField.checked = partner.isActive !== false;
+      const detailField = partnerForm.elements.namedItem('has_detail_page');
+      if (detailField instanceof HTMLInputElement) detailField.checked = partner.hasDetailPage === true;
+      const detail = partner.detailContent || {};
+      setValue('detail_description', detail.description || '');
+      setValue('detail_for_whom', Array.isArray(detail.forWhom) ? detail.forWhom.join('\n') : '');
+      setValue('detail_cta_label', detail.ctaLabel || '');
+      setValue('detail_cta_url', detail.ctaUrl || '');
+      setValue('detail_bonus', detail.bonus || '');
+      setValue(
+        'detail_faq',
+        Array.isArray(detail.faq)
+          ? detail.faq
+              .map((entry) => `${entry.question || ''} || ${entry.answer || ''}`)
+              .join('\n')
+          : ''
+      );
+      activePartnerId = partner.id || null;
+    };
+
+    const loadPartners = async () => {
+      try {
+        if (isLocalHost) {
+          const localPartners = getLocalPartners();
+          renderPartnersList(localPartners);
+          return;
+        }
+        const authHeaders = await getAuthHeaders();
+        const response = await fetch('/.netlify/functions/admin-partners', {
+          headers: { 'Content-Type': 'application/json', ...authHeaders }
+        });
+        if (!response.ok) throw new Error('partners_failed');
+        const payload = await response.json();
+        renderPartnersList(Array.isArray(payload?.partners) ? payload.partners : []);
+      } catch (error) {
+        renderPartnersList([]);
+      }
+    };
+
     const loadModerationQueue = async () => {
       if (loadingEl) loadingEl.hidden = false;
       if (emptyEl) emptyEl.hidden = true;
@@ -1168,7 +1339,117 @@ export const initAdmin = ({ formatMessage }) => {
       });
     }
 
+    if (partnersContainer) {
+      partnersContainer.addEventListener('click', async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const card = target.closest('[data-admin-partner-id]');
+        if (!card) return;
+        const partnerId = card.dataset.adminPartnerId || '';
+        const partner = partnersById.get(partnerId);
+        if (!partner) return;
+
+        if (target.dataset.action === 'edit-partner') {
+          setPartnerFormValues(partner);
+          const nameField = partnerForm?.elements?.namedItem('name');
+          if (nameField instanceof HTMLElement) nameField.focus();
+          return;
+        }
+
+        if (target.dataset.action === 'toggle-partner') {
+          const payload = { ...partner, isActive: !partner.isActive };
+          if (isLocalHost) {
+            upsertLocalPartner(payload);
+            await loadPartners();
+            return;
+          }
+          try {
+            const authHeaders = await getAuthHeaders();
+            await fetch('/.netlify/functions/admin-partners', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', ...authHeaders },
+              body: JSON.stringify(payload)
+            });
+          } catch (error) {
+            // Ignore network failure.
+          }
+          await loadPartners();
+          return;
+        }
+
+        if (target.dataset.action === 'delete-partner') {
+          if (!window.confirm('Видалити партнера?')) return;
+          if (isLocalHost) {
+            deleteLocalPartner(partnerId);
+            await loadPartners();
+            if (activePartnerId === partnerId) resetPartnerForm();
+            return;
+          }
+          try {
+            const authHeaders = await getAuthHeaders();
+            await fetch(`/.netlify/functions/admin-partners?id=${encodeURIComponent(partnerId)}`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json', ...authHeaders }
+            });
+          } catch (error) {
+            // Ignore network failure.
+          }
+          await loadPartners();
+          if (activePartnerId === partnerId) resetPartnerForm();
+        }
+      });
+    }
+
+    if (partnerForm instanceof HTMLFormElement) {
+      partnerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = await mapPartnerFromForm();
+        if (!payload?.name || !payload?.slug) {
+          return;
+        }
+        if (isLocalHost) {
+          const localId =
+            payload.id ||
+            `partner-local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          const logoUrl = payload.logoDataUrl || payload.logoUrl || '';
+          upsertLocalPartner({
+            id: localId,
+            name: payload.name,
+            slug: payload.slug,
+            logoUrl,
+            websiteUrl: payload.websiteUrl,
+            hasDetailPage: payload.hasDetailPage,
+            isActive: payload.isActive,
+            sortOrder: payload.sortOrder,
+            detailContent: payload.detailContent
+          });
+          resetPartnerForm();
+          await loadPartners();
+          return;
+        }
+        try {
+          const authHeaders = await getAuthHeaders();
+          await fetch('/.netlify/functions/admin-partners', {
+            method: payload.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify(payload)
+          });
+          resetPartnerForm();
+          await loadPartners();
+        } catch (error) {
+          // Ignore network failure.
+        }
+      });
+    }
+
+    if (partnerResetButton instanceof HTMLButtonElement) {
+      partnerResetButton.addEventListener('click', () => {
+        resetPartnerForm();
+      });
+    }
+
     loadModerationQueue();
+    loadPartners();
   };
 
   setupAdminAuth();

@@ -11,6 +11,7 @@ import {
 import { EventCard } from './components/event-card.js';
 import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
+import { resolveAdminSession } from './modules/admin-session.mjs';
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
 import { formatPriceRangeLabel } from './modules/price-detail.js';
 import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
@@ -30,6 +31,11 @@ import {
   restoreLocalEvent
 } from './modules/local-events.js';
 import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.js';
+import {
+  getLocalPartners,
+  getPublicPartners,
+  normalizePartnerSlug
+} from './modules/partners.mjs';
 
 (async () => {
   const header = document.querySelector('.site-header');
@@ -338,6 +344,51 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
       if (batch.length < limit) break;
     }
     return collected;
+  };
+
+  const fetchPublicPartners = async () => {
+    const payload = await fetchJson('/.netlify/functions/public-partners');
+    return Array.isArray(payload) ? payload : [];
+  };
+
+  const fetchPublicPartnerBySlug = async (slug) => {
+    if (!slug) return null;
+    const payload = await fetchJson(`/.netlify/functions/public-partner?slug=${encodeURIComponent(slug)}`);
+    if (payload?.ok && payload?.partner) return payload.partner;
+    return null;
+  };
+
+  const fetchStaticPartners = async () => {
+    try {
+      const payload = await fetchJson('./data/partners.json');
+      return Array.isArray(payload) ? payload : [];
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const fetchMergedPartners = async () => {
+    let baseList = [];
+    if (hasServerlessSupport) {
+      try {
+        baseList = await fetchPublicPartners();
+      } catch (error) {
+        baseList = [];
+      }
+    } else {
+      baseList = await fetchStaticPartners();
+    }
+    if (hasServerlessSupport) {
+      return getPublicPartners(baseList);
+    }
+    const localPartners = getLocalPartners();
+    const byId = new Map();
+    [...baseList, ...localPartners].forEach((item) => {
+      const key = String(item?.id || item?.slug || '');
+      if (!key) return;
+      byId.set(key, item);
+    });
+    return getPublicPartners(Array.from(byId.values()));
   };
 
   const fetchMergedEvents = async () => {
@@ -2620,7 +2671,108 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
       applyStoredFilters();
     }
 
+    const partnersSection = document.querySelector('[data-partners-section]');
+    const partnersTrack = partnersSection?.querySelector('[data-partners-track]');
+    const partnersPrev = partnersSection?.querySelector('[data-partners-prev]');
+    const partnersNext = partnersSection?.querySelector('[data-partners-next]');
+    let partnersItems = [];
+    let partnersIndex = 0;
+    let partnersTimer = null;
+
+    const getPartnersVisible = () => {
+      if (window.innerWidth < 768) return 1;
+      if (window.innerWidth < 1024) return 2;
+      return 3;
+    };
+
+    const getPartnerLogoUrl = (partner) =>
+      String(partner?.logoUrl || partner?.logo_url || partner?.logoPath || '').trim();
+
+    const updatePartnersState = () => {
+      if (!partnersSection || !partnersTrack) return;
+      const visible = getPartnersVisible();
+      const maxIndex = Math.max(0, partnersItems.length - visible);
+      partnersIndex = Math.max(0, Math.min(partnersIndex, maxIndex));
+      partnersTrack.style.setProperty('--partners-visible', String(visible));
+      partnersTrack.style.transform = `translateX(-${partnersIndex * (100 / visible)}%)`;
+      if (partnersPrev instanceof HTMLButtonElement) {
+        partnersPrev.disabled = partnersIndex <= 0;
+      }
+      if (partnersNext instanceof HTMLButtonElement) {
+        partnersNext.disabled = partnersIndex >= maxIndex;
+      }
+    };
+
+    const renderPartners = (partners) => {
+      if (!partnersSection || !partnersTrack) return;
+      partnersItems = Array.isArray(partners) ? partners : [];
+      if (!partnersItems.length) {
+        partnersSection.hidden = true;
+        return;
+      }
+      partnersSection.hidden = false;
+      partnersTrack.innerHTML = partnersItems
+        .map((partner) => {
+          const name = String(partner?.name || '').trim();
+          const slug = normalizePartnerSlug(partner?.slug || name);
+          const logoUrl = getPartnerLogoUrl(partner);
+          const hasDetail = partner?.hasDetailPage === true || partner?.has_detail_page === true;
+          const externalUrl = String(partner?.websiteUrl || partner?.website_url || '').trim();
+          const linkHref = hasDetail
+            ? `partner.html?slug=${encodeURIComponent(slug)}`
+            : externalUrl || '#';
+          const linkAttrs = hasDetail
+            ? ''
+            : ' target="_blank" rel="noopener"';
+          return `
+            <article class="partner-card" data-partner-id="${partner?.id || slug}">
+              <div class="partner-card__inner">
+                <a class="partner-card__logo-link" href="${linkHref}"${linkAttrs}>
+                  ${logoUrl ? `<img class="partner-card__logo" src="${logoUrl}" alt="${name}" loading="lazy" />` : `<div class="partner-card__logo" aria-hidden="true"></div>`}
+                </a>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+      partnersIndex = 0;
+      updatePartnersState();
+      if (partnersTimer) {
+        window.clearInterval(partnersTimer);
+        partnersTimer = null;
+      }
+      const visible = getPartnersVisible();
+      if (partnersItems.length > visible) {
+        partnersTimer = window.setInterval(() => {
+          const maxIndex = Math.max(0, partnersItems.length - getPartnersVisible());
+          partnersIndex = partnersIndex >= maxIndex ? 0 : partnersIndex + 1;
+          updatePartnersState();
+        }, 6000);
+      }
+    };
+
+    const loadPartners = async () => {
+      if (!partnersSection) return;
+      const partners = await fetchMergedPartners();
+      renderPartners(partners);
+    };
+
+    if (partnersPrev instanceof HTMLButtonElement) {
+      partnersPrev.addEventListener('click', () => {
+        partnersIndex -= 1;
+        updatePartnersState();
+      });
+    }
+    if (partnersNext instanceof HTMLButtonElement) {
+      partnersNext.addEventListener('click', () => {
+        partnersIndex += 1;
+        updatePartnersState();
+      });
+    }
+    window.addEventListener('resize', updatePartnersState);
+
     queueMicrotask(loadEvents);
+    queueMicrotask(loadPartners);
   }
 
   const eventMeta = document.querySelector('.event-article__meta[data-event-start]');
@@ -3328,7 +3480,14 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
         return;
       }
       resetEventDetail();
-      const isAdmin = hasAdminSession();
+      const isAdmin = await resolveAdminSession({
+        hasLocalSession:
+          hasLocalAdminSession() ||
+          hasAdminSession() ||
+          document.body.classList.contains('is-admin'),
+        getIdentity: async () => window.netlifyIdentity || null,
+        timeoutMs: 900
+      });
       if (!hasServerlessSupport) {
         try {
           const data = await fetchMergedEvents();
@@ -3376,6 +3535,110 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
     } else {
       loadEventDetail();
     }
+  }
+
+  if (document.body.classList.contains('partner-page')) {
+    const partnerTitleEl = document.querySelector('[data-partner-title]');
+    const partnerDescriptionEl = document.querySelector('[data-partner-description]');
+    const partnerLogoEl = document.querySelector('[data-partner-logo]');
+    const partnerForWhomSection = document.querySelector('[data-partner-for-whom-section]');
+    const partnerForWhomEl = document.querySelector('[data-partner-for-whom]');
+    const partnerBonusEl = document.querySelector('[data-partner-bonus]');
+    const partnerFaqSection = document.querySelector('[data-partner-faq-section]');
+    const partnerFaqEl = document.querySelector('[data-partner-faq]');
+    const partnerCtaEl = document.querySelector('[data-partner-cta]');
+    const slug = normalizePartnerSlug(new URLSearchParams(window.location.search).get('slug') || '');
+
+    const parseFaq = (value) => {
+      if (Array.isArray(value)) return value;
+      return [];
+    };
+
+    const renderPartner = (partner) => {
+      const detail = partner?.detailContent || partner?.detail_content || {};
+      const title = String(detail.title || partner?.name || '').trim();
+      const description = String(detail.description || '').trim();
+      const logoUrl = String(partner?.logoUrl || partner?.logo_url || '').trim();
+      if (partnerTitleEl) partnerTitleEl.textContent = title || 'Партнер';
+      if (partnerDescriptionEl) {
+        partnerDescriptionEl.textContent = description || '';
+        partnerDescriptionEl.hidden = !description;
+      }
+      if (partnerLogoEl instanceof HTMLImageElement) {
+        if (logoUrl) {
+          partnerLogoEl.hidden = false;
+          partnerLogoEl.src = logoUrl;
+          partnerLogoEl.alt = partner?.name || title || '';
+        } else {
+          partnerLogoEl.hidden = true;
+        }
+      }
+      const forWhom = Array.isArray(detail.forWhom) ? detail.forWhom.filter(Boolean) : [];
+      if (partnerForWhomEl) {
+        partnerForWhomEl.innerHTML = forWhom.map((item) => `<li>${item}</li>`).join('');
+      }
+      if (partnerForWhomSection) {
+        partnerForWhomSection.hidden = forWhom.length === 0;
+      }
+      const bonus = String(detail.bonus || '').trim();
+      if (partnerBonusEl) {
+        partnerBonusEl.textContent = bonus;
+        partnerBonusEl.hidden = !bonus;
+      }
+      const faq = parseFaq(detail.faq).filter((entry) => entry?.question || entry?.answer);
+      if (partnerFaqEl) {
+        partnerFaqEl.innerHTML = faq
+          .map(
+            (entry) => `
+              <details class="partner-article__faq-item">
+                <summary>${entry.question || ''}</summary>
+                <p>${entry.answer || ''}</p>
+              </details>
+            `
+          )
+          .join('');
+      }
+      if (partnerFaqSection) {
+        partnerFaqSection.hidden = faq.length === 0;
+      }
+      const ctaLabel = String(detail.ctaLabel || '').trim();
+      const ctaUrl = String(detail.ctaUrl || partner?.websiteUrl || partner?.website_url || '').trim();
+      if (partnerCtaEl instanceof HTMLAnchorElement) {
+        if (ctaUrl) {
+          partnerCtaEl.hidden = false;
+          partnerCtaEl.href = ctaUrl;
+          partnerCtaEl.textContent = ctaLabel || 'Перейти на сайт';
+        } else {
+          partnerCtaEl.hidden = true;
+        }
+      }
+      document.title = `${partner?.name || 'Партнер'} — What's on DK?`;
+    };
+
+    const loadPartner = async () => {
+      if (!slug) {
+        window.location.replace('./404.html');
+        return;
+      }
+      let partner = null;
+      if (hasServerlessSupport) {
+        try {
+          partner = await fetchPublicPartnerBySlug(slug);
+        } catch (error) {
+          partner = null;
+        }
+      } else {
+        const merged = await fetchMergedPartners();
+        partner = merged.find((item) => normalizePartnerSlug(item?.slug || item?.name) === slug) || null;
+      }
+      if (!partner || !(partner?.hasDetailPage === true || partner?.has_detail_page === true)) {
+        window.location.replace('./404.html');
+        return;
+      }
+      renderPartner(partner);
+    };
+
+    queueMicrotask(loadPartner);
   }
 
   document.addEventListener('click', async (event) => {
