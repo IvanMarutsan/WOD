@@ -3460,12 +3460,28 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   gap: 0.65rem;
 }
 
+.admin-partners-advanced {
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  padding: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+}
+
+.admin-partners-advanced legend {
+  padding: 0 0.35rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .admin-partners-details legend {
   padding: 0 0.35rem;
   color: var(--muted);
   font-weight: 600;
 }
 
+.admin-partners-advanced:disabled,
 .admin-partners-details:disabled {
   opacity: 0.6;
 }

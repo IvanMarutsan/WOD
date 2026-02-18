@@ -46,11 +46,11 @@ test('admin can create active partner with logo and it appears on homepage', asy
   const form = page.locator('[data-admin-partner-form]');
   await expect(form).toBeVisible();
 
+  await form.locator('input[name="has_detail_page"]').check({ force: true });
   await form.locator('input[name="name"]').fill(partnerName);
   await form.locator('input[name="slug"]').fill(partnerSlug);
   await form.locator('input[name="website_url"]').fill('https://example.com/qa');
   await form.locator('input[name="sort_order"]').fill('1');
-  await form.locator('input[name="has_detail_page"]').check({ force: true });
   await form.locator('textarea[name="detail_description"]').fill('QA description for partner detail page.');
   await form.locator('textarea[name="detail_for_whom"]').fill('Для тестування');
   await form.locator('input[name="detail_cta_label"]').fill('Відкрити сайт');

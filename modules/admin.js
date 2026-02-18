@@ -32,6 +32,7 @@ export const initAdmin = ({ formatMessage }) => {
     const partnerForm = document.querySelector('[data-admin-partner-form]');
     const partnerResetButton = document.querySelector('[data-admin-partner-reset]');
     const partnerDetailToggle = partnerForm?.elements?.namedItem?.('has_detail_page');
+    const partnerAdvancedFields = document.querySelector('[data-partner-advanced-fields]');
     const partnerDetailFields = document.querySelector('[data-partner-detail-fields]');
     if (!partnersContainer && !(partnerForm instanceof HTMLFormElement)) return;
     if (partnersContainer?.dataset.ready === 'true') return;
@@ -95,6 +96,10 @@ export const initAdmin = ({ formatMessage }) => {
       const detailField = partnerForm.elements.namedItem('has_detail_page');
       if (detailField instanceof HTMLInputElement) detailField.checked = false;
       activePartnerId = null;
+      if (partnerAdvancedFields instanceof HTMLFieldSetElement) {
+        partnerAdvancedFields.disabled = true;
+        partnerAdvancedFields.hidden = true;
+      }
       if (partnerDetailFields instanceof HTMLFieldSetElement) {
         partnerDetailFields.disabled = true;
         partnerDetailFields.hidden = true;
@@ -105,12 +110,16 @@ export const initAdmin = ({ formatMessage }) => {
       if (!(partnerForm instanceof HTMLFormElement)) return null;
       const formData = new FormData(partnerForm);
       const id = String(formData.get('id') || '').trim();
-      const name = String(formData.get('name') || '').trim();
+      const existing = id ? partnersById.get(id) : null;
+      const nameInput = String(formData.get('name') || '').trim();
+      const name = nameInput || String(existing?.name || '').trim();
       const slugInput = String(formData.get('slug') || '').trim();
-      const slug = normalizePartnerSlug(slugInput || name);
-      const websiteUrl = String(formData.get('website_url') || '').trim();
-      const logoUrl = String(formData.get('logo_url') || '').trim();
-      const sortOrder = Number(formData.get('sort_order') || 0);
+      const slug = normalizePartnerSlug(slugInput || name || existing?.slug || '');
+      const websiteUrl = String(formData.get('website_url') || '').trim() || String(existing?.websiteUrl || '').trim();
+      const logoUrlInput = String(formData.get('logo_url') || '').trim();
+      const logoUrl = logoUrlInput || String(existing?.logoUrl || '').trim();
+      const sortRaw = String(formData.get('sort_order') || '').trim();
+      const sortOrder = sortRaw ? Number(sortRaw) : Number(existing?.sortOrder ?? 0);
       const hasDetailPageRaw = formData.get('has_detail_page') === 'on';
       const isActive = formData.get('is_active') === 'on';
       const forWhom = String(formData.get('detail_for_whom') || '')
@@ -119,7 +128,7 @@ export const initAdmin = ({ formatMessage }) => {
         .filter(Boolean);
       const detailContent = hasDetailPageRaw
         ? {
-        title: name,
+        title: name || String(existing?.name || '').trim(),
         description: String(formData.get('detail_description') || '').trim(),
         forWhom,
         ctaLabel: String(formData.get('detail_cta_label') || '').trim(),
@@ -196,6 +205,11 @@ export const initAdmin = ({ formatMessage }) => {
       if (activeField instanceof HTMLInputElement) activeField.checked = partner.isActive !== false;
       const detailField = partnerForm.elements.namedItem('has_detail_page');
       if (detailField instanceof HTMLInputElement) detailField.checked = partner.hasDetailPage === true;
+      if (partnerAdvancedFields instanceof HTMLFieldSetElement) {
+        const enabled = detailField instanceof HTMLInputElement && detailField.checked;
+        partnerAdvancedFields.disabled = !enabled;
+        partnerAdvancedFields.hidden = !enabled;
+      }
       if (partnerDetailFields instanceof HTMLFieldSetElement) {
         const enabled = detailField instanceof HTMLInputElement && detailField.checked;
         partnerDetailFields.disabled = !enabled;
@@ -361,6 +375,10 @@ export const initAdmin = ({ formatMessage }) => {
 
     if (partnerDetailToggle instanceof HTMLInputElement) {
       const syncDetailFieldsState = () => {
+        if (partnerAdvancedFields instanceof HTMLFieldSetElement) {
+          partnerAdvancedFields.disabled = !partnerDetailToggle.checked;
+          partnerAdvancedFields.hidden = !partnerDetailToggle.checked;
+        }
         if (partnerDetailFields instanceof HTMLFieldSetElement) {
           partnerDetailFields.disabled = !partnerDetailToggle.checked;
           partnerDetailFields.hidden = !partnerDetailToggle.checked;

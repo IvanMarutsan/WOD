@@ -37,6 +37,29 @@ const normalizePartner = (item: any) => ({
 
 const getUploadBucket = () => process.env.SUPABASE_PARTNERS_BUCKET || process.env.SUPABASE_STORAGE_BUCKET || 'event-images';
 
+const extractHostName = (value: string) => {
+  try {
+    const normalized = value.startsWith('http') ? value : `https://${value}`;
+    const host = new URL(normalized).hostname.replace(/^www\./, '');
+    return host || '';
+  } catch (error) {
+    return '';
+  }
+};
+
+const hasDetailContent = (detail: any) => {
+  if (!detail || typeof detail !== 'object') return false;
+  const description = String(detail.description || '').trim();
+  const forWhom = Array.isArray(detail.forWhom) ? detail.forWhom.filter(Boolean) : [];
+  const bonus = String(detail.bonus || '').trim();
+  const faq = Array.isArray(detail.faq)
+    ? detail.faq.filter((entry) => entry?.question || entry?.answer)
+    : [];
+  const ctaLabel = String(detail.ctaLabel || '').trim();
+  const ctaUrl = String(detail.ctaUrl || '').trim();
+  return Boolean(description || forWhom.length || bonus || faq.length || ctaLabel || ctaUrl);
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     if (!hasAdminRole(getRoles(context))) {
@@ -82,25 +105,53 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
 
     const payload = event.body ? JSON.parse(event.body) : {};
     const id = String(payload.id || '').trim();
-    const name = String(payload.name || '').trim();
-    const slug = normalizeSlug(payload.slug || name);
+    const nameInput = String(payload.name || '').trim();
+    const slugInput = String(payload.slug || '').trim();
     const websiteUrl = String(payload.websiteUrl || '').trim();
-    const hasDetailPage = payload.hasDetailPage === true;
+    const hostName = extractHostName(websiteUrl);
     const isActive = payload.isActive !== false;
-    const sortOrder = Number.isFinite(Number(payload.sortOrder)) ? Number(payload.sortOrder) : 0;
+    const sortOrderInput = Number.isFinite(Number(payload.sortOrder)) ? Number(payload.sortOrder) : 0;
     const detailContent =
       payload.detailContent && typeof payload.detailContent === 'object'
         ? payload.detailContent
         : {};
-    let logoUrl = String(payload.logoUrl || '').trim();
+    const hasDetailPageRequested = payload.hasDetailPage === true;
+    const hasDetailPage = hasDetailPageRequested && hasDetailContent(detailContent);
+    let logoUrlInput = String(payload.logoUrl || '').trim();
     const logoDataUrl = String(payload.logoDataUrl || '').trim();
-    if (!name || !slug) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ok: false, error: 'missing_required' })
-      };
+    let existing: any = null;
+    if (method === 'PUT') {
+      if (!id) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ok: false, error: 'missing_id' })
+        };
+      }
+      const rows = (await supabaseFetch('partners', {
+        query: {
+          id: `eq.${id}`,
+          limit: '1',
+          select:
+            'id,name,slug,logo_url,website_url,has_detail_page,is_active,sort_order,detail_content'
+        }
+      })) as any[];
+      existing = rows?.[0] || null;
+      if (!existing) {
+        return {
+          statusCode: 404,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ok: false, error: 'not_found' })
+        };
+      }
     }
+
+    const fallbackName = hostName || (existing?.name ? String(existing.name) : '');
+    const name = nameInput || fallbackName || `Partner ${new Date().toISOString().slice(0, 10)}`;
+    const slugBase = slugInput || name || hostName || existing?.slug || '';
+    const slug = normalizeSlug(slugBase) || normalizeSlug(`partner-${Date.now()}`);
+    const sortOrder = Number.isFinite(sortOrderInput) ? sortOrderInput : Number(existing?.sort_order || 0);
+    let logoUrl = logoUrlInput || String(existing?.logo_url || '').trim();
 
     if (logoDataUrl.startsWith('data:')) {
       const uploaded = await uploadDataUrlImage(
@@ -115,9 +166,9 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
       name,
       slug,
       logo_url: logoUrl,
-      website_url: websiteUrl,
+      website_url: websiteUrl || String(existing?.website_url || '').trim(),
       has_detail_page: hasDetailPage,
-      detail_content: detailContent,
+      detail_content: hasDetailPage ? detailContent : {},
       is_active: isActive,
       sort_order: sortOrder
     };
@@ -126,13 +177,6 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (method === 'POST') {
       result = (await supabaseFetch('partners', { method: 'POST', body: [row] })) as any[];
     } else {
-      if (!id) {
-        return {
-          statusCode: 400,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ok: false, error: 'missing_id' })
-        };
-      }
       result = (await supabaseFetch('partners', {
         method: 'PATCH',
         query: { id: `eq.${id}` },
