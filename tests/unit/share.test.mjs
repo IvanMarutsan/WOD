@@ -2,26 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildShareText, getShareUrl } from '../../modules/share.mjs';
 
-test('getShareUrl appends utm params with channel', () => {
-  const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1';
-  const url = new URL(getShareUrl({ id: 'evt-1' }, 'telegram', base));
+test('getShareUrl supports all channels with stable base and UTM', () => {
+  const channels = ['instagram', 'facebook', 'linkedin', 'telegram', 'whatsapp', 'copy'];
+  channels.forEach((channel) => {
+    const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1&ref=a b';
+    const url = new URL(getShareUrl({ id: 'evt-1' }, channel, base));
 
-  assert.equal(url.searchParams.get('utm_source'), 'share');
-  assert.equal(url.searchParams.get('utm_medium'), 'web');
-  assert.equal(url.searchParams.get('utm_campaign'), 'event');
-  assert.equal(url.searchParams.get('utm_content'), 'telegram');
-  assert.equal(url.searchParams.get('id'), 'evt-1');
-  assert.equal(url.searchParams.get('t'), null);
-  assert.equal(url.searchParams.get('d'), null);
-  assert.equal(url.searchParams.get('i'), null);
-});
-
-test('getShareUrl supports instagram channel and appends utm params', () => {
-  const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1';
-  const url = new URL(getShareUrl({ id: 'evt-1' }, 'instagram', base));
-  assert.equal(url.pathname, '/event-card.html');
-  assert.equal(url.searchParams.get('id'), 'evt-1');
-  assert.equal(url.searchParams.get('utm_content'), 'instagram');
+    assert.equal(url.origin, 'https://whatsondk.netlify.app');
+    assert.equal(url.pathname, '/event-card.html');
+    assert.equal(url.searchParams.get('id'), 'evt-1');
+    assert.equal(url.searchParams.get('ref'), 'a b');
+    assert.equal(url.searchParams.get('utm_source'), 'share');
+    assert.equal(url.searchParams.get('utm_medium'), 'web');
+    assert.equal(url.searchParams.get('utm_campaign'), 'event');
+    assert.equal(url.searchParams.get('utm_content'), channel);
+    assert.match(url.toString(), /^https:\/\/whatsondk\.netlify\.app\/event-card\.html\?/);
+  });
 });
 
 test('buildShareText returns compact title/date/city without link by default', () => {
