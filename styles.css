@@ -3432,33 +3432,27 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   margin-bottom: 1rem;
 }
 
-.admin-partners-form .filters__toggle {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.3rem 0.55rem;
-  align-content: start;
-  align-items: start;
-  border-radius: 14px;
+.admin-partners-form .form-field {
+  min-height: 114px;
 }
 
-.admin-partners-form .filters__toggle input {
-  position: static;
-  opacity: 1;
-  pointer-events: auto;
+.admin-partners-form__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 114px;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-partners-form__checkbox input {
   width: 18px;
   height: 18px;
-  margin-top: 2px;
-}
-
-.admin-partners-form .filters__toggle span {
-  grid-column: 2;
-}
-
-.admin-partners-form .filters__toggle small {
-  grid-column: 2;
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.25;
+  margin: 0;
 }
 
 .admin-partners-details {

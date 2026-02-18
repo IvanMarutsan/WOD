@@ -2807,6 +2807,8 @@ import {
   const shareToggle = document.querySelector('[data-share-toggle]');
   const shareMenu = document.querySelector('[data-share-menu]');
   const shareCopyButton = document.querySelector('[data-share-copy]');
+  const shareInstagramButton = document.querySelector('[data-share-instagram]');
+  const shareNativeButton = document.querySelector('[data-share-native]');
   const shareChannelLinks = document.querySelectorAll('[data-share-channel]');
   const eventLocationEl = document.querySelector('[data-event-location]');
   const eventImageEl = document.querySelector('[data-event-image]');
@@ -3010,17 +3012,6 @@ import {
     }
   };
 
-  const shouldPreferNativeShare = () => {
-    if (typeof navigator === 'undefined') return false;
-    const ua = navigator.userAgent || '';
-    const isMobileUa = /Android|iPhone|iPad|iPod|Mobile|webOS/i.test(ua);
-    const isCoarsePointer =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(pointer: coarse)').matches;
-    return isMobileUa || isCoarsePointer;
-  };
-
   const setCalendarMenuOpen = (open) => {
     if (!calendarToggle || !calendarMenu) return;
     calendarToggle.setAttribute('aria-expanded', String(open));
@@ -3078,8 +3069,14 @@ import {
     if (shareCopyButton) {
       shareCopyButton.dataset.shareUrl = getShareUrl(eventData, 'copy', baseUrl);
     }
+    if (shareInstagramButton) {
+      shareInstagramButton.dataset.shareUrl = getShareUrl(eventData, 'instagram', baseUrl);
+    }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = getShareUrl(eventData, 'native', baseUrl);
+    }
+    if (shareNativeButton) {
+      shareNativeButton.dataset.shareUrl = getShareUrl(eventData, 'native', baseUrl);
     }
     setShareMenuOpen(false);
   };
@@ -3144,8 +3141,14 @@ import {
     if (shareCopyButton) {
       shareCopyButton.dataset.shareUrl = '';
     }
+    if (shareInstagramButton) {
+      shareInstagramButton.dataset.shareUrl = '';
+    }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = '';
+    }
+    if (shareNativeButton) {
+      shareNativeButton.dataset.shareUrl = '';
     }
     shareChannelLinks.forEach((link) => {
       if (link instanceof HTMLAnchorElement) {
@@ -3368,15 +3371,8 @@ import {
       });
     }
     if (shareToggle && shareMenu) {
-      shareToggle.addEventListener('click', async () => {
+      shareToggle.addEventListener('click', () => {
         if (!activeEventData) return;
-        if (shouldPreferNativeShare()) {
-          const nativeUrl =
-            shareToggle.dataset.shareUrl ||
-            getShareUrl(activeEventData, 'native', buildEventPageUrl(activeEventData));
-          const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
-          if (shared) return;
-        }
         const expanded = shareToggle.getAttribute('aria-expanded') === 'true';
         if (expanded) {
           setShareMenuOpen(false);
@@ -3384,6 +3380,20 @@ import {
           openShareFallbackMenu(activeEventData);
         }
         setCalendarMenuOpen(false);
+      });
+    }
+    if (shareNativeButton) {
+      shareNativeButton.addEventListener('click', async () => {
+        if (!activeEventData) return;
+        const shareUrl =
+          shareNativeButton.dataset.shareUrl ||
+          getShareUrl(activeEventData, 'native', buildEventPageUrl(activeEventData));
+        const shared = await tryShareWithWebApi(activeEventData, shareUrl);
+        if (shared) {
+          setShareMenuOpen(false);
+          return;
+        }
+        showToast('Нативне поширення недоступне на цьому пристрої');
       });
     }
     if ((calendarToggle && calendarMenu) || (shareToggle && shareMenu)) {
@@ -3433,6 +3443,24 @@ import {
         const copied = await copyToClipboard(url);
         if (copied) {
           showToast('Посилання скопійовано');
+          setShareMenuOpen(false);
+        }
+      });
+    }
+    if (shareInstagramButton) {
+      shareInstagramButton.addEventListener('click', async () => {
+        if (!activeEventData) return;
+        const shareUrl =
+          shareInstagramButton.dataset.shareUrl ||
+          getShareUrl(activeEventData, 'instagram', buildEventPageUrl(activeEventData));
+        const shared = await tryShareWithWebApi(activeEventData, shareUrl);
+        if (shared) {
+          setShareMenuOpen(false);
+          return;
+        }
+        const copied = await copyToClipboard(shareUrl);
+        if (copied) {
+          showToast('Посилання скопійовано. Вставте у Instagram');
           setShareMenuOpen(false);
         }
       });

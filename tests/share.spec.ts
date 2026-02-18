@@ -79,6 +79,15 @@ test('desktop share fallback menu works and builds network links', async ({ page
   expect(copied).toContain('utm_content=copy');
 
   await page.getByRole('button', { name: /Поділитися/i }).click();
+  await page.getByRole('button', { name: /Instagram/i }).click();
+  await expect(page.locator('[data-saved-toast]')).toHaveText(/Instagram/);
+  const copiedInstagram = await page.evaluate(() => {
+    // @ts-ignore
+    return window.__copiedText || '';
+  });
+  expect(copiedInstagram).toContain('utm_content=instagram');
+
+  await page.getByRole('button', { name: /Поділитися/i }).click();
   const telegramHref = await page
     .locator('[data-share-channel="telegram"]')
     .getAttribute('href');

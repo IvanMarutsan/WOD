@@ -16,6 +16,14 @@ test('getShareUrl appends utm params with channel', () => {
   assert.equal(url.searchParams.get('i'), null);
 });
 
+test('getShareUrl supports instagram channel and appends utm params', () => {
+  const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1';
+  const url = new URL(getShareUrl({ id: 'evt-1' }, 'instagram', base));
+  assert.equal(url.pathname, '/event-card.html');
+  assert.equal(url.searchParams.get('id'), 'evt-1');
+  assert.equal(url.searchParams.get('utm_content'), 'instagram');
+});
+
 test('buildShareText returns compact title/date/city without link by default', () => {
   const event = {
     title: 'Community Meetup',

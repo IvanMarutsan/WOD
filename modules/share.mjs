@@ -1,7 +1,7 @@
 const SHARE_UTM_SOURCE = 'share';
 const SHARE_UTM_MEDIUM = 'web';
 const SHARE_UTM_CAMPAIGN = 'event';
-const SOCIAL_CHANNELS = new Set(['facebook', 'linkedin', 'telegram', 'whatsapp']);
+const SOCIAL_CHANNELS = new Set(['facebook', 'linkedin', 'telegram', 'whatsapp', 'instagram']);
 
 const parseDate = (value) => {
   if (!value) return null;
@@ -114,6 +114,9 @@ export const getNetworkShareHref = (network, shareUrl, shareText) => {
     return `https://wa.me/?text=${encodeURIComponent(
       [shareText, shareUrl].filter(Boolean).join('\n')
     )}`;
+  }
+  if (network === 'instagram') {
+    return shareUrl || '#';
   }
   return shareUrl || '#';
 };

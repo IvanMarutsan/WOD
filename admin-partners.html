@@ -65,22 +65,18 @@
               <label class="form-field">
                 <span>Сайт</span>
                 <input type="url" name="website_url" required />
-                <small>Куди переходити при натисканні на банер партнера.</small>
               </label>
               <label class="form-field">
                 <span>Логотип</span>
                 <input type="file" name="logo_file" accept="image/*" />
-                <small>Основне зображення партнера в каруселі.</small>
               </label>
-              <label class="filters__toggle">
+              <label class="admin-partners-form__checkbox">
                 <input type="checkbox" name="is_active" checked />
                 <span>Активне / Не активне</span>
-                <small>Активне: партнер показується на головній.</small>
               </label>
-              <label class="filters__toggle">
+              <label class="admin-partners-form__checkbox">
                 <input type="checkbox" name="has_detail_page" />
                 <span>Розширена сторінка партнера</span>
-                <small>Увімкнено: можна заповнити детальний контент нижче.</small>
               </label>
               <fieldset class="admin-partners-advanced form-field--full" data-partner-advanced-fields disabled hidden>
                 <legend>Налаштування розширеної сторінки</legend>
@@ -91,12 +87,10 @@
                 <label class="form-field">
                   <span>Slug</span>
                   <input type="text" name="slug" placeholder="waylight" />
-                  <small>Унікальна частина URL: `partner.html?slug=...`.</small>
                 </label>
                 <label class="form-field">
                   <span>Порядок</span>
                   <input type="number" name="sort_order" value="0" />
-                  <small>Менше число = раніше в списку партнерів.</small>
                 </label>
               </fieldset>
               <fieldset class="admin-partners-details form-field--full" data-partner-detail-fields disabled hidden>
