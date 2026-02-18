@@ -42,12 +42,23 @@ const normalizeDateValue = (value: unknown) => {
 
 const normalizeLanguage = (value: unknown) => {
   if (value === undefined || value === null) return '';
-  const raw = String(value).trim().toLowerCase();
+  const raw = String(value).trim().toLowerCase().replace(/\s+/g, '');
   if (!raw) return '';
-  if (raw.includes('/')) return 'mixed';
-  if (raw.includes('mix')) return 'mixed';
-  const allowed = new Set(['uk', 'en', 'da', 'mixed']);
-  return allowed.has(raw) ? raw : '';
+  if (raw.includes('mix')) return 'uk/en';
+  const normalized = raw.replace(/_/g, '/');
+  const aliases = new Map([
+    ['en-gb', 'en'],
+    ['en/gb', 'en'],
+    ['ua', 'uk'],
+    ['uk/ua', 'uk'],
+    ['ua/uk', 'uk'],
+    ['en/uk', 'uk/en'],
+    ['da/uk', 'uk/da'],
+    ['da/en', 'en/da']
+  ]);
+  const resolved = aliases.get(normalized) || normalized;
+  const allowed = new Set(['uk', 'en', 'da', 'uk/en', 'uk/da', 'en/da']);
+  return allowed.has(resolved) ? resolved : '';
 };
 
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {

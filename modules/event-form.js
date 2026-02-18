@@ -1,4 +1,5 @@
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './auth.js';
+import { normalizeEventLanguage } from './language.mjs';
 import { buildLocalEventId, findMergedEventById, upsertLocalEvent } from './local-events.js';
 
 export const initEventForm = ({ formatMessage, getVerificationState, publishState }) => {
@@ -252,7 +253,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('start', formatInputDateTime(eventData.start));
     setValue('end', formatInputDateTime(eventData.end));
     setValue('format', eventData.format || '');
-    setValue('language', eventData.language || '');
+    setValue('language', normalizeEventLanguage(eventData.language || ''));
     setValue('city', eventData.city || '');
     setValue('address', eventData.address || eventData.venue || '');
     setValue('ticket-type', eventData.priceType || '');
@@ -609,6 +610,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
       const formData = new FormData(multiStepForm);
       const payload = Object.fromEntries(formData.entries());
+      payload.language = normalizeEventLanguage(payload.language);
       payload.description = String(payload.description || '').trim();
       if (!payload.description) {
         const message = formatMessage('form_description_required', {}) || 'Опис події обовʼязковий.';

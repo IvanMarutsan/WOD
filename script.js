@@ -16,6 +16,7 @@ import { formatPriceRangeLabel } from './modules/price-detail.js';
 import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
 import { buildGoogleMapsLink } from './modules/maps.mjs';
 import { buildGoogleCalendarUrl, buildIcs } from './modules/calendar.mjs';
+import { getLanguageLabel } from './modules/language.mjs';
 import {
   buildShareText,
   getNetworkShareHref,
@@ -857,29 +858,6 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
     welcome: { uk: 'вітання' },
     wellbeing: { uk: 'добробут' },
     workshop: { uk: 'воркшоп' }
-  };
-
-  const LANGUAGE_LABELS = {
-    uk: 'Українська',
-    ua: 'Українська',
-    uk_ua: 'Українська',
-    en: 'Англійська',
-    en_gb: 'Англійська',
-    da: 'Данська',
-    uk_en: 'Українська / Англійська',
-    en_uk: 'Українська / Англійська'
-  };
-
-  const getLanguageLabel = (value) => {
-    const normalized = normalize(value);
-    if (!normalized) return '';
-    const compact = normalized.replace(/\s+/g, '');
-    if (compact.includes('/')) {
-      const parts = compact.split('/').filter(Boolean);
-      const labels = parts.map((part) => LANGUAGE_LABELS[part] || part);
-      return labels.join(' / ');
-    }
-    return LANGUAGE_LABELS[compact] || value;
   };
 
   const getLocalizedEventTitle = (event) =>
