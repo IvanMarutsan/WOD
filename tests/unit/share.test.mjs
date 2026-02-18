@@ -63,11 +63,9 @@ test('facebook share href uses sharer.php with encoded share url', () => {
   assert.match(href, /utm_content%3Dfacebook/);
 });
 
-test('messenger share href uses compose url with encoded share url', () => {
+test('messenger share href uses stable messages url', () => {
   const shareUrl =
     'https://whatsondk.netlify.app/.netlify/functions/share-event?id=evt-1&utm_content=messenger';
   const href = getNetworkShareHref('messenger', shareUrl, '');
-  assert.match(href, /^https:\/\/www\.facebook\.com\/messages\/compose\/\?link=/);
-  assert.match(href, /https%3A%2F%2Fwhatsondk\.netlify\.app%2F\.netlify%2Ffunctions%2Fshare-event/);
-  assert.match(href, /utm_content%3Dmessenger/);
+  assert.equal(href, 'https://www.facebook.com/messages/t/');
 });

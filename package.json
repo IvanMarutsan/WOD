@@ -11,7 +11,14 @@
     "test:e2e:report": "playwright show-report",
     "test:unit": "node --test tests/unit/*.test.mjs",
     "test:admin-cycle": "node scripts/admin-cycle.mjs",
-    "test:admin-cycle:extended": "node scripts/admin-cycle.extended.mjs"
+    "test:admin-cycle:extended": "node scripts/admin-cycle.extended.mjs",
+    "test:e2e:staging": "playwright test -c playwright.staging.config.ts tests/staging.smoke.spec.ts",
+    "test:e2e:staging:headed": "playwright test -c playwright.staging.config.ts tests/staging.smoke.spec.ts --headed",
+    "test:e2e:staging:extended": "playwright test -c playwright.staging.config.ts tests/staging.smoke.spec.ts tests/staging.extended.spec.ts",
+    "test:e2e:staging:extended:headed": "playwright test -c playwright.staging.config.ts tests/staging.smoke.spec.ts tests/staging.extended.spec.ts --headed",
+    "test:staging:admin-cycle": "node scripts/admin-cycle.mjs",
+    "test:staging:admin-cycle:extended": "node scripts/admin-cycle.extended.mjs",
+    "test:staging:premerge": "npm run test:e2e:staging:extended && npm run test:staging:admin-cycle && npm run test:staging:admin-cycle:extended"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.5",

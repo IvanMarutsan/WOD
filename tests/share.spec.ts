@@ -107,8 +107,7 @@ test('desktop share fallback menu works and builds network links', async ({ page
     .getAttribute('href');
   expect(facebookHref || '').toContain('https://www.facebook.com/sharer/sharer.php?u=');
   expect(facebookHref || '').toContain('utm_content%3Dfacebook');
-  expect(messengerHref || '').toContain('https://www.facebook.com/messages/compose/?link=');
-  expect(messengerHref || '').toContain('utm_content%3Dmessenger');
+  expect(messengerHref || '').toBe('https://www.facebook.com/messages/t/');
   expect(linkedinHref || '').toContain('https://www.linkedin.com/sharing/share-offsite/?url=');
   expect(linkedinHref || '').toContain('utm_content%3Dlinkedin');
   expect(telegramHref || '').toContain('https://t.me/share/url');
@@ -208,8 +207,12 @@ test.describe('mobile share behavior', () => {
       // @ts-ignore
       return window.__openedMessenger || '';
     });
-    expect(openedMessenger).toContain('https://www.facebook.com/messages/compose/?link=');
-    expect(openedMessenger).toContain('utm_content%3Dmessenger');
+    const copiedMessengerUrl = await page.evaluate(() => {
+      // @ts-ignore
+      return window.__copiedText || '';
+    });
+    expect(openedMessenger).toContain('https://www.facebook.com/messages/t/');
+    expect(copiedMessengerUrl).toContain('utm_content=messenger');
 
     await page.getByRole('button', { name: /Поділитися/i }).click();
     await page.getByRole('button', { name: /^Інше$/i }).click();

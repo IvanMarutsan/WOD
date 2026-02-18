@@ -3058,9 +3058,8 @@ import {
       const popup = window.open(href, '_blank', 'noopener');
       if (popup) return true;
     } catch (error) {
-      // No-op: show fallback toast below.
+      // No-op: fallback handled by caller.
     }
-    showToast('Не вдалося відкрити Messenger. Спробуйте Copy link або Інше');
     return false;
   };
 
@@ -3078,6 +3077,9 @@ import {
       const channelUrl = getShareUrl(eventData, channel, baseUrl);
       const text = buildShareText(eventData);
       link.href = getNetworkShareHref(channel, channelUrl, text);
+      if (channel === 'messenger') {
+        link.dataset.shareUrl = channelUrl;
+      }
     });
     if (shareCopyButton) {
       shareCopyButton.dataset.shareUrl = getShareUrl(eventData, 'copy', baseUrl);
@@ -3464,11 +3466,20 @@ import {
       });
     });
     if (shareMessengerLink instanceof HTMLAnchorElement) {
-      shareMessengerLink.addEventListener('click', (event) => {
+      shareMessengerLink.addEventListener('click', async (event) => {
         event.preventDefault();
+        const shareUrl = String(shareMessengerLink.dataset.shareUrl || '').trim();
+        const copied = shareUrl ? await copyToClipboard(shareUrl) : false;
         const opened = openMessengerShare(shareMessengerLink.href);
+        if (copied) {
+          showToast('Посилання скопійовано. Вставте у Messenger');
+        }
         if (opened) {
           setShareMenuOpen(false);
+          return;
+        }
+        if (!copied) {
+          showToast('Не вдалося відкрити Messenger. Спробуйте Copy link або Інше');
         }
       });
     }

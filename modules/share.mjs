@@ -115,7 +115,7 @@ export const getNetworkShareHref = (network, shareUrl, shareText) => {
     return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   }
   if (network === 'messenger') {
-    return `https://www.facebook.com/messages/compose/?link=${encodedUrl}`;
+    return 'https://www.facebook.com/messages/t/';
   }
   if (network === 'linkedin') {
     return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
