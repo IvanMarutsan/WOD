@@ -13,6 +13,7 @@ import { HighlightCard } from './components/highlight-card.js';
 import { ADMIN_SESSION_KEY, getIdentityToken, hasAdminRole } from './modules/auth.js';
 import { resolveAdminSession } from './modules/admin-session.mjs';
 import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagination.mjs';
+import { getMaxScrollLeft, getNextScrollLeft } from './modules/highlights-carousel.mjs';
 import { formatPriceRangeLabel } from './modules/price-detail.js';
 import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
 import { buildGoogleMapsLink } from './modules/maps.mjs';
@@ -1463,10 +1464,8 @@ import {
       return `${clean.slice(0, maxLength - 3).trimEnd()}...`;
     };
 
-    const selectHighlights = (list, limit) =>
-      [...list]
-        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-        .slice(0, limit);
+    const selectHighlights = (list) =>
+      [...list].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
     const eventCardHelpers = {
       formatPriceLabel,
@@ -1494,16 +1493,19 @@ import {
       const upcomingWeek = filterWeeklyEvents(list, now, { isArchivedEvent, isPast });
 
       if (!upcomingWeek.length) {
+        highlightsTrack.classList.add('highlights__track--empty');
         highlightsTrack.innerHTML = `
           <div class="highlights__empty">
             <p class="highlights__empty-title">Немає подій на цьому тижні.</p>
             <p class="highlights__empty-text">Перевірте каталог або поверніться пізніше — ми додаємо нові події регулярно.</p>
           </div>
         `;
+        scheduleHighlightsControls();
         return;
       }
 
-      const selection = selectHighlights(upcomingWeek, 6);
+      highlightsTrack.classList.remove('highlights__track--empty');
+      const selection = selectHighlights(upcomingWeek);
       highlightsTrack.innerHTML = selection.map((event) => HighlightCard(event, highlightCardHelpers)).join('');
       scheduleHighlightsControls();
     };
@@ -2941,10 +2943,21 @@ import {
     const locationText = [eventData.address, eventData.venue, eventData.city].filter(Boolean).join(' ');
     return formatValue.includes('online') || ONLINE_PATTERN.test(locationText);
   };
+  const getOnlinePlatformLabel = (eventData) => {
+    if (!eventData) return '';
+    const generic = /^(online|онлайн|virtual|webinar)$/i;
+    const parts = getUniqueParts(
+      [eventData.address, eventData.venue].map((value) => String(value || '').trim()).filter(Boolean)
+    );
+    const specific = parts.find((part) => !generic.test(part));
+    return specific || parts[0] || '';
+  };
   const buildEventLocation = (eventData) => {
     const onlineLabel = formatMessage('online', {}) || 'Онлайн';
     if (isOnlineEvent(eventData)) {
-      return { label: onlineLabel, mapQuery: '' };
+      const platformLabel = getOnlinePlatformLabel(eventData);
+      const label = platformLabel ? `${onlineLabel} · ${platformLabel}` : onlineLabel;
+      return { label, mapQuery: '' };
     }
     const address = String(eventData.address || '').trim();
     const cityLabel = getDisplayCity(eventData.city);
@@ -3059,7 +3072,7 @@ import {
       if (!(link instanceof HTMLAnchorElement)) return;
       const channel = link.dataset.shareChannel || 'native';
       const channelUrl = getShareUrl(eventData, channel, baseUrl);
-      const text = buildShareText(eventData, channelUrl);
+      const text = buildShareText(eventData);
       link.href = getNetworkShareHref(channel, channelUrl, text);
     });
     if (shareCopyButton) {
@@ -3746,17 +3759,38 @@ import {
   if (highlightsTrack) {
     const prevButton = document.querySelector('.highlights__button[data-action="prev"]');
     const nextButton = document.querySelector('.highlights__button[data-action="next"]');
-    const getStep = () => highlightsTrack.clientWidth * 0.8;
+    const getStep = () => {
+      const firstCard = highlightsTrack.querySelector('.highlights__card');
+      if (!(firstCard instanceof HTMLElement)) {
+        return highlightsTrack.clientWidth * 0.8;
+      }
+      const styles = window.getComputedStyle(highlightsTrack);
+      const gap =
+        Number.parseFloat(styles.columnGap || styles.gap || '') ||
+        Number.parseFloat(styles.rowGap || '') ||
+        0;
+      return firstCard.offsetWidth + gap;
+    };
     const updateControls = () => {
       if (!prevButton || !nextButton) return;
-      const hasOverflow = highlightsTrack.scrollWidth - highlightsTrack.clientWidth > 4;
+      const hasCards = highlightsTrack.querySelectorAll('.highlights__card').length > 0;
+      const maxScrollLeft = getMaxScrollLeft(highlightsTrack.scrollWidth, highlightsTrack.clientWidth);
+      const hasOverflow = hasCards && maxScrollLeft > 4;
+      const currentLeft = highlightsTrack.scrollLeft;
+      const canGoPrev = hasOverflow && currentLeft > 2;
+      const canGoNext = hasOverflow && currentLeft < maxScrollLeft - 2;
       prevButton.hidden = !hasOverflow;
       nextButton.hidden = !hasOverflow;
+      prevButton.disabled = !canGoPrev;
+      nextButton.disabled = !canGoNext;
     };
     scheduleHighlightsControls = () => requestAnimationFrame(updateControls);
 
     const scrollByStep = (direction) => {
-      highlightsTrack.scrollBy({ left: direction * getStep(), behavior: 'smooth' });
+      const step = getStep();
+      const maxScrollLeft = getMaxScrollLeft(highlightsTrack.scrollWidth, highlightsTrack.clientWidth);
+      const target = getNextScrollLeft(highlightsTrack.scrollLeft, direction, step, maxScrollLeft);
+      highlightsTrack.scrollTo({ left: target, behavior: 'smooth' });
     };
 
     if (prevButton) {

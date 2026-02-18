@@ -99,9 +99,10 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const description = String(payload.description || '').trim();
     if (!isNonEmptyString(description)) errors.push('description');
     if (!isValidDate(payload.start)) errors.push('start');
-    if (!['offline', 'online'].includes(String(payload.format || ''))) errors.push('format');
+    const format = String(payload.format || '');
+    if (!['offline', 'online'].includes(format)) errors.push('format');
     if (!isNonEmptyString(payload.address)) errors.push('address');
-    if (!isNonEmptyString(payload.city)) errors.push('city');
+    if (format !== 'online' && !isNonEmptyString(payload.city)) errors.push('city');
     if (!['free', 'paid'].includes(String(payload['ticket-type'] || ''))) errors.push('ticket-type');
     if (!isNonEmptyString(payload['contact-name'])) errors.push('contact-name');
     if (payload['contact-email'] && !isValidEmail(payload['contact-email'])) {
@@ -176,7 +177,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
           slug: payload.slug || id,
           title,
           description,
-          city: payload.city || payload.eventCity || '',
+          city: format === 'online' ? (payload.city || '') : payload.city || payload.eventCity || '',
           address: payload.address || '',
           venue: payload.venue || payload.address || '',
           start_at: payload.start || payload.eventStart || null,

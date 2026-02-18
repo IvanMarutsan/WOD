@@ -65,7 +65,7 @@ test('event detail shows real data and edit link', async ({ page }) => {
   await expect(meta).toContainText('04.02.2026');
   await expect(meta).toContainText('Онлайн');
 
-  await expect(page.locator('[data-event-location]')).toHaveText('Онлайн');
+  await expect(page.locator('[data-event-location]')).toHaveText('Онлайн · Zoom');
   await expect(page.locator('[data-price-type]')).toContainText('Ціна: 350 - 520 DKK');
 
   await page.locator('[data-action="admin-edit"]').click();

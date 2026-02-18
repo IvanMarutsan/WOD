@@ -12,6 +12,7 @@ const mapOrganizer = (organizer?: {
   website?: string;
   instagram?: string;
   facebook?: string;
+  telegram?: string;
   meta?: string;
 }) => {
   if (!organizer) return null;
@@ -22,6 +23,7 @@ const mapOrganizer = (organizer?: {
     website: organizer.website || '',
     instagram: organizer.instagram || '',
     facebook: organizer.facebook || '',
+    telegram: organizer.telegram || '',
     meta: organizer.meta || ''
   };
 };
@@ -134,6 +136,7 @@ export const handler = async (event: HandlerEvent, _context: HandlerContext) => 
           website: '',
           instagram: '',
           facebook: '',
+          telegram: '',
           meta: ''
         }
       };

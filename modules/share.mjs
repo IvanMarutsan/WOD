@@ -32,12 +32,6 @@ export const getShareUrl = (event, channel = 'native', baseUrl = '') => {
     url.pathname = '/.netlify/functions/share-event';
     url.search = '';
     url.searchParams.set('id', String(event.id));
-    const title = String(event?.title || '').trim();
-    const description = String(event?.description || '').trim();
-    const image = String(event?.images?.[0] || '').trim();
-    if (title) url.searchParams.set('t', title);
-    if (description) url.searchParams.set('d', description.slice(0, 280));
-    if (image) url.searchParams.set('i', image);
   }
   url.searchParams.set('utm_source', SHARE_UTM_SOURCE);
   url.searchParams.set('utm_medium', SHARE_UTM_MEDIUM);
@@ -46,12 +40,20 @@ export const getShareUrl = (event, channel = 'native', baseUrl = '') => {
   return url.toString();
 };
 
-export const buildShareText = (event, shareUrl = '') => {
+export const buildShareText = (event, options = {}) => {
+  const opts =
+    typeof options === 'string'
+      ? { shareUrl: options, includeUrl: true }
+      : options && typeof options === 'object'
+        ? options
+        : {};
+  const shareUrl = String(opts.shareUrl || '').trim();
+  const includeUrl = Boolean(opts.includeUrl && shareUrl);
   const title = String(event?.title || '').trim();
   const dateLabel = formatDateTime(event?.start);
   const city = String(event?.city || '').trim();
   const meta = [dateLabel, city].filter(Boolean).join(' · ');
-  return [title, meta, shareUrl].filter(Boolean).join('\n');
+  return [title, meta, includeUrl ? shareUrl : ''].filter(Boolean).join('\n');
 };
 
 const fetchShareImageFile = async (event) => {
@@ -75,7 +77,7 @@ export const tryShareWithWebApi = async (event, shareUrl) => {
   const url = shareUrl || '';
   const payload = {
     title: String(event?.title || ''),
-    text: buildShareText(event, url),
+    text: buildShareText(event),
     url
   };
   try {
@@ -105,10 +107,13 @@ export const getNetworkShareHref = (network, shareUrl, shareText) => {
     return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   }
   if (network === 'telegram') {
-    return `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+    const textParam = encodedText ? `&text=${encodedText}` : '';
+    return `https://t.me/share/url?url=${encodedUrl}${textParam}`;
   }
   if (network === 'whatsapp') {
-    return `https://wa.me/?text=${encodeURIComponent(`${shareText || ''}\n${shareUrl || ''}`.trim())}`;
+    return `https://wa.me/?text=${encodeURIComponent(
+      [shareText, shareUrl].filter(Boolean).join('\n')
+    )}`;
   }
   return shareUrl || '#';
 };

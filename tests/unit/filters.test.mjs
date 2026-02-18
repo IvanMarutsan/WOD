@@ -33,6 +33,12 @@ test('city filter matches normalized city', () => {
   assert.equal(eventMatchesFilters(event, filters, helpers), true);
 });
 
+test('city filter ignores online events', () => {
+  const event = { status: 'published', city: 'Copenhagen', format: 'online' };
+  const filters = { city: 'copenhagen' };
+  assert.equal(eventMatchesFilters(event, filters, helpers), false);
+});
+
 test('past filter hides past events unless showPast is set', () => {
   const event = { status: 'published', past: true };
   assert.equal(eventMatchesFilters(event, { showPast: false }, helpers), false);

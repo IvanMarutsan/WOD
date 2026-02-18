@@ -61,6 +61,11 @@ const normalizeLanguage = (value: unknown) => {
   return allowed.has(resolved) ? resolved : '';
 };
 
+const normalizeOptionalText = (value: unknown) => {
+  if (value === undefined) return undefined;
+  return String(value ?? '').trim();
+};
+
 export const handler = async (event: HandlerEvent, context: HandlerContext) => {
   try {
     const roles = getRoles(context);
@@ -122,7 +127,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     if (endValue) updatePayload.end_at = endValue;
     if (updates.address) updatePayload.address = String(updates.address);
     if (updates.venue) updatePayload.venue = String(updates.venue);
-    if (updates.city) updatePayload.city = String(updates.city);
+    if (updates.city !== undefined) updatePayload.city = String(updates.city || '').trim();
     if (updates['ticket-url']) updatePayload.registration_url = String(updates['ticket-url']);
     if (updates['ticket-type']) updatePayload.price_type = String(updates['ticket-type']);
     const hasMin = updates['price-min'] !== undefined;
@@ -153,6 +158,53 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
         updatePayload.image_url = upload?.url || '';
       } else {
         updatePayload.image_url = rawImage;
+      }
+    }
+
+    const organizerUpdates: Record<string, unknown> = {};
+    const contactName = normalizeOptionalText(updates['contact-name']);
+    if (contactName) {
+      organizerUpdates.name = contactName;
+    }
+    const contactMeta = normalizeOptionalText(updates['contact-meta']);
+    if (contactMeta !== undefined) {
+      organizerUpdates.meta = contactMeta || null;
+    }
+    const organizerFieldMap: Array<[string, string]> = [
+      ['contact-email', 'email'],
+      ['contact-phone', 'phone'],
+      ['contact-website', 'website'],
+      ['contact-instagram', 'instagram'],
+      ['contact-facebook', 'facebook']
+    ];
+    organizerFieldMap.forEach(([incomingKey, targetKey]) => {
+      const value = normalizeOptionalText(updates[incomingKey]);
+      if (value === undefined) return;
+      organizerUpdates[targetKey] = value || null;
+    });
+    const shouldUpdateOrganizer = Object.keys(organizerUpdates).length > 0;
+    if (shouldUpdateOrganizer) {
+      if (existing.organizer_id) {
+        await supabaseFetch('organizers', {
+          method: 'PATCH',
+          query: { id: `eq.${existing.organizer_id}` },
+          body: organizerUpdates
+        });
+      } else {
+        const hasValue = Object.values(organizerUpdates).some((value) => value !== null && value !== '');
+        if (hasValue) {
+          if (!organizerUpdates.name) {
+            organizerUpdates.name = 'Організатор';
+          }
+          const createdOrganizer = (await supabaseFetch('organizers', {
+            method: 'POST',
+            body: [organizerUpdates]
+          })) as any[];
+          const organizerId = createdOrganizer?.[0]?.id;
+          if (organizerId) {
+            updatePayload.organizer_id = organizerId;
+          }
+        }
       }
     }
     if (Object.keys(updatePayload).length) {

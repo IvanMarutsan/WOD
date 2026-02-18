@@ -352,6 +352,9 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     if (imageInput && existingImage) {
       imageInput.required = false;
     }
+    if (formatSelect) {
+      formatSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
     renderTagChips();
     updatePreview();
   };
@@ -535,7 +538,18 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   };
 
   if (formatSelect) {
+    const syncCityRequirement = () => {
+      if (!(cityField instanceof HTMLInputElement)) return;
+      const formatValue = String(getFieldValue('format') || '').trim().toLowerCase();
+      const cityRequired = formatValue !== 'online';
+      cityField.required = cityRequired;
+      if (!cityRequired) {
+        cityField.setCustomValidity('');
+      }
+    };
+    syncCityRequirement();
     formatSelect.addEventListener('change', () => {
+      syncCityRequirement();
       updatePreview();
     });
   }
@@ -708,9 +722,11 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         }
         return;
       }
+      const formatValue = String(payload.format || '').trim().toLowerCase();
       const rawCity = String(payload.city || '').trim().replace(/\s+/g, ' ');
       payload.city = rawCity;
-      if (!payload.city) {
+      const requiresCity = formatValue !== 'online';
+      if (requiresCity && !payload.city) {
         const message = formatMessage('form_city_required', {}) || 'Місто обовʼязкове.';
         if (cityField) {
           cityField.setCustomValidity(message);
@@ -734,7 +750,10 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       if (tagsHidden) {
         tagsHidden.value = tagsPayload;
       }
-      const derivedCity = payload.city || editingEventData?.city || '';
+      const derivedCity =
+        formatValue === 'online'
+          ? payload.city || ''
+          : payload.city || editingEventData?.city || '';
       const eventId = editingEventId;
       const priceInput = payload.price ? String(payload.price).trim() : '';
       const { min: priceMin, max: priceMax } = parsePriceInput(priceInput);

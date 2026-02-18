@@ -17,6 +17,7 @@ test('buildCityOptions returns unique city values from active events', () => {
     { status: 'published', city: 'Copenhagen', start: '2026-01-01T10:00:00+01:00' },
     { status: 'published', city: ' Copenhagen ', start: '2026-01-02T10:00:00+01:00' },
     { status: 'published', city: 'Aarhus', start: '2026-01-03T10:00:00+01:00' },
+    { status: 'published', city: 'Odense', format: 'online', start: '2026-01-03T11:00:00+01:00' },
     { status: 'archived', city: 'Odense', start: '2026-01-04T10:00:00+01:00' },
     { status: 'published', city: '', start: '2026-01-05T10:00:00+01:00' }
   ];

@@ -4,7 +4,14 @@ const { EventCard } = await import('../../components/event-card.js');
 
 const helpers = {
   formatPriceLabel: () => 'DKK 100',
-  formatMessage: (key) => (key === 'register_cta' ? 'Реєстрація' : key === 'ticket_cta' ? 'Квитки' : key),
+  formatMessage: (key) =>
+    key === 'register_cta'
+      ? 'Реєстрація'
+      : key === 'ticket_cta'
+        ? 'Квитки'
+        : key === 'online'
+          ? 'Онлайн'
+          : key,
   getTagList: (tags) => tags || [],
   getLocalizedTag: (label) => label,
   getLocalizedEventTitle: (event) => event.title || '',
@@ -39,4 +46,21 @@ test('event card renders language label when available', () => {
     helpers
   );
   assert.match(html, /Українська/);
+});
+
+test('event card renders online label instead of city for online events', () => {
+  const html = EventCard(
+    {
+      id: 'evt-4',
+      title: 'Online Event',
+      format: 'online',
+      city: 'Copenhagen',
+      address: 'Zoom',
+      priceType: 'free',
+      tags: []
+    },
+    helpers
+  );
+  assert.match(html, /event-card__location">Онлайн</);
+  assert.doesNotMatch(html, /event-card__location">Copenhagen</);
 });

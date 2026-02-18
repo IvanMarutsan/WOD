@@ -43,6 +43,15 @@ test('update-event uses external_id lookup for non-uuid ids', () => {
   assert.match(content, /id\.eq/);
 });
 
+test('update-event clears organizer social fields when payload values are empty', () => {
+  const content = readFile('../../netlify/functions/update-event.ts');
+  assert.match(content, /organizerFieldMap/);
+  assert.match(content, /contact-instagram/);
+  assert.match(content, /contact-facebook/);
+  assert.match(content, /value \|\| null/);
+  assert.match(content, /supabaseFetch\('organizers'/);
+});
+
 test('admin-update enforces roles', () => {
   const content = readFile('../../netlify/functions/admin-update.ts');
   assert.match(content, /error:\s*'forbidden'/);

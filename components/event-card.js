@@ -25,6 +25,7 @@ export const EventCard = (event, helpers) => {
     isArchived
   } = helpers;
   const normalizePart = (value) => String(value || '').trim().toLowerCase();
+  const ONLINE_PATTERN = /zoom|google meet|meet\.google|teams\.microsoft|teams|online|webinar/i;
   const normalizeLocationPart = (value) =>
     String(value || '')
       .trim()
@@ -70,7 +71,12 @@ export const EventCard = (event, helpers) => {
   const showTicketCta = event.priceType !== 'free' || Boolean(rawTicketUrl);
   const ticketUrl = rawTicketUrl || '#';
   const detailUrl = `event-card.html?id=${encodeURIComponent(event.id)}`;
-  const cityLabel = getLocalizedCity(event.city);
+  const formatValue = String(event.format || '').toLowerCase();
+  const onlineLocationText = [event.address, event.venue].filter(Boolean).join(' ');
+  const isOnline = formatValue.includes('online') || ONLINE_PATTERN.test(onlineLocationText);
+  const cityLabel = isOnline
+    ? formatMessage('online', {}) || 'Онлайн'
+    : getLocalizedCity(event.city);
   const location = cityLabel ? cityLabel : '';
   const languageMarkup = languageLabel ? `<p class="event-card__language">${languageLabel}</p>` : '';
   const statusLabel = archivedEvent ? 'archived' : pastEvent ? 'past' : 'active';

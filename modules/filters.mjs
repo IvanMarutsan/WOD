@@ -4,6 +4,107 @@ export const defaultNormalizeCity = (value) =>
     .trim()
     .replace(/\s+/g, ' ')
     .toLowerCase();
+const COPENHAGEN_TIME_ZONE = 'Europe/Copenhagen';
+const ONLINE_PATTERN = /zoom|google meet|meet\.google|teams\.microsoft|teams|online|webinar/i;
+
+const COPENHAGEN_DATE_PARTS_FORMATTER = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: COPENHAGEN_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false
+});
+
+const COPENHAGEN_WEEKDAY_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  timeZone: COPENHAGEN_TIME_ZONE,
+  weekday: 'short'
+});
+
+const WEEKDAY_TO_INDEX = {
+  mon: 1,
+  tue: 2,
+  wed: 3,
+  thu: 4,
+  fri: 5,
+  sat: 6,
+  sun: 7
+};
+
+const getCopenhagenDateParts = (value) => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const map = Object.fromEntries(
+    COPENHAGEN_DATE_PARTS_FORMATTER
+      .formatToParts(date)
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, Number(part.value)])
+  );
+  return {
+    year: map.year,
+    month: map.month,
+    day: map.day,
+    hour: map.hour,
+    minute: map.minute,
+    second: map.second
+  };
+};
+
+const getCopenhagenOffsetMs = (value) => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return 0;
+  const parts = getCopenhagenDateParts(date);
+  if (!parts) return 0;
+  const asUtc = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+    0
+  );
+  return asUtc - date.getTime();
+};
+
+const buildCopenhagenDate = (year, month, day, hour = 0, minute = 0, second = 0, millisecond = 0) => {
+  let timestamp = Date.UTC(year, month - 1, day, hour, minute, second, millisecond);
+  for (let index = 0; index < 3; index += 1) {
+    const offset = getCopenhagenOffsetMs(timestamp);
+    const next = Date.UTC(year, month - 1, day, hour, minute, second, millisecond) - offset;
+    if (Math.abs(next - timestamp) < 1) {
+      timestamp = next;
+      break;
+    }
+    timestamp = next;
+  }
+  return new Date(timestamp);
+};
+
+const addCalendarDays = (year, month, day, diffDays) => {
+  const utcDate = new Date(Date.UTC(year, month - 1, day + diffDays, 12, 0, 0, 0));
+  return {
+    year: utcDate.getUTCFullYear(),
+    month: utcDate.getUTCMonth() + 1,
+    day: utcDate.getUTCDate()
+  };
+};
+
+const getCopenhagenWeekday = (value) => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return 1;
+  const label = COPENHAGEN_WEEKDAY_FORMATTER.format(date).slice(0, 3).toLowerCase();
+  return WEEKDAY_TO_INDEX[label] || 1;
+};
+
+const isOnlineEvent = (event, normalize = defaultNormalize) => {
+  const formatValue = normalize(event?.format);
+  if (formatValue.includes('online')) return true;
+  const locationText = [event?.address, event?.venue].filter(Boolean).join(' ');
+  return ONLINE_PATTERN.test(String(locationText || ''));
+};
 
 export const buildFilters = (formData, searchQuery, helpers = {}) => {
   const normalize = helpers.normalize || defaultNormalize;
@@ -98,7 +199,10 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   if (filters.quickFavorites && !isSaved(event?.id)) {
     return false;
   }
-  if (filters.city && normalizeCity(event.city) !== filters.city) return false;
+  if (filters.city) {
+    if (isOnlineEvent(event, normalize)) return false;
+    if (normalizeCity(event.city) !== filters.city) return false;
+  }
   if (filters.price && normalize(event.priceType) !== filters.price) return false;
   if (filters.format && normalize(event.format) !== filters.format) return false;
   if (filters.tags && filters.tags.length) {
@@ -165,6 +269,7 @@ export const buildCityOptions = (events, helpers = {}) => {
     if (!event || event.status !== 'published') return;
     if (isArchivedEvent(event)) return;
     if (isPast(event)) return;
+    if (isOnlineEvent(event)) return;
     const rawCity = String(event.city || '').trim();
     const normalized = normalizeCity(rawCity);
     if (!normalized) return;
@@ -198,24 +303,33 @@ export const matchCityFromQuery = (query, cityOptions = [], helpers = {}) => {
 };
 
 export const getWeekRange = (now = new Date()) => {
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  const day = start.getDay();
-  const daysFromMonday = (day + 6) % 7;
-  start.setDate(start.getDate() - daysFromMonday);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
+  const current = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(current.getTime())) {
+    return { start: new Date(0), end: new Date(0) };
+  }
+  const copenhagenParts = getCopenhagenDateParts(current);
+  if (!copenhagenParts) {
+    return { start: new Date(0), end: new Date(0) };
+  }
+  const weekday = getCopenhagenWeekday(current);
+  const monday = addCalendarDays(
+    copenhagenParts.year,
+    copenhagenParts.month,
+    copenhagenParts.day,
+    -(weekday - 1)
+  );
+  const sunday = addCalendarDays(monday.year, monday.month, monday.day, 6);
+  const start = buildCopenhagenDate(monday.year, monday.month, monday.day, 0, 0, 0, 0);
+  const end = buildCopenhagenDate(sunday.year, sunday.month, sunday.day, 23, 59, 59, 0);
   return { start, end };
 };
 
 export const filterWeeklyEvents = (events, now = new Date(), helpers = {}) => {
   const isArchivedEvent = helpers.isArchivedEvent || (() => false);
   const isPast = helpers.isPast || (() => false);
-  const { start: weekStart, end } = getWeekRange(now);
-  const todayStart = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  const start = todayStart > weekStart ? todayStart : weekStart;
+  const start = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(start.getTime())) return [];
+  const { end } = getWeekRange(start);
   return (events || []).filter((event) => {
     if (!event || event.status !== 'published') return false;
     if (isArchivedEvent(event)) return false;

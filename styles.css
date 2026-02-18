@@ -1526,7 +1526,7 @@ body:not(.is-admin) [data-admin-controls] {
 }
 
 .highlights__button[data-action="next"] {
-  margin-right: -32px; /* або -8px, якщо треба ближче до картки */
+  margin-right: 0;
 }
 
 
@@ -1547,6 +1547,14 @@ body:not(.is-admin) [data-admin-controls] {
   padding-inline: 32px;
   scroll-behavior: smooth;
   scrollbar-width: none;
+}
+
+.highlights__track--empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+  overflow: hidden;
 }
 
 .highlights__track::-webkit-scrollbar {
@@ -1683,8 +1691,9 @@ body:not(.is-admin) [data-admin-controls] {
 .highlights__empty {
   color: var(--muted);
   font-size: 0.9rem;
-  padding: 4px 2px;
+  padding: 8px;
   max-width: 420px;
+  text-align: center;
 }
 
 .highlights__empty-title {
