@@ -2688,6 +2688,19 @@ import {
     const getPartnerLogoUrl = (partner) =>
       String(partner?.logoUrl || partner?.logo_url || partner?.logoPath || '').trim();
 
+    const hasPartnerDetailContent = (partner) => {
+      const detail = partner?.detailContent || partner?.detail_content || {};
+      const description = String(detail?.description || '').trim();
+      const forWhom = Array.isArray(detail?.forWhom) ? detail.forWhom.filter(Boolean) : [];
+      const bonus = String(detail?.bonus || '').trim();
+      const faq = Array.isArray(detail?.faq)
+        ? detail.faq.filter((entry) => entry?.question || entry?.answer)
+        : [];
+      const ctaLabel = String(detail?.ctaLabel || '').trim();
+      const ctaUrl = String(detail?.ctaUrl || '').trim();
+      return Boolean(description || forWhom.length || bonus || faq.length || ctaLabel || ctaUrl);
+    };
+
     const updatePartnersState = () => {
       if (!partnersSection || !partnersTrack) return;
       const visible = getPartnersVisible();
@@ -2716,11 +2729,18 @@ import {
           const name = String(partner?.name || '').trim();
           const slug = normalizePartnerSlug(partner?.slug || name);
           const logoUrl = getPartnerLogoUrl(partner);
-          const linkHref = `partner.html?slug=${encodeURIComponent(slug)}`;
+          const hasDetail =
+            (partner?.hasDetailPage === true || partner?.has_detail_page === true) &&
+            hasPartnerDetailContent(partner);
+          const externalUrl = String(partner?.websiteUrl || partner?.website_url || '').trim();
+          const linkHref = hasDetail
+            ? `partner.html?slug=${encodeURIComponent(slug)}`
+            : externalUrl || '#';
+          const linkAttrs = hasDetail ? '' : ' target="_blank" rel="noopener"';
           return `
             <article class="partner-card" data-partner-id="${partner?.id || slug}">
               <div class="partner-card__inner">
-                <a class="partner-card__logo-link" href="${linkHref}">
+                <a class="partner-card__logo-link" href="${linkHref}"${linkAttrs}>
                   ${logoUrl ? `<img class="partner-card__logo" src="${logoUrl}" alt="${name}" loading="lazy" />` : `<div class="partner-card__logo" aria-hidden="true"></div>`}
                 </a>
               </div>
@@ -3595,6 +3615,19 @@ import {
       return [];
     };
 
+    const hasPartnerDetailContent = (partner) => {
+      const detail = partner?.detailContent || partner?.detail_content || {};
+      const description = String(detail?.description || '').trim();
+      const forWhom = Array.isArray(detail?.forWhom) ? detail.forWhom.filter(Boolean) : [];
+      const bonus = String(detail?.bonus || '').trim();
+      const faq = Array.isArray(detail?.faq)
+        ? detail.faq.filter((entry) => entry?.question || entry?.answer)
+        : [];
+      const ctaLabel = String(detail?.ctaLabel || '').trim();
+      const ctaUrl = String(detail?.ctaUrl || '').trim();
+      return Boolean(description || forWhom.length || bonus || faq.length || ctaLabel || ctaUrl);
+    };
+
     const renderPartner = (partner) => {
       const detail = partner?.detailContent || partner?.detail_content || {};
       const title = String(detail.title || partner?.name || '').trim();
@@ -3672,7 +3705,16 @@ import {
         const merged = await fetchMergedPartners();
         partner = merged.find((item) => normalizePartnerSlug(item?.slug || item?.name) === slug) || null;
       }
-      if (!partner) {
+      const hasDetail =
+        partner &&
+        (partner?.hasDetailPage === true || partner?.has_detail_page === true) &&
+        hasPartnerDetailContent(partner);
+      if (!hasDetail) {
+        const websiteUrl = String(partner?.websiteUrl || partner?.website_url || '').trim();
+        if (websiteUrl) {
+          window.location.replace(websiteUrl);
+          return;
+        }
         window.location.replace('./404.html');
         return;
       }

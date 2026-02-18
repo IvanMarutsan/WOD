@@ -14,6 +14,19 @@ const normalizePartner = (item: any) => ({
   detailContent: item.detail_content || {}
 });
 
+const hasDetailContent = (item: any) => {
+  const detail = item?.detail_content || {};
+  const description = String(detail?.description || '').trim();
+  const forWhom = Array.isArray(detail?.forWhom) ? detail.forWhom.filter(Boolean) : [];
+  const bonus = String(detail?.bonus || '').trim();
+  const faq = Array.isArray(detail?.faq)
+    ? detail.faq.filter((entry) => entry?.question || entry?.answer)
+    : [];
+  const ctaLabel = String(detail?.ctaLabel || '').trim();
+  const ctaUrl = String(detail?.ctaUrl || '').trim();
+  return Boolean(description || forWhom.length || bonus || faq.length || ctaLabel || ctaUrl);
+};
+
 export const handler = async (event: HandlerEvent) => {
   try {
     const slug = String(event.queryStringParameters?.slug || '').trim().toLowerCase();
@@ -28,13 +41,14 @@ export const handler = async (event: HandlerEvent) => {
       query: {
         slug: `eq.${slug}`,
         is_active: 'eq.true',
+        has_detail_page: 'eq.true',
         limit: '1',
         select:
           'id,name,slug,logo_url,website_url,has_detail_page,is_active,sort_order,detail_content'
       }
     })) as any[];
     const partner = rows?.[0];
-    if (!partner) {
+    if (!partner || !hasDetailContent(partner)) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },

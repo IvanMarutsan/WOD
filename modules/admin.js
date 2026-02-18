@@ -68,6 +68,21 @@ export const initAdmin = ({ formatMessage }) => {
         })
         .filter((entry) => entry.question || entry.answer);
 
+    const hasDetailContent = (detailContent) => {
+      if (!detailContent || typeof detailContent !== 'object') return false;
+      const description = String(detailContent.description || '').trim();
+      const forWhom = Array.isArray(detailContent.forWhom)
+        ? detailContent.forWhom.filter(Boolean)
+        : [];
+      const bonus = String(detailContent.bonus || '').trim();
+      const faq = Array.isArray(detailContent.faq)
+        ? detailContent.faq.filter((entry) => entry?.question || entry?.answer)
+        : [];
+      const ctaLabel = String(detailContent.ctaLabel || '').trim();
+      const ctaUrl = String(detailContent.ctaUrl || '').trim();
+      return Boolean(description || forWhom.length || bonus || faq.length || ctaLabel || ctaUrl);
+    };
+
     const resetPartnerForm = () => {
       if (!(partnerForm instanceof HTMLFormElement)) return;
       partnerForm.reset();
@@ -96,13 +111,13 @@ export const initAdmin = ({ formatMessage }) => {
       const websiteUrl = String(formData.get('website_url') || '').trim();
       const logoUrl = String(formData.get('logo_url') || '').trim();
       const sortOrder = Number(formData.get('sort_order') || 0);
-      const hasDetailPage = formData.get('has_detail_page') === 'on';
+      const hasDetailPageRaw = formData.get('has_detail_page') === 'on';
       const isActive = formData.get('is_active') === 'on';
       const forWhom = String(formData.get('detail_for_whom') || '')
         .split('\n')
         .map((line) => line.trim())
         .filter(Boolean);
-      const detailContent = hasDetailPage
+      const detailContent = hasDetailPageRaw
         ? {
         title: name,
         description: String(formData.get('detail_description') || '').trim(),
@@ -113,6 +128,7 @@ export const initAdmin = ({ formatMessage }) => {
         faq: parseFaqRows(formData.get('detail_faq') || '')
       }
         : {};
+      const hasDetailPage = hasDetailPageRaw && hasDetailContent(detailContent);
       const logoFile = formData.get('logo_file');
       let logoDataUrl = '';
       if (logoFile instanceof File && logoFile.size > 0) {

@@ -55,31 +55,21 @@ const fetchPublishedEvent = async (id: string) => {
 
 export const handler = async (event: HandlerEvent) => {
   const id = String(event.queryStringParameters?.id || '').trim();
-  if (!id) {
-    return {
-      statusCode: 302,
-      headers: { Location: '/404.html', 'Cache-Control': 'no-store' },
-      body: ''
-    };
-  }
-
   const origin = buildOrigin(event);
-  const eventUrl = `${origin}/event-card.html?id=${encodeURIComponent(id)}`;
+  const eventUrl = id
+    ? `${origin}/event-card.html?id=${encodeURIComponent(id)}`
+    : `${origin}/event-card.html`;
 
   try {
-    const apiEvent = await fetchPublishedEventFromPublicApi(id, origin);
-    const row = apiEvent || (await fetchPublishedEvent(id));
-    if (!row) {
-      return {
-        statusCode: 302,
-        headers: { Location: eventUrl, 'Cache-Control': 'no-store' },
-        body: ''
-      };
+    let row: any = null;
+    if (id) {
+      const apiEvent = await fetchPublishedEventFromPublicApi(id, origin);
+      row = apiEvent || (await fetchPublishedEvent(id));
     }
 
-    const title = `${String(row.title || 'Подія').trim()} — What's on DK?`;
-    const description = String(row.description || '').trim() || 'Деталі події в Данії.';
-    const image = String(row.images?.[0] || row.image_url || '').trim() || DEFAULT_IMAGE;
+    const title = `${String(row?.title || 'Подія').trim()} — What's on DK?`;
+    const description = String(row?.description || '').trim() || 'Деталі події в Данії.';
+    const image = String(row?.images?.[0] || row?.image_url || '').trim() || DEFAULT_IMAGE;
 
     const html = `<!doctype html>
 <html lang="uk">
@@ -91,17 +81,23 @@ export const handler = async (event: HandlerEvent) => {
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="${escapeHtml(image)}" />
+    <meta property="og:image:secure_url" content="${escapeHtml(image)}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="${escapeHtml(eventUrl)}" />
     <meta property="og:locale" content="uk_UA" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(description)}" />
     <meta name="twitter:image" content="${escapeHtml(image)}" />
-    <meta http-equiv="refresh" content="0;url=${escapeHtml(eventUrl)}" />
     <link rel="canonical" href="${escapeHtml(eventUrl)}" />
   </head>
   <body>
-    <script>window.location.replace(${JSON.stringify(eventUrl)});</script>
+    <main>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(description)}</p>
+      <p><a href="${escapeHtml(eventUrl)}">Відкрити подію</a></p>
+    </main>
   </body>
 </html>`;
 
@@ -114,10 +110,31 @@ export const handler = async (event: HandlerEvent) => {
       body: html
     };
   } catch (error) {
+    const html = `<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <title>Подія — What's on DK?</title>
+    <meta property="og:title" content="Подія — What's on DK?" />
+    <meta property="og:description" content="Деталі події в Данії." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="${escapeHtml(DEFAULT_IMAGE)}" />
+    <meta property="og:url" content="${escapeHtml(eventUrl)}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Подія — What's on DK?" />
+    <meta name="twitter:description" content="Деталі події в Данії." />
+    <meta name="twitter:image" content="${escapeHtml(DEFAULT_IMAGE)}" />
+    <link rel="canonical" href="${escapeHtml(eventUrl)}" />
+  </head>
+  <body></body>
+</html>`;
     return {
-      statusCode: 302,
-      headers: { Location: eventUrl, 'Cache-Control': 'no-store' },
-      body: ''
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store'
+      },
+      body: html
     };
   }
 };
