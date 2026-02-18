@@ -32,6 +32,12 @@ export const getShareUrl = (event, channel = 'native', baseUrl = '') => {
     url.pathname = '/.netlify/functions/share-event';
     url.search = '';
     url.searchParams.set('id', String(event.id));
+    const title = String(event?.title || '').trim();
+    const description = String(event?.description || '').trim();
+    const image = String(event?.images?.[0] || '').trim();
+    if (title) url.searchParams.set('t', title);
+    if (description) url.searchParams.set('d', description.slice(0, 280));
+    if (image) url.searchParams.set('i', image);
   }
   url.searchParams.set('utm_source', SHARE_UTM_SOURCE);
   url.searchParams.set('utm_medium', SHARE_UTM_MEDIUM);

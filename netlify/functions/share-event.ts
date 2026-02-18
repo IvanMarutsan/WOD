@@ -55,6 +55,9 @@ const fetchPublishedEvent = async (id: string) => {
 
 export const handler = async (event: HandlerEvent) => {
   const id = String(event.queryStringParameters?.id || '').trim();
+  const fallbackTitle = String(event.queryStringParameters?.t || '').trim();
+  const fallbackDescription = String(event.queryStringParameters?.d || '').trim();
+  const fallbackImage = String(event.queryStringParameters?.i || '').trim();
   const origin = buildOrigin(event);
   const eventUrl = id
     ? `${origin}/event-card.html?id=${encodeURIComponent(id)}`
@@ -67,9 +70,12 @@ export const handler = async (event: HandlerEvent) => {
       row = apiEvent || (await fetchPublishedEvent(id));
     }
 
-    const title = `${String(row?.title || 'Подія').trim()} — What's on DK?`;
-    const description = String(row?.description || '').trim() || 'Деталі події в Данії.';
-    const image = String(row?.images?.[0] || row?.image_url || '').trim() || DEFAULT_IMAGE;
+    const rawTitle = String(row?.title || fallbackTitle || 'Подія').trim();
+    const title = `${rawTitle} — What's on DK?`;
+    const description =
+      String(row?.description || fallbackDescription || '').trim() || 'Деталі події в Данії.';
+    const image =
+      String(row?.images?.[0] || row?.image_url || fallbackImage || '').trim() || DEFAULT_IMAGE;
 
     const html = `<!doctype html>
 <html lang="uk">
