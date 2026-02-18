@@ -236,3 +236,53 @@ test('tag filters reorder on selection and keep URL in sync', async ({ page }) =
     page.locator('[data-filters-tags-list] .filters__tag--selected', { hasText: secondLabel })
   ).toHaveCount(1);
 });
+
+test('city dropdown and advanced button keep responsive horizontal layout until small phone', async ({ page }) => {
+  const assertSameRowAtWidth = async (width: number) => {
+    await page.setViewportSize({ width, height: 900 });
+    await freezeTime(page);
+    await page.goto('/');
+    await waitForEventsRendered(page);
+
+    const citySelect = page.locator('.filters__row--main select[name="city"]');
+    const advancedButton = page.locator('.filters__row--main [data-action="filters-advanced"]');
+    await expect(citySelect).toBeVisible();
+    await expect(advancedButton).toBeVisible();
+
+    const cityBox = await citySelect.boundingBox();
+    const buttonBox = await advancedButton.boundingBox();
+    expect(cityBox).toBeTruthy();
+    expect(buttonBox).toBeTruthy();
+    if (!cityBox || !buttonBox) return;
+
+    expect(buttonBox.x).toBeGreaterThan(cityBox.x + 8);
+    expect(Math.abs(buttonBox.y - cityBox.y)).toBeLessThan(18);
+    expect(buttonBox.y).toBeLessThan(cityBox.y + cityBox.height - 2);
+  };
+
+  await assertSameRowAtWidth(700);
+  await assertSameRowAtWidth(520);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await freezeTime(page);
+  await page.goto('/');
+  await waitForEventsRendered(page);
+
+  const citySelect = page.locator('.filters__row--main select[name="city"]');
+  const advancedButton = page.locator('.filters__row--main [data-action="filters-advanced"]');
+  await expect(citySelect).toBeVisible();
+  await expect(advancedButton).toBeVisible();
+
+  const cityBox = await citySelect.boundingBox();
+  const buttonBox = await advancedButton.boundingBox();
+  expect(cityBox).toBeTruthy();
+  expect(buttonBox).toBeTruthy();
+  if (!cityBox || !buttonBox) return;
+
+  const intersects =
+    cityBox.x < buttonBox.x + buttonBox.width &&
+    cityBox.x + cityBox.width > buttonBox.x &&
+    cityBox.y < buttonBox.y + buttonBox.height &&
+    cityBox.y + cityBox.height > buttonBox.y;
+  expect(intersects).toBeFalsy();
+});
