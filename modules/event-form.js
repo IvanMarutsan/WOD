@@ -3,6 +3,7 @@ import { isArchivedEvent } from './event-status.mjs';
 import { normalizeEventLanguage } from './language.mjs';
 import {
   buildLocalEventId,
+  fetchMergedLocalEvents,
   findMergedEventById,
   getLocalEvents,
   upsertLocalEvent
@@ -35,11 +36,13 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
   const tagsInput = multiStepForm.querySelector('.tags-input__field');
   const tagsList = multiStepForm.querySelector('.tags-input__list');
   const tagsHidden = multiStepForm.querySelector('input[name="tags"]');
+  const tagsSuggestions = multiStepForm.querySelector('[data-tag-suggestions]');
   const statusField = multiStepForm.querySelector('input[name="status"]');
   const verificationBanner = multiStepForm.querySelector('[data-verification-banner]');
   const verificationBannerButton = multiStepForm.querySelector('[data-action="open-verification"]');
   const honeypotField = multiStepForm.querySelector('input[name="website"]');
   const pendingTags = new Set();
+  const knownTagsByKey = new Map();
   let currentStep = 0;
   const publishButton = multiStepForm.querySelector('button[type="submit"]');
   const verificationWarning = multiStepForm.querySelector('[data-verification-warning]');
@@ -63,6 +66,71 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   const getTagsRequiredMessage = () =>
     formatMessage('form_tags_required', {}) || 'Add at least one tag.';
+
+  const normalizeTagLabel = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+  const normalizeTagKey = (value) => normalizeTagLabel(value).toLocaleLowerCase('uk-UA');
+
+  const getTagLabel = (tag) =>
+    normalizeTagLabel(typeof tag === 'string' ? tag : tag?.label || '');
+
+  const hasPendingTagKey = (key) =>
+    Array.from(pendingTags).some((tag) => normalizeTagKey(tag) === key);
+
+  const rememberTag = (rawValue) => {
+    const label = normalizeTagLabel(rawValue);
+    if (!label) return;
+    const key = normalizeTagKey(label);
+    if (!knownTagsByKey.has(key)) {
+      knownTagsByKey.set(key, label);
+    }
+  };
+
+  const addPendingTag = (rawValue) => {
+    const label = normalizeTagLabel(rawValue);
+    if (!label) return;
+    rememberTag(label);
+    const key = normalizeTagKey(label);
+    if (hasPendingTagKey(key)) return;
+    pendingTags.add(knownTagsByKey.get(key) || label);
+  };
+
+  const renderTagSuggestions = (inputValue = '') => {
+    if (!(tagsSuggestions instanceof HTMLDataListElement)) return;
+    const term = normalizeTagKey(inputValue);
+    if (term.length < 2) {
+      tagsSuggestions.innerHTML = '';
+      return;
+    }
+    const options = Array.from(knownTagsByKey.values())
+      .filter((label) => !hasPendingTagKey(normalizeTagKey(label)))
+      .filter((label) => normalizeTagKey(label).includes(term))
+      .sort((a, b) => {
+        const aKey = normalizeTagKey(a);
+        const bKey = normalizeTagKey(b);
+        const aStarts = aKey.startsWith(term) ? 0 : 1;
+        const bStarts = bKey.startsWith(term) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return a.localeCompare(b, 'uk');
+      })
+      .slice(0, 12);
+    tagsSuggestions.innerHTML = options
+      .map((label) => `<option value="${label.replace(/"/g, '&quot;')}"></option>`)
+      .join('');
+  };
+
+  const loadKnownTags = async () => {
+    try {
+      const events = await fetchMergedLocalEvents();
+      if (!Array.isArray(events)) return;
+      events.forEach((event) => {
+        (event?.tags || []).forEach((tag) => {
+          rememberTag(getTagLabel(tag));
+        });
+      });
+    } catch (error) {
+      // Ignore: tag suggestions are a progressive enhancement.
+    }
+  };
 
   const ensureTagsSelected = (report = false) => {
     const hasTags = pendingTags.size > 0;
@@ -274,7 +342,7 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
     setValue('contact-telegram', eventData.contactPerson?.telegram || '');
     pendingTags.clear();
     (eventData.tags || []).forEach((tag) => {
-      if (tag?.label) pendingTags.add(tag.label);
+      addPendingTag(getTagLabel(tag));
     });
     if (tagsHidden) {
       tagsHidden.value = Array.from(pendingTags).join(', ');
@@ -433,8 +501,9 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
       .split(',')
       .map((tag) => tag.trim())
       .filter(Boolean)
-      .forEach((tag) => pendingTags.add(tag));
+      .forEach((tag) => addPendingTag(tag));
     tagsInput.value = '';
+    renderTagSuggestions('');
     renderTagChips();
   };
 
@@ -477,6 +546,12 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
         event.preventDefault();
         flushTagInput();
       }
+    });
+    tagsInput.addEventListener('input', () => {
+      renderTagSuggestions(tagsInput.value);
+    });
+    tagsInput.addEventListener('focus', () => {
+      renderTagSuggestions(tagsInput.value);
     });
     tagsInput.addEventListener('blur', () => {
       flushTagInput();
@@ -529,6 +604,9 @@ export const initEventForm = ({ formatMessage, getVerificationState, publishStat
 
   setStep(currentStep);
   renderTagChips();
+  loadKnownTags().then(() => {
+    renderTagSuggestions(tagsInput?.value || '');
+  });
   publishState.update = () => {
     const isAdmin = isAdminBypass();
     const verified = getEffectiveOrganizerStatus() !== 'none';

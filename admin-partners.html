@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Партнери — What's on DK?</title>
+    <meta name="description" content="Керування партнерами в What's on DK." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="dashboard-page admin-page" data-admin-auth="checking">
+    <a class="skip-link" href="./admin-partners.html#content">Перейти до вмісту</a>
+
+    <header class="site-header" role="banner">
+      <div class="container header__inner">
+        <a class="brand" href="./" aria-label="Домівка">
+          <img class="brand__logo" src="./static/wod_logo.PNG" alt="What's on DK? логотип" width="1024" height="1024" decoding="async" loading="eager" />
+          <span class="visually-hidden">What's on DK?</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
+          <span class="sr-only">Перемкнути навігацію</span>
+          <span aria-hidden="true" class="menu-toggle__icon"></span>
+        </button>
+        <nav id="primary-nav" class="site-nav" aria-label="Основна навігація">
+          <a href="./#events">Події</a>
+          <a href="./about.html">Про нас</a>
+        </nav>
+        <div class="header-utils">
+          <a class="btn ghost" href="./admin-page.html" data-admin-link data-admin-only>Адмінка</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="content" class="dashboard" data-admin-content>
+      <div class="container">
+        <section class="admin-auth" data-admin-auth>
+          <p class="admin-auth__status" data-admin-status>Перевіряємо доступ...</p>
+          <div class="admin-auth__meta" hidden>
+            <span data-admin-user></span>
+            <span data-admin-role></span>
+          </div>
+          <div class="admin-auth__actions">
+            <button class="btn primary" type="button" data-admin-login>Увійти</button>
+            <button class="btn ghost" type="button" data-admin-logout hidden>Вийти</button>
+          </div>
+        </section>
+
+        <div data-admin-protected>
+          <header class="dashboard__header">
+            <div>
+              <p class="eyebrow">Робочий простір адміністратора</p>
+              <h1>Партнери</h1>
+            </div>
+            <div class="dashboard__actions">
+              <a class="btn ghost" href="./admin-page.html">До модерації</a>
+            </div>
+          </header>
+
+          <section class="moderation moderation--partners" aria-labelledby="partners-admin-title">
+            <header class="section-header">
+              <h2 id="partners-admin-title">Керування партнерами</h2>
+              <p class="section-summary">Логотипи, посилання та detail-сторінки партнерів.</p>
+            </header>
+            <form class="admin-partners-form" data-admin-partner-form>
+              <input type="hidden" name="id" />
+              <label class="form-field">
+                <span>Назва</span>
+                <input type="text" name="name" required />
+              </label>
+              <label class="form-field">
+                <span>Slug</span>
+                <input type="text" name="slug" />
+              </label>
+              <label class="form-field">
+                <span>Сайт</span>
+                <input type="url" name="website_url" />
+              </label>
+              <label class="form-field">
+                <span>Порядок</span>
+                <input type="number" name="sort_order" value="0" />
+              </label>
+              <label class="form-field">
+                <span>Логотип</span>
+                <input type="file" name="logo_file" accept="image/*" />
+              </label>
+              <label class="form-field">
+                <span>URL логотипа</span>
+                <input type="url" name="logo_url" />
+              </label>
+              <label class="filters__toggle">
+                <input type="checkbox" name="is_active" checked />
+                <span>Активний</span>
+              </label>
+              <label class="filters__toggle">
+                <input type="checkbox" name="has_detail_page" />
+                <span>Є detail-сторінка</span>
+              </label>
+              <label class="form-field form-field--full">
+                <span>Короткий опис</span>
+                <textarea name="detail_description" rows="3"></textarea>
+              </label>
+              <label class="form-field form-field--full">
+                <span>Кому корисно (кожен пункт з нового рядка)</span>
+                <textarea name="detail_for_whom" rows="3"></textarea>
+              </label>
+              <label class="form-field form-field--full">
+                <span>CTA текст</span>
+                <input type="text" name="detail_cta_label" />
+              </label>
+              <label class="form-field form-field--full">
+                <span>CTA URL</span>
+                <input type="url" name="detail_cta_url" />
+              </label>
+              <label class="form-field form-field--full">
+                <span>Бонус</span>
+                <textarea name="detail_bonus" rows="2"></textarea>
+              </label>
+              <label class="form-field form-field--full">
+                <span>FAQ (формат: Питання? || Відповідь, один блок на рядок)</span>
+                <textarea name="detail_faq" rows="4"></textarea>
+              </label>
+              <div class="admin-partners-form__actions form-field--full">
+                <button class="btn primary" type="submit">Зберегти партнера</button>
+                <button class="btn ghost" type="button" data-admin-partner-reset>Очистити</button>
+              </div>
+            </form>
+            <div class="moderation-list" data-admin-partners-list></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer__row">
+          <p>© 2026 What’s on DK?. Всі права захищено.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script type="module" src="./script.js" defer></script>
+  </body>
+</html>

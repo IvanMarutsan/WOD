@@ -147,10 +147,11 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     };
   } catch (error) {
     console.log('admin-partners error', error);
+    const message = error instanceof Error ? error.message : 'unknown_error';
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: false })
+      body: JSON.stringify({ ok: false, error: message })
     };
   }
 };

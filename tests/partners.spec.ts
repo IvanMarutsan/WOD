@@ -41,6 +41,8 @@ test('admin can create active partner with logo and it appears on homepage', asy
 
   await enableAdminSession(page);
   await page.goto('/admin-page.html');
+  await page.locator('a[href="./admin-partners.html"]').click();
+  await expect(page).toHaveURL(/admin-partners\.html/);
   const form = page.locator('[data-admin-partner-form]');
   await expect(form).toBeVisible();
 

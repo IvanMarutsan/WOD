@@ -46,3 +46,28 @@ test('create event without end time', async ({ page }) => {
   await expect(previewTime).toContainText(/01\.05\.2030/);
   await expect(previewTime).not.toContainText(/–/); // no end time range
 });
+
+test('tag input shows autocomplete suggestions after 2 characters', async ({ page }) => {
+  const suggestionTag = 'Unicorn Meetup Tag';
+  await page.goto('/');
+  await page.evaluate((tag) => {
+    const key = 'wodLocalEvents';
+    const raw = localStorage.getItem(key);
+    const list = raw ? JSON.parse(raw) : [];
+    const next = Array.isArray(list) ? list : [];
+    next.push({
+      id: `evt-local-tag-${Date.now()}`,
+      title: 'Autocomplete seed',
+      status: 'published',
+      tags: [{ label: tag }]
+    });
+    localStorage.setItem(key, JSON.stringify(next));
+  }, suggestionTag);
+
+  await enableAdminSession(page);
+  await page.goto('/new-event.html');
+  await page.locator('.multi-step[data-ready="true"]').waitFor({ state: 'attached' });
+  const tagsInput = page.getByLabel(/Додати тег|Add tag|Tilføj tag/i);
+  await tagsInput.fill('Un');
+  await expect(page.locator('#tag-suggestions option[value="Unicorn Meetup Tag"]')).toHaveCount(1);
+});
