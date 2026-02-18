@@ -36,20 +36,6 @@ const buildShareUrl = (event: HandlerEvent, origin: string) => {
   return `${origin}/.netlify/functions/share-event${qs ? `?${qs}` : ''}`;
 };
 
-const fetchPublishedEventFromPublicApi = async (id: string, origin: string) => {
-  try {
-    const response = await fetch(
-      `${origin}/.netlify/functions/public-event?id=${encodeURIComponent(id)}`
-    );
-    if (!response.ok) return null;
-    const payload = (await response.json()) as { ok?: boolean; event?: any };
-    if (!payload?.ok || !payload?.event) return null;
-    return payload.event;
-  } catch (error) {
-    return null;
-  }
-};
-
 const fetchPublishedEvent = async (id: string) => {
   const query: Record<string, string> = {
     status: 'eq.published',
@@ -79,8 +65,7 @@ export const handler = async (event: HandlerEvent) => {
   try {
     let row: any = null;
     if (id) {
-      const apiEvent = await fetchPublishedEventFromPublicApi(id, origin);
-      row = apiEvent || (await fetchPublishedEvent(id));
+      row = await fetchPublishedEvent(id);
     }
 
     const rawTitle = String(row?.title || fallbackTitle || 'Подія').trim();

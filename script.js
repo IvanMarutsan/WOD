@@ -3051,6 +3051,17 @@ import {
     }
   };
 
+  const isMobileShareDevice = () => {
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent || '';
+    const isMobileUa = /Android|iPhone|iPad|iPod|Mobile|webOS/i.test(ua);
+    const isCoarsePointer =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches;
+    return isMobileUa || isCoarsePointer;
+  };
+
   const syncShareActions = (eventData) => {
     if (!shareContainer) return;
     if (!eventData?.id) {
@@ -3071,6 +3082,7 @@ import {
     }
     if (shareInstagramButton) {
       shareInstagramButton.dataset.shareUrl = getShareUrl(eventData, 'instagram', baseUrl);
+      shareInstagramButton.hidden = !isMobileShareDevice();
     }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = getShareUrl(eventData, 'native', baseUrl);
@@ -3143,6 +3155,7 @@ import {
     }
     if (shareInstagramButton) {
       shareInstagramButton.dataset.shareUrl = '';
+      shareInstagramButton.hidden = true;
     }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = '';
@@ -3450,6 +3463,10 @@ import {
     if (shareInstagramButton) {
       shareInstagramButton.addEventListener('click', async () => {
         if (!activeEventData) return;
+        if (!isMobileShareDevice()) {
+          showToast('Instagram Stories доступно лише на телефоні');
+          return;
+        }
         const shareUrl =
           shareInstagramButton.dataset.shareUrl ||
           getShareUrl(activeEventData, 'instagram', buildEventPageUrl(activeEventData));
@@ -3458,16 +3475,25 @@ import {
           setShareMenuOpen(false);
           return;
         }
-        const copied = await copyToClipboard(shareUrl);
-        if (copied) {
-          showToast('Посилання скопійовано. Вставте у Instagram');
-          setShareMenuOpen(false);
-        }
+        showToast('Не вдалося відкрити Stories. Спробуйте кнопку "Інше".');
       });
     }
     shareChannelLinks.forEach((link) => {
       if (!(link instanceof HTMLAnchorElement)) return;
-      link.addEventListener('click', () => {
+      link.addEventListener('click', async (event) => {
+        const channel = String(link.dataset.shareChannel || '').toLowerCase();
+        if (channel === 'facebook' && isMobileShareDevice() && activeEventData) {
+          event.preventDefault();
+          const nativeUrl = getShareUrl(
+            activeEventData,
+            'facebook',
+            buildEventPageUrl(activeEventData)
+          );
+          const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
+          if (!shared) {
+            window.open(link.href, '_blank', 'noopener');
+          }
+        }
         setShareMenuOpen(false);
       });
     });
