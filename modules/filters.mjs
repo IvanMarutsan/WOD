@@ -21,6 +21,7 @@ export const buildFilters = (formData, searchQuery, helpers = {}) => {
     quickTomorrow: Boolean(getValue('quick-tomorrow')),
     quickWeekend: Boolean(getValue('quick-weekend')),
     quickOnline: Boolean(getValue('quick-online')),
+    quickFavorites: Boolean(getValue('quick-favorites')),
     showPast: Boolean(getValue('show-past')),
     tags: getAll('tags').map((tag) => normalize(tag)).filter(Boolean),
     searchQuery: normalize(searchQuery || '')
@@ -37,6 +38,7 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   const getLocalizedCity = helpers.getLocalizedCity || ((value) => value || '');
   const getLocalizedTag = helpers.getLocalizedTag || ((value) => value || '');
   const getLang = helpers.getLang || (() => 'uk');
+  const isSaved = helpers.isSaved || (() => false);
 
   const ignorePastToggle = options.ignorePastToggle;
   if (isArchivedEvent(event)) return false;
@@ -93,6 +95,9 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
   if (filters.quickOnline && normalize(event.format) !== 'online') {
     return false;
   }
+  if (filters.quickFavorites && !isSaved(event?.id)) {
+    return false;
+  }
   if (filters.city && normalizeCity(event.city) !== filters.city) return false;
   if (filters.price && normalize(event.priceType) !== filters.price) return false;
   if (filters.format && normalize(event.format) !== filters.format) return false;
@@ -118,6 +123,11 @@ export const eventMatchesFilters = (event, filters, helpers = {}, options = {}) 
     if (!haystack.includes(filters.searchQuery)) return false;
   }
   return true;
+};
+
+export const filterSavedEvents = (events, savedIds = new Set()) => {
+  const set = savedIds instanceof Set ? savedIds : new Set(savedIds || []);
+  return (events || []).filter((event) => event?.id && set.has(String(event.id)));
 };
 
 export const filterEvents = (events, filters, helpers = {}, options = {}) =>

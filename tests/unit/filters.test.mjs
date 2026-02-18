@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { eventMatchesFilters } from '../../modules/filters.mjs';
+import { eventMatchesFilters, filterSavedEvents } from '../../modules/filters.mjs';
 
 const helpers = {
   normalize: (value) => String(value || '').toLowerCase(),
@@ -37,4 +37,21 @@ test('past filter hides past events unless showPast is set', () => {
   const event = { status: 'published', past: true };
   assert.equal(eventMatchesFilters(event, { showPast: false }, helpers), false);
   assert.equal(eventMatchesFilters(event, { showPast: true }, helpers), true);
+});
+
+test('favorites quick filter shows only saved events', () => {
+  const savedIds = new Set(['evt-1']);
+  const event = { id: 'evt-1', status: 'published' };
+  const unsaved = { id: 'evt-2', status: 'published' };
+  const favoriteHelpers = {
+    ...helpers,
+    isSaved: (eventId) => savedIds.has(String(eventId || ''))
+  };
+
+  assert.equal(eventMatchesFilters(event, { quickFavorites: true }, favoriteHelpers), true);
+  assert.equal(eventMatchesFilters(unsaved, { quickFavorites: true }, favoriteHelpers), false);
+  assert.deepEqual(
+    filterSavedEvents([event, unsaved], savedIds).map((item) => item.id),
+    ['evt-1']
+  );
 });

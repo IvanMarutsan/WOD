@@ -21,6 +21,7 @@ import {
   mergeWithLocalEvents,
   restoreLocalEvent
 } from './modules/local-events.js';
+import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.js';
 
 (async () => {
   const header = document.querySelector('.site-header');
@@ -911,6 +912,51 @@ import {
     return Array.from(tagMap.values());
   };
 
+  const getSavedToggleLabel = (saved) => (saved ? 'Прибрати з вибраних' : 'Додати у вибрані');
+
+  const syncSavedStarButton = (button) => {
+    if (!(button instanceof HTMLButtonElement)) return;
+    const eventId = String(button.dataset.eventId || '').trim();
+    const saved = eventId ? isSaved(eventId) : false;
+    button.dataset.saved = saved ? 'true' : 'false';
+    button.classList.toggle('is-saved', saved);
+    const label = getSavedToggleLabel(saved);
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
+    const icon = button.querySelector('span');
+    if (icon) {
+      icon.textContent = saved ? '★' : '☆';
+    }
+  };
+
+  const syncSavedStars = (scope = document) => {
+    scope.querySelectorAll('[data-action="toggle-saved"]').forEach((button) => {
+      syncSavedStarButton(button);
+    });
+  };
+
+  let savedToastTimer = null;
+  const showSavedToast = (saved) => {
+    const text = saved ? 'Додано у вибрані' : 'Прибрано з вибраних';
+    let toast = document.querySelector('[data-saved-toast]');
+    if (!(toast instanceof HTMLElement)) {
+      toast = document.createElement('div');
+      toast.className = 'save-toast';
+      toast.dataset.savedToast = 'true';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = text;
+    toast.classList.add('is-visible');
+    if (savedToastTimer) {
+      window.clearTimeout(savedToastTimer);
+    }
+    savedToastTimer = window.setTimeout(() => {
+      toast.classList.remove('is-visible');
+    }, 1600);
+  };
+
   await loadTranslations();
   applyTranslations();
   injectEventJsonLd();
@@ -1182,7 +1228,8 @@ import {
           today: filtersForm.elements['quick-today'],
           tomorrow: filtersForm.elements['quick-tomorrow'],
           weekend: filtersForm.elements['quick-weekend'],
-          online: filtersForm.elements['quick-online']
+          online: filtersForm.elements['quick-online'],
+          favorites: filtersForm.elements['quick-favorites']
         }
       : {};
     const emptyResetButton = document.querySelector('[data-action="reset-filters"]');
@@ -1363,6 +1410,7 @@ import {
       normalizeCity,
       isPast,
       isArchivedEvent,
+      isSaved: (eventId) => isSaved(eventId),
       getCitySlug: normalizeCity,
       getTagList,
       getLocalizedEventTitle,
@@ -1666,6 +1714,7 @@ import {
 
     const renderEvents = (list) => {
       catalogGrid.innerHTML = list.map((event) => EventCard(event, eventCardHelpers)).join('');
+      syncSavedStars(catalogGrid);
       const hasResults = list.length > 0;
       if (emptyState) {
         emptyState.hidden = hasResults;
@@ -1679,6 +1728,19 @@ import {
 
     if (catalogGrid) {
       catalogGrid.addEventListener('click', (event) => {
+        const savedToggle = event.target.closest('[data-action="toggle-saved"]');
+        if (savedToggle) {
+          const eventId = savedToggle.dataset.eventId || '';
+          const saved = toggleSaved(eventId);
+          showSavedToast(saved);
+          const favoritesOnly = Boolean(filtersForm?.elements?.['quick-favorites']?.checked);
+          if (favoritesOnly) {
+            applyFilters({ preservePage: true });
+          } else {
+            syncSavedStarButton(savedToggle);
+          }
+          return;
+        }
         const card = event.target.closest('.event-card');
         if (!card) return;
         if (event.target.closest('a, button, input, select, textarea')) return;
@@ -1829,6 +1891,8 @@ import {
         normalizeCity
       });
       currentFilters = filters;
+      const savedIds = getSavedEventIds();
+      filterHelpers.isSaved = (eventId) => savedIds.has(String(eventId || ''));
       updateCatalogQueryParams();
       const baseList = state.events.filter((event) =>
         eventMatchesFilters(event, filters, filterHelpers)
@@ -2153,6 +2217,7 @@ import {
         const quickTomorrow = filtersForm.elements['quick-tomorrow'];
         const quickWeekend = filtersForm.elements['quick-weekend'];
         const quickOnline = filtersForm.elements['quick-online'];
+        const quickFavorites = filtersForm.elements['quick-favorites'];
         const showPast = filtersForm.elements['show-past'];
         if (quickToday) {
           quickToday.checked = params.get('today') === '1';
@@ -2165,6 +2230,9 @@ import {
         }
         if (quickOnline) {
           quickOnline.checked = params.get('online') === '1';
+        }
+        if (quickFavorites) {
+          quickFavorites.checked = params.get('favorites') === '1';
         }
         if (quickToday && quickToday.checked) {
           setDateRange(new Date(), new Date());
@@ -2234,6 +2302,9 @@ import {
         }
         if (formData.get('quick-online')) {
           params.set('online', '1');
+        }
+        if (formData.get('quick-favorites')) {
+          params.set('favorites', '1');
         }
         if (formData.get('show-past')) {
           params.set('past', '1');
@@ -2543,6 +2614,21 @@ import {
       window.addEventListener('resize', updateTagOverflow);
     }
 
+    const handleSavedStateChange = () => {
+      const favoritesOnly = Boolean(filtersForm?.elements?.['quick-favorites']?.checked);
+      if (favoritesOnly) {
+        applyFilters({ preservePage: true });
+      } else {
+        syncSavedStars(catalogGrid);
+      }
+    };
+    window.addEventListener('wod:saved-events-changed', handleSavedStateChange);
+    window.addEventListener('storage', (storageEvent) => {
+      if (storageEvent.key === 'wod_saved_events') {
+        handleSavedStateChange();
+      }
+    });
+
     pendingCatalogState = loadCatalogState();
     if (pendingCatalogState) {
       applyStoredFilters();
@@ -2556,6 +2642,7 @@ import {
   const pastBanner = document.querySelector('[data-past-banner]');
   const ticketNote = document.querySelector('.event-sidebar__note');
   const eventTitleEl = document.querySelector('[data-event-title]');
+  const eventSaveButton = document.querySelector('[data-event-save]');
   const eventDescriptionEl = document.querySelector('[data-event-description]');
   const eventDescriptionToggle = document.querySelector('[data-event-description-toggle]');
   const eventLocationEl = document.querySelector('[data-event-location]');
@@ -2732,6 +2819,11 @@ import {
       eventImageEl.removeAttribute('src');
       eventImageEl.removeAttribute('alt');
     }
+    if (eventSaveButton) {
+      eventSaveButton.dataset.eventId = '';
+      eventSaveButton.dataset.saved = 'false';
+      syncSavedStarButton(eventSaveButton);
+    }
     if (eventLanguageEl) {
       eventLanguageEl.textContent = '';
       eventLanguageEl.hidden = true;
@@ -2760,6 +2852,10 @@ import {
     if (!eventData) return;
     activeEventData = eventData;
     if (eventTitleEl) eventTitleEl.textContent = eventData.title;
+    if (eventSaveButton) {
+      eventSaveButton.dataset.eventId = eventData.id || '';
+      syncSavedStarButton(eventSaveButton);
+    }
     if (eventDescriptionEl) {
       const description = String(eventData.description || '').trim();
       eventDescriptionEl.textContent = description;
@@ -2932,6 +3028,16 @@ import {
   };
 
   if (document.body.classList.contains('event-page')) {
+    if (eventSaveButton) {
+      eventSaveButton.addEventListener('click', () => {
+        const eventId = eventSaveButton.dataset.eventId || activeEventData?.id || '';
+        if (!eventId) return;
+        const saved = toggleSaved(eventId);
+        syncSavedStarButton(eventSaveButton);
+        showSavedToast(saved);
+      });
+    }
+
     const sendAdminAction = async (action) => {
       if (!activeEventData?.id) return false;
       const isLocalEvent = String(activeEventData.id).startsWith('evt-local-');

@@ -1,3 +1,5 @@
+import { renderStarButton } from '../modules/saved-events.js';
+
 const buildTagMarkup = (tag, helpers) => {
   const { formatMessage, getLocalizedTag } = helpers;
   const isPending = tag.status === 'pending';
@@ -79,7 +81,10 @@ export const EventCard = (event, helpers) => {
           <div class="event-card__body">
             <div class="event-card__meta">
               <span class="event-card__datetime">${formatDateRange(event.start, event.end)}</span>
-              <span class="event-card__price ${priceInfo.className}">${priceInfo.label}</span>
+              <div class="event-card__meta-right">
+                <span class="event-card__price ${priceInfo.className}">${priceInfo.label}</span>
+                ${renderStarButton(event.id, 'catalog')}
+              </div>
             </div>
             <h3 class="event-card__title">
               <a class="event-card__link" href="${detailUrl}">${title}</a>
