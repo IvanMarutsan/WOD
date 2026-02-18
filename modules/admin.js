@@ -111,11 +111,24 @@ export const initAdmin = ({ formatMessage }) => {
       const formData = new FormData(partnerForm);
       const id = String(formData.get('id') || '').trim();
       const existing = id ? partnersById.get(id) : null;
+      const websiteUrlInput = String(formData.get('website_url') || '').trim();
+      const deriveNameFromWebsite = (value) => {
+        if (!value) return '';
+        try {
+          const normalized = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+          const host = new URL(normalized).hostname.replace(/^www\./i, '').trim();
+          return host || '';
+        } catch (error) {
+          return '';
+        }
+      };
       const nameInput = String(formData.get('name') || '').trim();
-      const name = nameInput || String(existing?.name || '').trim();
+      const derivedWebsiteName = deriveNameFromWebsite(websiteUrlInput);
+      const name =
+        nameInput || String(existing?.name || '').trim() || derivedWebsiteName || 'Партнер';
       const slugInput = String(formData.get('slug') || '').trim();
-      const slug = normalizePartnerSlug(slugInput || name || existing?.slug || '');
-      const websiteUrl = String(formData.get('website_url') || '').trim() || String(existing?.websiteUrl || '').trim();
+      const slug = normalizePartnerSlug(slugInput || name || existing?.slug || derivedWebsiteName || '');
+      const websiteUrl = websiteUrlInput || String(existing?.websiteUrl || '').trim();
       const logoUrlInput = String(formData.get('logo_url') || '').trim();
       const logoUrl = logoUrlInput || String(existing?.logoUrl || '').trim();
       const sortRaw = String(formData.get('sort_order') || '').trim();
@@ -1229,10 +1242,23 @@ export const initAdmin = ({ formatMessage }) => {
       if (!(partnerForm instanceof HTMLFormElement)) return null;
       const formData = new FormData(partnerForm);
       const id = String(formData.get('id') || '').trim();
-      const name = String(formData.get('name') || '').trim();
+      const websiteUrlInput = String(formData.get('website_url') || '').trim();
+      const deriveNameFromWebsite = (value) => {
+        if (!value) return '';
+        try {
+          const normalized = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+          const host = new URL(normalized).hostname.replace(/^www\./i, '').trim();
+          return host || '';
+        } catch (error) {
+          return '';
+        }
+      };
+      const nameInput = String(formData.get('name') || '').trim();
+      const derivedWebsiteName = deriveNameFromWebsite(websiteUrlInput);
+      const name = nameInput || derivedWebsiteName || 'Партнер';
       const slugInput = String(formData.get('slug') || '').trim();
       const slug = normalizePartnerSlug(slugInput || name);
-      const websiteUrl = String(formData.get('website_url') || '').trim();
+      const websiteUrl = websiteUrlInput;
       const logoUrl = String(formData.get('logo_url') || '').trim();
       const sortOrder = Number(formData.get('sort_order') || 0);
       const hasDetailPage = formData.get('has_detail_page') === 'on';

@@ -71,3 +71,31 @@ test('admin can create active partner with logo and it appears on homepage', asy
   await expect(page.locator('[data-partners-section]')).toBeVisible();
   await expect(page.locator(`.partner-card a[href*="partner.html?slug=${partnerSlug}"]`).first()).toBeVisible();
 });
+
+test('admin can save partner with basic fields only', async ({ page }) => {
+  const uniq = Date.now();
+  const website = `https://basic-${uniq}.example.com`;
+
+  await enableAdminSession(page);
+  await page.goto('/admin-page.html');
+  await page.locator('a[href="./admin-partners.html"]').click();
+  await expect(page).toHaveURL(/admin-partners\.html/);
+  const form = page.locator('[data-admin-partner-form]');
+  await expect(form).toBeVisible();
+
+  await form.locator('input[name="website_url"]').fill(website);
+  await form.locator('input[name="logo_file"]').setInputFiles({
+    name: 'partner-basic.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4z8DwHwAE/wJ/lYt9NwAAAABJRU5ErkJggg==',
+      'base64'
+    )
+  });
+  await form.locator('button[type="submit"]').click();
+
+  const expectedName = `basic-${uniq}.example.com`;
+  const card = page.locator('[data-admin-partners-list] .admin-partner-card').first();
+  await expect(card).toContainText(expectedName);
+  await expect(card).toContainText(website);
+});
