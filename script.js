@@ -15,6 +15,13 @@ import { clampPage, getPageSlice, getTotalPages } from './modules/catalog-pagina
 import { formatPriceRangeLabel } from './modules/price-detail.js';
 import { isArchivedEvent, mergeEventData } from './modules/event-status.mjs';
 import { buildGoogleMapsLink } from './modules/maps.mjs';
+import { buildGoogleCalendarUrl, buildIcs } from './modules/calendar.mjs';
+import {
+  buildShareText,
+  getNetworkShareHref,
+  getShareUrl,
+  tryShareWithWebApi
+} from './modules/share.mjs';
 import {
   archiveLocalEvent,
   deleteLocalEvent,
@@ -935,9 +942,8 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
     });
   };
 
-  let savedToastTimer = null;
-  const showSavedToast = (saved) => {
-    const text = saved ? 'Додано у вибрані' : 'Прибрано з вибраних';
+  let toastTimer = null;
+  const showToast = (text) => {
     let toast = document.querySelector('[data-saved-toast]');
     if (!(toast instanceof HTMLElement)) {
       toast = document.createElement('div');
@@ -949,13 +955,15 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
     }
     toast.textContent = text;
     toast.classList.add('is-visible');
-    if (savedToastTimer) {
-      window.clearTimeout(savedToastTimer);
+    if (toastTimer) {
+      window.clearTimeout(toastTimer);
     }
-    savedToastTimer = window.setTimeout(() => {
+    toastTimer = window.setTimeout(() => {
       toast.classList.remove('is-visible');
     }, 1600);
   };
+  const showSavedToast = (saved) =>
+    showToast(saved ? 'Додано у вибрані' : 'Прибрано з вибраних');
 
   await loadTranslations();
   applyTranslations();
@@ -2645,6 +2653,16 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
   const eventSaveButton = document.querySelector('[data-event-save]');
   const eventDescriptionEl = document.querySelector('[data-event-description]');
   const eventDescriptionToggle = document.querySelector('[data-event-description-toggle]');
+  const calendarContainer = document.querySelector('[data-calendar]');
+  const calendarToggle = document.querySelector('[data-calendar-toggle]');
+  const calendarMenu = document.querySelector('[data-calendar-menu]');
+  const calendarGoogleLink = document.querySelector('[data-calendar-google]');
+  const calendarIcsButton = document.querySelector('[data-calendar-ics]');
+  const shareContainer = document.querySelector('[data-share]');
+  const shareToggle = document.querySelector('[data-share-toggle]');
+  const shareMenu = document.querySelector('[data-share-menu]');
+  const shareCopyButton = document.querySelector('[data-share-copy]');
+  const shareChannelLinks = document.querySelectorAll('[data-share-channel]');
   const eventLocationEl = document.querySelector('[data-event-location]');
   const eventImageEl = document.querySelector('[data-event-image]');
   const eventLanguageEl = document.querySelector('[data-event-language]');
@@ -2798,6 +2816,93 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
     }
     return { label: cityLabel || '—', mapQuery: cityLabel || '' };
   };
+  const buildEventPageUrl = (eventData) => {
+    const eventId = eventData?.id ? encodeURIComponent(eventData.id) : '';
+    const path = eventId ? `event-card.html?id=${eventId}` : window.location.pathname;
+    return new URL(path, window.location.href).toString();
+  };
+
+  const setCalendarMenuOpen = (open) => {
+    if (!calendarToggle || !calendarMenu) return;
+    calendarToggle.setAttribute('aria-expanded', String(open));
+    calendarMenu.hidden = !open;
+  };
+
+  const setShareMenuOpen = (open) => {
+    if (!shareToggle || !shareMenu) return;
+    shareToggle.setAttribute('aria-expanded', String(open));
+    shareMenu.hidden = !open;
+  };
+
+  const copyToClipboard = async (text) => {
+    const value = String(text || '').trim();
+    if (!value) return false;
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch (error) {
+        // Fallback below.
+      }
+    }
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = value;
+      textarea.setAttribute('readonly', 'true');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      return copied;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const syncShareActions = (eventData) => {
+    if (!shareContainer) return;
+    if (!eventData?.id) {
+      shareContainer.hidden = true;
+      return;
+    }
+    shareContainer.hidden = false;
+    const baseUrl = buildEventPageUrl(eventData);
+    shareChannelLinks.forEach((link) => {
+      if (!(link instanceof HTMLAnchorElement)) return;
+      const channel = link.dataset.shareChannel || 'native';
+      const channelUrl = getShareUrl(eventData, channel, baseUrl);
+      const text = buildShareText(eventData, channelUrl);
+      link.href = getNetworkShareHref(channel, channelUrl, text);
+    });
+    if (shareCopyButton) {
+      shareCopyButton.dataset.shareUrl = getShareUrl(eventData, 'copy', baseUrl);
+    }
+    if (shareToggle) {
+      shareToggle.dataset.shareUrl = getShareUrl(eventData, 'native', baseUrl);
+    }
+    setShareMenuOpen(false);
+  };
+
+  const openShareFallbackMenu = (eventData) => {
+    syncShareActions(eventData);
+    setShareMenuOpen(true);
+  };
+
+  const syncCalendarActions = (eventData) => {
+    if (!calendarContainer || !calendarGoogleLink || !calendarIcsButton) return;
+    if (!eventData?.start) {
+      calendarContainer.hidden = true;
+      return;
+    }
+    calendarContainer.hidden = false;
+    const eventUrl = buildEventPageUrl(eventData);
+    const googleUrl = buildGoogleCalendarUrl(eventData, { eventUrl });
+    calendarGoogleLink.setAttribute('href', googleUrl || '#');
+    calendarIcsButton.dataset.eventUrl = eventUrl;
+    setCalendarMenuOpen(false);
+  };
   const resetEventDetail = () => {
     if (eventTitleEl) eventTitleEl.textContent = '';
     if (eventDescriptionEl) eventDescriptionEl.textContent = '';
@@ -2824,6 +2929,31 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
       eventSaveButton.dataset.saved = 'false';
       syncSavedStarButton(eventSaveButton);
     }
+    if (calendarContainer) {
+      calendarContainer.hidden = true;
+    }
+    if (calendarGoogleLink) {
+      calendarGoogleLink.setAttribute('href', '#');
+    }
+    if (calendarIcsButton) {
+      calendarIcsButton.dataset.eventUrl = '';
+    }
+    setCalendarMenuOpen(false);
+    if (shareContainer) {
+      shareContainer.hidden = true;
+    }
+    if (shareCopyButton) {
+      shareCopyButton.dataset.shareUrl = '';
+    }
+    if (shareToggle) {
+      shareToggle.dataset.shareUrl = '';
+    }
+    shareChannelLinks.forEach((link) => {
+      if (link instanceof HTMLAnchorElement) {
+        link.href = '#';
+      }
+    });
+    setShareMenuOpen(false);
     if (eventLanguageEl) {
       eventLanguageEl.textContent = '';
       eventLanguageEl.hidden = true;
@@ -2856,6 +2986,8 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
       eventSaveButton.dataset.eventId = eventData.id || '';
       syncSavedStarButton(eventSaveButton);
     }
+    syncCalendarActions(eventData);
+    syncShareActions(eventData);
     if (eventDescriptionEl) {
       const description = String(eventData.description || '').trim();
       eventDescriptionEl.textContent = description;
@@ -3028,6 +3160,86 @@ import { getSavedEventIds, isSaved, toggleSaved } from './modules/saved-events.j
   };
 
   if (document.body.classList.contains('event-page')) {
+    if (calendarToggle && calendarMenu) {
+      calendarToggle.addEventListener('click', () => {
+        const expanded = calendarToggle.getAttribute('aria-expanded') === 'true';
+        setCalendarMenuOpen(!expanded);
+        setShareMenuOpen(false);
+      });
+    }
+    if (shareToggle && shareMenu) {
+      shareToggle.addEventListener('click', async () => {
+        if (!activeEventData) return;
+        const nativeUrl = shareToggle.dataset.shareUrl || getShareUrl(activeEventData, 'native', buildEventPageUrl(activeEventData));
+        const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
+        if (shared) return;
+        const expanded = shareToggle.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          setShareMenuOpen(false);
+        } else {
+          openShareFallbackMenu(activeEventData);
+        }
+        setCalendarMenuOpen(false);
+      });
+    }
+    if ((calendarToggle && calendarMenu) || (shareToggle && shareMenu)) {
+      document.addEventListener('click', (event) => {
+        if (calendarContainer && calendarContainer.contains(event.target)) return;
+        if (shareContainer && shareContainer.contains(event.target)) return;
+        setCalendarMenuOpen(false);
+        setShareMenuOpen(false);
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setCalendarMenuOpen(false);
+          setShareMenuOpen(false);
+        }
+      });
+    }
+    if (calendarIcsButton) {
+      calendarIcsButton.addEventListener('click', () => {
+        if (!activeEventData) return;
+        const eventUrl = calendarIcsButton.dataset.eventUrl || buildEventPageUrl(activeEventData);
+        const ics = buildIcs(activeEventData, { eventUrl });
+        if (!ics) return;
+        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        const href = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        const slug = String(activeEventData.slug || activeEventData.id || 'event')
+          .toLowerCase()
+          .replace(/[^a-z0-9-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        anchor.href = href;
+        anchor.download = `${slug || 'event'}.ics`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(href);
+        setCalendarMenuOpen(false);
+      });
+    }
+    if (calendarGoogleLink) {
+      calendarGoogleLink.addEventListener('click', () => {
+        setCalendarMenuOpen(false);
+      });
+    }
+    if (shareCopyButton) {
+      shareCopyButton.addEventListener('click', async () => {
+        const url = shareCopyButton.dataset.shareUrl || '';
+        const copied = await copyToClipboard(url);
+        if (copied) {
+          showToast('Посилання скопійовано');
+          setShareMenuOpen(false);
+        }
+      });
+    }
+    shareChannelLinks.forEach((link) => {
+      if (!(link instanceof HTMLAnchorElement)) return;
+      link.addEventListener('click', () => {
+        setShareMenuOpen(false);
+      });
+    });
+
     if (eventSaveButton) {
       eventSaveButton.addEventListener('click', () => {
         const eventId = eventSaveButton.dataset.eventId || activeEventData?.id || '';
