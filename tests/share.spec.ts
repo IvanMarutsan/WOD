@@ -78,7 +78,7 @@ test('desktop share fallback menu works and builds network links', async ({ page
   });
   expect(copied).toContain('utm_content=copy');
 
-  await expect(page.locator('[data-share-instagram]')).toBeHidden();
+  await expect(page.locator('[data-share-instagram]')).toHaveCount(0);
 
   await page.getByRole('button', { name: /Поділитися/i }).click();
   const facebookHref = await page
@@ -106,7 +106,7 @@ test('desktop share fallback menu works and builds network links', async ({ page
 test.describe('mobile share behavior', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('instagram stories is visible with fallback copy and facebook uses stable sharer href', async ({
+  test('instagram stories is absent, other uses native fallback, and facebook uses stable sharer href', async ({
     page
   }) => {
     const eventId = 'evt-share-002';
@@ -149,14 +149,7 @@ test.describe('mobile share behavior', () => {
       window.__copiedText = '';
       // @ts-ignore
       window.__nativeShareCalls = 0;
-      Object.defineProperty(window.navigator, 'share', {
-        value: async () => {
-          // @ts-ignore
-          window.__nativeShareCalls += 1;
-          throw new Error('share failed');
-        },
-        configurable: true
-      });
+      Object.defineProperty(window.navigator, 'share', { value: undefined, configurable: true });
       Object.defineProperty(window.navigator, 'canShare', { value: undefined, configurable: true });
       Object.defineProperty(window.navigator, 'clipboard', {
         value: {
@@ -183,27 +176,15 @@ test.describe('mobile share behavior', () => {
     await page.goto(`/event-card.html?id=${eventId}&serverless=1`);
 
     await page.getByRole('button', { name: /Поділитися/i }).click();
-    await expect(page.locator('[data-share-instagram]')).toBeVisible();
-    await page.getByRole('button', { name: /Instagram Stories/i }).click();
-    await expect(page.locator('[data-saved-toast]')).toHaveText(
-      'Виникла помилка. Але посилання скопійовано. Вставте у Instagram Stories'
-    );
-    const copiedInstagram = await page.evaluate(() => {
-      // @ts-ignore
-      return window.__copiedText || '';
-    });
-    expect(copiedInstagram).toContain('utm_content=instagram');
+    await expect(page.locator('[data-share-instagram]')).toHaveCount(0);
+    await page.getByRole('button', { name: /^Інше$/i }).click();
+    await expect(page.locator('[data-saved-toast]')).toHaveText('Нативне поширення недоступне');
 
     await page.getByRole('button', { name: /Поділитися/i }).click();
     const facebookHref = await page
       .locator('[data-share-channel="facebook"]')
       .getAttribute('href');
 
-    const nativeShareCalls = await page.evaluate(() => {
-      // @ts-ignore
-      return window.__nativeShareCalls || 0;
-    });
-    expect(nativeShareCalls).toBeGreaterThan(0);
     expect(facebookHref || '').toContain('https://www.facebook.com/sharer/sharer.php?u=');
     expect(facebookHref || '').toContain('utm_content%3Dfacebook');
   });

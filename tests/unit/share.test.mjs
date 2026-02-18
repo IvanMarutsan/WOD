@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildShareText, getShareUrl } from '../../modules/share.mjs';
+import { buildShareText, getNetworkShareHref, getShareUrl } from '../../modules/share.mjs';
 
 test('getShareUrl supports all channels with stable base and UTM', () => {
   const channels = ['instagram', 'facebook', 'linkedin', 'telegram', 'whatsapp', 'copy', 'other'];
@@ -43,4 +43,13 @@ test('buildShareText can include link when explicitly requested', () => {
   const text = buildShareText(event, { shareUrl: link, includeUrl: true });
 
   assert.match(text, /https:\/\/whatsondk\.netlify\.app\/event-card\.html/);
+});
+
+test('facebook share href uses sharer.php with encoded share url', () => {
+  const shareUrl =
+    'https://whatsondk.netlify.app/.netlify/functions/share-event?id=evt-1&utm_content=facebook';
+  const href = getNetworkShareHref('facebook', shareUrl, '');
+  assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
+  assert.match(href, /https%3A%2F%2Fwhatsondk\.netlify\.app%2F\.netlify%2Ffunctions%2Fshare-event/);
+  assert.match(href, /utm_content%3Dfacebook/);
 });

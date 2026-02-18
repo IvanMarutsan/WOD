@@ -2807,7 +2807,6 @@ import {
   const shareToggle = document.querySelector('[data-share-toggle]');
   const shareMenu = document.querySelector('[data-share-menu]');
   const shareCopyButton = document.querySelector('[data-share-copy]');
-  const shareInstagramButton = document.querySelector('[data-share-instagram]');
   const shareNativeButton = document.querySelector('[data-share-native]');
   const shareChannelLinks = document.querySelectorAll('[data-share-channel]');
   const eventLocationEl = document.querySelector('[data-event-location]');
@@ -3051,11 +3050,6 @@ import {
     }
   };
 
-  const isMobileShareViewport = () => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
-    return window.matchMedia('(max-width: 767px)').matches;
-  };
-
   const syncShareActions = (eventData) => {
     if (!shareContainer) return;
     if (!eventData?.id) {
@@ -3073,10 +3067,6 @@ import {
     });
     if (shareCopyButton) {
       shareCopyButton.dataset.shareUrl = getShareUrl(eventData, 'copy', baseUrl);
-    }
-    if (shareInstagramButton) {
-      shareInstagramButton.dataset.shareUrl = getShareUrl(eventData, 'instagram', baseUrl);
-      shareInstagramButton.hidden = !isMobileShareViewport();
     }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = getShareUrl(eventData, 'native', baseUrl);
@@ -3146,10 +3136,6 @@ import {
     }
     if (shareCopyButton) {
       shareCopyButton.dataset.shareUrl = '';
-    }
-    if (shareInstagramButton) {
-      shareInstagramButton.dataset.shareUrl = '';
-      shareInstagramButton.hidden = true;
     }
     if (shareToggle) {
       shareToggle.dataset.shareUrl = '';
@@ -3454,34 +3440,6 @@ import {
           showToast('Посилання скопійовано');
           setShareMenuOpen(false);
         }
-      });
-    }
-    if (shareInstagramButton) {
-      shareInstagramButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-        if (!activeEventData) return;
-        if (!isMobileShareViewport()) {
-          showToast('Instagram Stories доступно лише на телефоні');
-          setShareMenuOpen(false);
-          return;
-        }
-        const shareUrl =
-          shareInstagramButton.dataset.shareUrl ||
-          getShareUrl(activeEventData, 'instagram', buildEventPageUrl(activeEventData));
-        const shared = await tryShareWithWebApi(activeEventData, shareUrl, {
-          preferUrlOnly: true
-        });
-        if (shared) {
-          setShareMenuOpen(false);
-          return;
-        }
-        const copied = await copyToClipboard(shareUrl);
-        if (copied) {
-          showToast('Виникла помилка. Але посилання скопійовано. Вставте у Instagram Stories');
-        } else {
-          showToast('Виникла помилка поширення');
-        }
-        setShareMenuOpen(false);
       });
     }
     shareChannelLinks.forEach((link) => {
