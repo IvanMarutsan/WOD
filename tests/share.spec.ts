@@ -81,8 +81,20 @@ test('desktop share fallback menu works and builds network links', async ({ page
   await expect(page.locator('[data-share-instagram]')).toHaveCount(0);
 
   await page.getByRole('button', { name: /Поділитися/i }).click();
+  const optionLabels = await page
+    .locator('[data-share-menu] .event-share__option')
+    .allTextContents();
+  const normalized = optionLabels.map((value) => value.trim());
+  const facebookIndex = normalized.indexOf('Facebook');
+  const messengerIndex = normalized.indexOf('Messenger');
+  expect(facebookIndex).toBeGreaterThanOrEqual(0);
+  expect(messengerIndex).toBe(facebookIndex + 1);
+
   const facebookHref = await page
     .locator('[data-share-channel="facebook"]')
+    .getAttribute('href');
+  const messengerHref = await page
+    .locator('[data-share-channel="messenger"]')
     .getAttribute('href');
   const linkedinHref = await page
     .locator('[data-share-channel="linkedin"]')
@@ -95,6 +107,8 @@ test('desktop share fallback menu works and builds network links', async ({ page
     .getAttribute('href');
   expect(facebookHref || '').toContain('https://www.facebook.com/sharer/sharer.php?u=');
   expect(facebookHref || '').toContain('utm_content%3Dfacebook');
+  expect(messengerHref || '').toContain('https://www.facebook.com/messages/compose/?link=');
+  expect(messengerHref || '').toContain('utm_content%3Dmessenger');
   expect(linkedinHref || '').toContain('https://www.linkedin.com/sharing/share-offsite/?url=');
   expect(linkedinHref || '').toContain('utm_content%3Dlinkedin');
   expect(telegramHref || '').toContain('https://t.me/share/url');
@@ -149,6 +163,8 @@ test.describe('mobile share behavior', () => {
       window.__copiedText = '';
       // @ts-ignore
       window.__nativeShareCalls = 0;
+      // @ts-ignore
+      window.__openedMessenger = '';
       Object.defineProperty(window.navigator, 'share', { value: undefined, configurable: true });
       Object.defineProperty(window.navigator, 'canShare', { value: undefined, configurable: true });
       Object.defineProperty(window.navigator, 'clipboard', {
@@ -157,6 +173,14 @@ test.describe('mobile share behavior', () => {
             // @ts-ignore
             window.__copiedText = value;
           }
+        },
+        configurable: true
+      });
+      Object.defineProperty(window, 'open', {
+        value: (url: string) => {
+          // @ts-ignore
+          window.__openedMessenger = url;
+          return {};
         },
         configurable: true
       });
@@ -177,6 +201,17 @@ test.describe('mobile share behavior', () => {
 
     await page.getByRole('button', { name: /Поділитися/i }).click();
     await expect(page.locator('[data-share-instagram]')).toHaveCount(0);
+    const messengerLink = page.locator('[data-share-channel="messenger"]');
+    await expect(messengerLink).toBeVisible();
+    await messengerLink.click();
+    const openedMessenger = await page.evaluate(() => {
+      // @ts-ignore
+      return window.__openedMessenger || '';
+    });
+    expect(openedMessenger).toContain('https://www.facebook.com/messages/compose/?link=');
+    expect(openedMessenger).toContain('utm_content%3Dmessenger');
+
+    await page.getByRole('button', { name: /Поділитися/i }).click();
     await page.getByRole('button', { name: /^Інше$/i }).click();
     await expect(page.locator('[data-saved-toast]')).toHaveText('Нативне поширення недоступне');
 

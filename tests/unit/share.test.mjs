@@ -3,7 +3,16 @@ import assert from 'node:assert/strict';
 import { buildShareText, getNetworkShareHref, getShareUrl } from '../../modules/share.mjs';
 
 test('getShareUrl supports all channels with stable base and UTM', () => {
-  const channels = ['instagram', 'facebook', 'linkedin', 'telegram', 'whatsapp', 'copy', 'other'];
+  const channels = [
+    'instagram',
+    'facebook',
+    'messenger',
+    'linkedin',
+    'telegram',
+    'whatsapp',
+    'copy',
+    'other'
+  ];
   channels.forEach((channel) => {
     const base = 'https://whatsondk.netlify.app/event-card.html?id=evt-1&ref=a b';
     const url = new URL(getShareUrl({ id: 'evt-1' }, channel, base));
@@ -52,4 +61,13 @@ test('facebook share href uses sharer.php with encoded share url', () => {
   assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
   assert.match(href, /https%3A%2F%2Fwhatsondk\.netlify\.app%2F\.netlify%2Ffunctions%2Fshare-event/);
   assert.match(href, /utm_content%3Dfacebook/);
+});
+
+test('messenger share href uses compose url with encoded share url', () => {
+  const shareUrl =
+    'https://whatsondk.netlify.app/.netlify/functions/share-event?id=evt-1&utm_content=messenger';
+  const href = getNetworkShareHref('messenger', shareUrl, '');
+  assert.match(href, /^https:\/\/www\.facebook\.com\/messages\/compose\/\?link=/);
+  assert.match(href, /https%3A%2F%2Fwhatsondk\.netlify\.app%2F\.netlify%2Ffunctions%2Fshare-event/);
+  assert.match(href, /utm_content%3Dmessenger/);
 });

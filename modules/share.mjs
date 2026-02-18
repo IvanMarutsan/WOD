@@ -1,7 +1,14 @@
 const SHARE_UTM_SOURCE = 'share';
 const SHARE_UTM_MEDIUM = 'web';
 const SHARE_UTM_CAMPAIGN = 'event';
-const SOCIAL_CHANNELS = new Set(['facebook', 'linkedin', 'telegram', 'whatsapp', 'instagram']);
+const SOCIAL_CHANNELS = new Set([
+  'facebook',
+  'messenger',
+  'linkedin',
+  'telegram',
+  'whatsapp',
+  'instagram'
+]);
 
 const parseDate = (value) => {
   if (!value) return null;
@@ -106,6 +113,9 @@ export const getNetworkShareHref = (network, shareUrl, shareText) => {
   const encodedText = encodeURIComponent(shareText || '');
   if (network === 'facebook') {
     return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  }
+  if (network === 'messenger') {
+    return `https://www.facebook.com/messages/compose/?link=${encodedUrl}`;
   }
   if (network === 'linkedin') {
     return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;

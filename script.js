@@ -2808,6 +2808,7 @@ import {
   const shareMenu = document.querySelector('[data-share-menu]');
   const shareCopyButton = document.querySelector('[data-share-copy]');
   const shareNativeButton = document.querySelector('[data-share-native]');
+  const shareMessengerLink = document.querySelector('[data-share-channel="messenger"]');
   const shareChannelLinks = document.querySelectorAll('[data-share-channel]');
   const eventLocationEl = document.querySelector('[data-event-location]');
   const eventImageEl = document.querySelector('[data-event-image]');
@@ -3048,6 +3049,19 @@ import {
     } catch (error) {
       return false;
     }
+  };
+
+  const openMessengerShare = (url) => {
+    const href = String(url || '').trim();
+    if (!href || typeof window === 'undefined') return false;
+    try {
+      const popup = window.open(href, '_blank', 'noopener');
+      if (popup) return true;
+    } catch (error) {
+      // No-op: show fallback toast below.
+    }
+    showToast('Не вдалося відкрити Messenger. Спробуйте Copy link або Інше');
+    return false;
   };
 
   const syncShareActions = (eventData) => {
@@ -3444,10 +3458,20 @@ import {
     }
     shareChannelLinks.forEach((link) => {
       if (!(link instanceof HTMLAnchorElement)) return;
+      if (String(link.dataset.shareChannel || '').toLowerCase() === 'messenger') return;
       link.addEventListener('click', () => {
         setShareMenuOpen(false);
       });
     });
+    if (shareMessengerLink instanceof HTMLAnchorElement) {
+      shareMessengerLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        const opened = openMessengerShare(shareMessengerLink.href);
+        if (opened) {
+          setShareMenuOpen(false);
+        }
+      });
+    }
 
     if (eventSaveButton) {
       eventSaveButton.addEventListener('click', () => {
