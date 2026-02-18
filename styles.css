@@ -1266,10 +1266,18 @@ body:not(.is-admin) [data-admin-controls] {
 .event-card__meta {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 12px;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.event-card__meta-left {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
 }
 
 .event-card__meta-right {
@@ -1277,6 +1285,7 @@ body:not(.is-admin) [data-admin-controls] {
   align-items: center;
   gap: 8px;
   margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .event-card__datetime,
@@ -3412,6 +3421,19 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.8rem;
   margin-bottom: 1rem;
+}
+
+.admin-partners-form .filters__toggle {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  border-radius: 14px;
+}
+
+.admin-partners-form .filters__toggle small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.25;
 }
 
 .admin-partners-form__actions {

@@ -1,6 +1,7 @@
 const SHARE_UTM_SOURCE = 'share';
 const SHARE_UTM_MEDIUM = 'web';
 const SHARE_UTM_CAMPAIGN = 'event';
+const SOCIAL_CHANNELS = new Set(['facebook', 'linkedin', 'telegram', 'whatsapp']);
 
 const parseDate = (value) => {
   if (!value) return null;
@@ -27,6 +28,11 @@ export const getShareUrl = (event, channel = 'native', baseUrl = '') => {
   const source = String(baseUrl || fallbackBase || '').trim();
   if (!source) return '';
   const url = new URL(source);
+  if (event?.id && SOCIAL_CHANNELS.has(channel) && typeof window !== 'undefined') {
+    url.pathname = '/.netlify/functions/share-event';
+    url.search = '';
+    url.searchParams.set('id', String(event.id));
+  }
   url.searchParams.set('utm_source', SHARE_UTM_SOURCE);
   url.searchParams.set('utm_medium', SHARE_UTM_MEDIUM);
   url.searchParams.set('utm_campaign', SHARE_UTM_CAMPAIGN);

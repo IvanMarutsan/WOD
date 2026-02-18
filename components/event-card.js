@@ -80,9 +80,11 @@ export const EventCard = (event, helpers) => {
           ${imageMarkup}
           <div class="event-card__body">
             <div class="event-card__meta">
-              <span class="event-card__datetime">${formatDateRange(event.start, event.end)}</span>
-              <div class="event-card__meta-right">
+              <div class="event-card__meta-left">
+                <span class="event-card__datetime">${formatDateRange(event.start, event.end)}</span>
                 <span class="event-card__price ${priceInfo.className}">${priceInfo.label}</span>
+              </div>
+              <div class="event-card__meta-right">
                 ${renderStarButton(event.id, 'catalog')}
               </div>
             </div>

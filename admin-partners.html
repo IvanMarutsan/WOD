@@ -68,7 +68,8 @@
               </label>
               <label class="form-field">
                 <span>Slug</span>
-                <input type="text" name="slug" />
+                <input type="text" name="slug" placeholder="waylight" />
+                <small>Унікальна частина URL для detail-сторінки: `partner.html?slug=...`.</small>
               </label>
               <label class="form-field">
                 <span>Сайт</span>
@@ -89,10 +90,12 @@
               <label class="filters__toggle">
                 <input type="checkbox" name="is_active" checked />
                 <span>Активний</span>
+                <small>Увімкнено: партнер показується на головній. Вимкнено: прихований.</small>
               </label>
               <label class="filters__toggle">
                 <input type="checkbox" name="has_detail_page" />
                 <span>Є detail-сторінка</span>
+                <small>Увімкнено: клік по банеру відкриває `partner.html`. Вимкнено: відкривається зовнішній сайт.</small>
               </label>
               <label class="form-field form-field--full">
                 <span>Короткий опис</span>

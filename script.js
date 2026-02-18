@@ -2952,6 +2952,49 @@ import {
     return new URL(path, window.location.href).toString();
   };
 
+  const setMetaContent = (selector, value) => {
+    const meta = document.querySelector(selector);
+    if (meta && value) {
+      meta.setAttribute('content', value);
+    }
+  };
+
+  const updateEventSocialMeta = (eventData) => {
+    if (!eventData?.id) return;
+    const eventUrl = buildEventPageUrl(eventData);
+    const title = `${String(eventData.title || '').trim() || 'Подія'} — What's on DK?`;
+    const city = getDisplayCity(eventData.city);
+    const dateLabel = formatDateRange(eventData.start, eventData.end);
+    const description = [dateLabel, city].filter(Boolean).join(' · ') || 'Деталі події в Данії.';
+    const imageUrl = String(eventData.images?.[0] || '').trim();
+    document.title = title;
+    setMetaContent('meta[name="description"]', description);
+    setMetaContent('meta[property="og:title"]', title);
+    setMetaContent('meta[property="og:description"]', description);
+    setMetaContent('meta[property="og:url"]', eventUrl);
+    setMetaContent('meta[name="twitter:title"]', title);
+    setMetaContent('meta[name="twitter:description"]', description);
+    if (imageUrl) {
+      setMetaContent('meta[property="og:image"]', imageUrl);
+      setMetaContent('meta[name="twitter:image"]', imageUrl);
+    }
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', eventUrl);
+    }
+  };
+
+  const shouldPreferNativeShare = () => {
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent || '';
+    const isMobileUa = /Android|iPhone|iPad|iPod|Mobile|webOS/i.test(ua);
+    const isCoarsePointer =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches;
+    return isMobileUa || isCoarsePointer;
+  };
+
   const setCalendarMenuOpen = (open) => {
     if (!calendarToggle || !calendarMenu) return;
     calendarToggle.setAttribute('aria-expanded', String(open));
@@ -3112,6 +3155,7 @@ import {
     if (!eventData) return;
     activeEventData = eventData;
     if (eventTitleEl) eventTitleEl.textContent = eventData.title;
+    updateEventSocialMeta(eventData);
     if (eventSaveButton) {
       eventSaveButton.dataset.eventId = eventData.id || '';
       syncSavedStarButton(eventSaveButton);
@@ -3300,9 +3344,13 @@ import {
     if (shareToggle && shareMenu) {
       shareToggle.addEventListener('click', async () => {
         if (!activeEventData) return;
-        const nativeUrl = shareToggle.dataset.shareUrl || getShareUrl(activeEventData, 'native', buildEventPageUrl(activeEventData));
-        const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
-        if (shared) return;
+        if (shouldPreferNativeShare()) {
+          const nativeUrl =
+            shareToggle.dataset.shareUrl ||
+            getShareUrl(activeEventData, 'native', buildEventPageUrl(activeEventData));
+          const shared = await tryShareWithWebApi(activeEventData, nativeUrl);
+          if (shared) return;
+        }
         const expanded = shareToggle.getAttribute('aria-expanded') === 'true';
         if (expanded) {
           setShareMenuOpen(false);
