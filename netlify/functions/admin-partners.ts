@@ -23,6 +23,24 @@ const normalizeSlug = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
+const ensureUniqueSlug = async (candidate: string, currentId = '') => {
+  const base = normalizeSlug(candidate) || normalizeSlug(`partner-${Date.now()}`);
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    const slug = attempt === 0 ? base : `${base}-${attempt + 1}`;
+    const rows = (await supabaseFetch('partners', {
+      query: {
+        slug: `eq.${slug}`,
+        select: 'id,slug',
+        limit: '1'
+      }
+    })) as any[];
+    const existing = rows?.[0];
+    if (!existing) return slug;
+    if (currentId && String(existing.id) === String(currentId)) return slug;
+  }
+  return `${base}-${Date.now()}`;
+};
+
 const normalizePartner = (item: any) => ({
   id: item.id,
   name: item.name || '',
@@ -149,7 +167,7 @@ export const handler = async (event: HandlerEvent, context: HandlerContext) => {
     const fallbackName = hostName || (existing?.name ? String(existing.name) : '');
     const name = nameInput || fallbackName || `Partner ${new Date().toISOString().slice(0, 10)}`;
     const slugBase = slugInput || name || hostName || existing?.slug || '';
-    const slug = normalizeSlug(slugBase) || normalizeSlug(`partner-${Date.now()}`);
+    const slug = await ensureUniqueSlug(slugBase, id || String(existing?.id || ''));
     const sortOrder = Number.isFinite(sortOrderInput) ? sortOrderInput : Number(existing?.sort_order || 0);
     let logoUrl = logoUrlInput || String(existing?.logo_url || '').trim();
 
