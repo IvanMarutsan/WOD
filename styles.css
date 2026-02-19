@@ -3531,6 +3531,22 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   border-radius: 14px;
   padding: 0.8rem;
   background: var(--surface);
+  align-items: flex-start;
+}
+
+.admin-partner-card > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-partner-card > div:first-child p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-partner-card > div:last-child {
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .admin-partner-card + .admin-partner-card {
@@ -3549,6 +3565,7 @@ body[data-admin-auth="denied"] [data-admin-protected] {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 1023px) {

@@ -2680,6 +2680,7 @@ import {
     let partnersItems = [];
     let partnersIndex = 0;
     let partnersTimer = null;
+    let partnersAutoPaused = false;
 
     const getPartnersVisible = () => {
       if (window.innerWidth < 768) return 1;
@@ -2718,6 +2719,25 @@ import {
       }
     };
 
+    const stopPartnersAutoplay = () => {
+      if (partnersTimer) {
+        window.clearInterval(partnersTimer);
+        partnersTimer = null;
+      }
+    };
+
+    const startPartnersAutoplay = () => {
+      if (!partnersSection || partnersAutoPaused) return;
+      stopPartnersAutoplay();
+      const visible = getPartnersVisible();
+      if (partnersItems.length <= visible) return;
+      partnersTimer = window.setInterval(() => {
+        const maxIndex = Math.max(0, partnersItems.length - getPartnersVisible());
+        partnersIndex = partnersIndex >= maxIndex ? 0 : partnersIndex + 1;
+        updatePartnersState();
+      }, 6000);
+    };
+
     const renderPartners = (partners) => {
       if (!partnersSection || !partnersTrack) return;
       partnersItems = Array.isArray(partners) ? partners : [];
@@ -2752,18 +2772,7 @@ import {
         .join('');
       partnersIndex = 0;
       updatePartnersState();
-      if (partnersTimer) {
-        window.clearInterval(partnersTimer);
-        partnersTimer = null;
-      }
-      const visible = getPartnersVisible();
-      if (partnersItems.length > visible) {
-        partnersTimer = window.setInterval(() => {
-          const maxIndex = Math.max(0, partnersItems.length - getPartnersVisible());
-          partnersIndex = partnersIndex >= maxIndex ? 0 : partnersIndex + 1;
-          updatePartnersState();
-        }, 6000);
-      }
+      startPartnersAutoplay();
     };
 
     const loadPartners = async () => {
@@ -2784,7 +2793,31 @@ import {
         updatePartnersState();
       });
     }
-    window.addEventListener('resize', updatePartnersState);
+    window.addEventListener('resize', () => {
+      updatePartnersState();
+      startPartnersAutoplay();
+    });
+
+    if (partnersSection instanceof HTMLElement) {
+      partnersSection.addEventListener('mouseenter', () => {
+        partnersAutoPaused = true;
+        stopPartnersAutoplay();
+      });
+      partnersSection.addEventListener('mouseleave', () => {
+        partnersAutoPaused = false;
+        startPartnersAutoplay();
+      });
+      partnersSection.addEventListener('focusin', () => {
+        partnersAutoPaused = true;
+        stopPartnersAutoplay();
+      });
+      partnersSection.addEventListener('focusout', () => {
+        const active = document.activeElement;
+        if (active instanceof Element && partnersSection.contains(active)) return;
+        partnersAutoPaused = false;
+        startPartnersAutoplay();
+      });
+    }
 
     queueMicrotask(loadEvents);
     queueMicrotask(loadPartners);

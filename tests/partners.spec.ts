@@ -99,3 +99,46 @@ test('admin can save partner with basic fields only', async ({ page }) => {
   await expect(card).toContainText(expectedName);
   await expect(card).toContainText(website);
 });
+
+test('admin partner card keeps action buttons visible with long website url', async ({ page }) => {
+  const uniq = Date.now();
+  const website = `https://very-long-partner-domain-${uniq}.example.com/very/long/path/that/should/not/push/actions/out/of/view`;
+
+  await enableAdminSession(page);
+  await page.goto('/admin-partners.html');
+  await expect(page).toHaveURL(/admin-partners\.html/);
+  const form = page.locator('[data-admin-partner-form]');
+  await expect(form).toBeVisible();
+
+  await form.locator('input[name="website_url"]').fill(website);
+  await form.locator('button[type="submit"]').click();
+
+  const card = page.locator('[data-admin-partners-list] .admin-partner-card').first();
+  const editButton = card.locator('[data-action="edit-partner"]');
+  const toggleButton = card.locator('[data-action="toggle-partner"]');
+  const deleteButton = card.locator('[data-action="delete-partner"]');
+
+  await expect(editButton).toBeVisible();
+  await expect(toggleButton).toBeVisible();
+  await expect(deleteButton).toBeVisible();
+
+  const [cardRect, editRect, toggleRect, deleteRect, viewportWidth] = await Promise.all([
+    card.boundingBox(),
+    editButton.boundingBox(),
+    toggleButton.boundingBox(),
+    deleteButton.boundingBox(),
+    page.evaluate(() => window.innerWidth)
+  ]);
+
+  expect(cardRect).toBeTruthy();
+  expect(editRect).toBeTruthy();
+  expect(toggleRect).toBeTruthy();
+  expect(deleteRect).toBeTruthy();
+
+  const buttonsRight = Math.max(
+    (editRect?.x || 0) + (editRect?.width || 0),
+    (toggleRect?.x || 0) + (toggleRect?.width || 0),
+    (deleteRect?.x || 0) + (deleteRect?.width || 0)
+  );
+  expect(buttonsRight).toBeLessThanOrEqual(viewportWidth + 1);
+});
