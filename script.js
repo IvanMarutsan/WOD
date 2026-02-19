@@ -1654,7 +1654,7 @@ import {
           liveRotationTimer = window.setInterval(() => {
             liveRotationIndex = (liveRotationIndex + 1) % liveEvents.length;
             renderHeroCard(liveEvents[liveRotationIndex], true);
-          }, 6000);
+          }, 10000);
         } else if (liveEvents.length <= 1 && liveRotationTimer) {
           window.clearInterval(liveRotationTimer);
           liveRotationTimer = null;
