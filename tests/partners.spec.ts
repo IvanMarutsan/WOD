@@ -142,3 +142,60 @@ test('admin partner card keeps action buttons visible with long website url', as
   );
   expect(buttonsRight).toBeLessThanOrEqual(viewportWidth + 1);
 });
+
+test('admin normalizes duplicate partner order and persists after refresh', async ({ page }) => {
+  await page.addInitScript(() => {
+    const partners = [
+      {
+        id: 'partner-a',
+        name: 'Partner A',
+        slug: 'partner-a',
+        websiteUrl: 'https://a.example.com',
+        isActive: true,
+        hasDetailPage: false,
+        sortOrder: 2,
+        detailContent: {}
+      },
+      {
+        id: 'partner-b',
+        name: 'Partner B',
+        slug: 'partner-b',
+        websiteUrl: 'https://b.example.com',
+        isActive: true,
+        hasDetailPage: false,
+        sortOrder: 2,
+        detailContent: {}
+      },
+      {
+        id: 'partner-c',
+        name: 'Partner C',
+        slug: 'partner-c',
+        websiteUrl: 'https://c.example.com',
+        isActive: false,
+        hasDetailPage: false,
+        sortOrder: 1,
+        detailContent: {}
+      }
+    ];
+    localStorage.setItem('wodLocalPartners', JSON.stringify(partners));
+  });
+
+  await enableAdminSession(page);
+  await page.goto('/admin-partners.html');
+
+  const cards = page.locator('[data-admin-partner-id]');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.first()).toContainText('Partner A');
+  await expect(cards.nth(1)).toContainText('Partner B');
+  await expect(cards.nth(2)).toContainText('Partner C');
+
+  await page.reload();
+  const cardsAfterReload = page.locator('[data-admin-partner-id]');
+  await expect(cardsAfterReload).toHaveCount(3);
+  await expect(cardsAfterReload.first()).toContainText('Partner A');
+  await expect(cardsAfterReload.nth(1)).toContainText('Partner B');
+  await expect(cardsAfterReload.nth(2)).toContainText('Partner C');
+  await expect(cardsAfterReload.first()).toContainText('sort 1');
+  await expect(cardsAfterReload.nth(1)).toContainText('sort 2');
+  await expect(cardsAfterReload.nth(2)).toContainText('sort 3');
+});

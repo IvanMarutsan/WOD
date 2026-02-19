@@ -39,6 +39,18 @@ export const sortPartners = (partners = []) =>
     return nameA.localeCompare(nameB, 'uk');
   });
 
+export const normalizePartnersOrder = (partners = []) => {
+  const sorted = sortPartners(partners);
+  return sorted.map((partner, index) => {
+    const nextOrder = index + 1;
+    return {
+      ...partner,
+      sortOrder: nextOrder,
+      sort_order: nextOrder
+    };
+  });
+};
+
 export const filterActivePartners = (partners = []) =>
   partners.filter((partner) => partner && partner.is_active !== false);
 

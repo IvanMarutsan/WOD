@@ -9,6 +9,7 @@ import {
 import {
   deleteLocalPartner,
   getLocalPartners,
+  normalizePartnersOrder,
   normalizePartnerSlug,
   sortPartners,
   upsertLocalPartner
@@ -189,6 +190,12 @@ export const initAdmin = ({ formatMessage }) => {
       };
     };
 
+    const getPartnerOrderValue = (partner) => {
+      const raw = partner?.sortOrder ?? partner?.sort_order;
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
     const renderPartnersList = (partners) => {
       if (!partnersContainer) return;
       const sorted = sortPartners(Array.isArray(partners) ? partners : []);
@@ -234,20 +241,40 @@ export const initAdmin = ({ formatMessage }) => {
       await parsePartnersResponse(response);
     };
 
-    const persistActiveOrderFromDom = async () => {
+    const persistPartnersOrder = async (orderedPartners) => {
+      const normalized = normalizePartnersOrder(orderedPartners);
+      for (const partner of normalized) {
+        await savePartnerPayload({ ...partner, sortOrder: getPartnerOrderValue(partner) });
+      }
+      return normalized;
+    };
+
+    const needsOrderNormalization = (partners = []) => {
+      const sorted = sortPartners(partners);
+      const normalized = normalizePartnersOrder(sorted);
+      if (sorted.length !== normalized.length) return true;
+      for (let index = 0; index < sorted.length; index += 1) {
+        const source = sorted[index];
+        const target = normalized[index];
+        if (String(source?.id || '') !== String(target?.id || '')) return true;
+        if (getPartnerOrderValue(source) !== getPartnerOrderValue(target)) return true;
+      }
+      return false;
+    };
+
+    const persistOrderFromDom = async () => {
       if (!partnersContainer) return;
-      const activeIds = Array.from(
-        partnersContainer.querySelectorAll('[data-admin-partner-id][data-partner-active="true"]')
+      const ids = Array.from(
+        partnersContainer.querySelectorAll('[data-admin-partner-id]')
       )
         .map((card) => String(card.getAttribute('data-admin-partner-id') || '').trim())
         .filter(Boolean);
-      if (activeIds.length < 2) return;
-      for (let index = 0; index < activeIds.length; index += 1) {
-        const partnerId = activeIds[index];
-        const partner = partnersById.get(partnerId);
-        if (!partner) continue;
-        await savePartnerPayload({ ...partner, sortOrder: index });
-      }
+      if (ids.length < 2) return;
+      const orderedPartners = ids
+        .map((partnerId) => partnersById.get(partnerId))
+        .filter(Boolean);
+      if (orderedPartners.length < 2) return;
+      await persistPartnersOrder(orderedPartners);
       await loadPartners();
     };
 
@@ -297,7 +324,12 @@ export const initAdmin = ({ formatMessage }) => {
     const loadPartners = async () => {
       try {
         if (useLocalPartners) {
-          renderPartnersList(getLocalPartners());
+          const localPartners = getLocalPartners();
+          const normalizedLocal = normalizePartnersOrder(localPartners);
+          if (needsOrderNormalization(localPartners)) {
+            normalizedLocal.forEach((partner) => upsertLocalPartner(partner));
+          }
+          renderPartnersList(normalizedLocal);
           return;
         }
         const authHeaders = await getAuthHeaders();
@@ -305,11 +337,18 @@ export const initAdmin = ({ formatMessage }) => {
           headers: { 'Content-Type': 'application/json', ...authHeaders }
         });
         const payload = await parsePartnersResponse(response);
-        renderPartnersList(Array.isArray(payload?.partners) ? payload.partners : []);
+        const partners = Array.isArray(payload?.partners) ? payload.partners : [];
+        if (needsOrderNormalization(partners)) {
+          const normalized = await persistPartnersOrder(partners);
+          renderPartnersList(normalized);
+          return;
+        }
+        renderPartnersList(partners);
       } catch (error) {
         if (isLocalHost) {
           useLocalPartners = true;
-          renderPartnersList(getLocalPartners());
+          const localPartners = getLocalPartners();
+          renderPartnersList(normalizePartnersOrder(localPartners));
           return;
         }
         console.error('load partners failed', error);
@@ -419,7 +458,7 @@ export const initAdmin = ({ formatMessage }) => {
         if (!draggedPartnerId) return;
         event.preventDefault();
         try {
-          await persistActiveOrderFromDom();
+          await persistOrderFromDom();
         } catch (error) {
           console.error('partner reorder failed', error);
           showPartnersError('Не вдалося зберегти новий порядок партнерів.');
