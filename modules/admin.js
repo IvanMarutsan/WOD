@@ -226,21 +226,40 @@ export const initAdmin = ({ formatMessage }) => {
     const savePartnerPayload = async (payload) => {
       if (useLocalPartners) {
         upsertLocalPartner(payload);
-        return;
+        return payload;
       }
       const authHeaders = await getAuthHeaders();
-      const response = await fetch('/.netlify/functions/admin-partners', {
-        method: payload.id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders },
-        body: JSON.stringify(payload)
-      });
-      await parsePartnersResponse(response);
+      let attempts = 0;
+      let lastError = null;
+      while (attempts < 2) {
+        try {
+          const response = await fetch('/.netlify/functions/admin-partners', {
+            method: payload.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify(payload)
+          });
+          const parsed = await parsePartnersResponse(response);
+          return parsed?.partner || payload;
+        } catch (error) {
+          lastError = error;
+          attempts += 1;
+          if (attempts >= 2) break;
+          await new Promise((resolve) => window.setTimeout(resolve, 180));
+        }
+      }
+      throw lastError || new Error('partners_save_failed');
     };
 
     const persistPartnersOrder = async (orderedPartners) => {
       const normalized = normalizePartnersOrder(orderedPartners);
       for (const partner of normalized) {
-        await savePartnerPayload({ ...partner, sortOrder: getPartnerOrderValue(partner) });
+        const current = partnersById.get(partner.id);
+        const nextOrder = getPartnerOrderValue(partner);
+        const currentOrder = getPartnerOrderValue(current);
+        if (current && currentOrder === nextOrder) {
+          continue;
+        }
+        await savePartnerPayload({ ...partner, sortOrder: nextOrder });
       }
       return normalized;
     };
