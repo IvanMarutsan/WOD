@@ -2798,22 +2798,36 @@ import {
       startPartnersAutoplay();
     });
 
-    if (partnersSection instanceof HTMLElement) {
-      partnersSection.addEventListener('mouseenter', () => {
+    if (partnersTrack instanceof HTMLElement) {
+      partnersTrack.addEventListener('mouseover', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        if (!target.closest('.partner-card')) return;
         partnersAutoPaused = true;
         stopPartnersAutoplay();
       });
-      partnersSection.addEventListener('mouseleave', () => {
+      partnersTrack.addEventListener('mouseout', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const fromCard = target.closest('.partner-card');
+        if (!fromCard) return;
+        const nextTarget = event.relatedTarget;
+        if (nextTarget instanceof Element && nextTarget.closest('.partner-card') === fromCard) {
+          return;
+        }
         partnersAutoPaused = false;
         startPartnersAutoplay();
       });
-      partnersSection.addEventListener('focusin', () => {
+      partnersTrack.addEventListener('focusin', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        if (!target.closest('.partner-card')) return;
         partnersAutoPaused = true;
         stopPartnersAutoplay();
       });
-      partnersSection.addEventListener('focusout', () => {
+      partnersTrack.addEventListener('focusout', () => {
         const active = document.activeElement;
-        if (active instanceof Element && partnersSection.contains(active)) return;
+        if (active instanceof Element && partnersTrack.contains(active)) return;
         partnersAutoPaused = false;
         startPartnersAutoplay();
       });

@@ -24,8 +24,15 @@ export const normalizePartnerSlug = (value = '') =>
 
 export const sortPartners = (partners = []) =>
   [...partners].sort((a, b) => {
-    const orderA = Number.isFinite(Number(a?.sort_order)) ? Number(a.sort_order) : 0;
-    const orderB = Number.isFinite(Number(b?.sort_order)) ? Number(b.sort_order) : 0;
+    const isActiveA = (a?.isActive ?? a?.is_active) !== false;
+    const isActiveB = (b?.isActive ?? b?.is_active) !== false;
+    if (isActiveA !== isActiveB) {
+      return isActiveA ? -1 : 1;
+    }
+    const rawOrderA = a?.sortOrder ?? a?.sort_order;
+    const rawOrderB = b?.sortOrder ?? b?.sort_order;
+    const orderA = Number.isFinite(Number(rawOrderA)) ? Number(rawOrderA) : 0;
+    const orderB = Number.isFinite(Number(rawOrderB)) ? Number(rawOrderB) : 0;
     if (orderA !== orderB) return orderA - orderB;
     const nameA = String(a?.name || '');
     const nameB = String(b?.name || '');

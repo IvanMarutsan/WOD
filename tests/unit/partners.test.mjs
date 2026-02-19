@@ -31,6 +31,20 @@ test('sortPartners falls back to name when sort_order is equal', () => {
   );
 });
 
+test('sortPartners keeps active partners above inactive and supports camelCase sortOrder', () => {
+  const list = [
+    { id: 'inactive-1', name: 'Zeta', isActive: false, sortOrder: 0 },
+    { id: 'active-2', name: 'Beta', isActive: true, sortOrder: 2 },
+    { id: 'active-1', name: 'Alpha', is_active: true, sort_order: 1 },
+    { id: 'inactive-2', name: 'Alpha', is_active: false, sort_order: 0 }
+  ];
+  const result = sortPartners(list);
+  assert.deepEqual(
+    result.map((item) => item.id),
+    ['active-1', 'active-2', 'inactive-2', 'inactive-1']
+  );
+});
+
 test('normalizePartnerSlug handles spaces, symbols and cyrillic', () => {
   assert.equal(normalizePartnerSlug('  Waylight Partner  '), 'waylight-partner');
   assert.equal(normalizePartnerSlug('Партнер Дія'), 'partner-diia');

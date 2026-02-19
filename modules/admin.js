@@ -196,10 +196,11 @@ export const initAdmin = ({ formatMessage }) => {
       partnersContainer.innerHTML = sorted
         .map((partner) => {
           const logoUrl = partner.logoUrl || '';
-          const activeLabel = partner.isActive ? 'Активний' : 'Неактивний';
+          const isActive = partner.isActive !== false;
+          const activeLabel = isActive ? 'Активний' : 'Неактивний';
           const detailLabel = partner.hasDetailPage ? 'Є detail' : 'Без detail';
           return `
-            <article class="admin-partner-card" data-admin-partner-id="${partner.id}">
+            <article class="admin-partner-card" data-admin-partner-id="${partner.id}" data-partner-active="${isActive ? 'true' : 'false'}" draggable="${isActive ? 'true' : 'false'}">
               <div>
                 <strong>${partner.name || '—'}</strong>
                 <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel} · sort ${partner.sortOrder ?? 0}</p>
@@ -217,6 +218,37 @@ export const initAdmin = ({ formatMessage }) => {
           `;
         })
         .join('');
+    };
+
+    const savePartnerPayload = async (payload) => {
+      if (useLocalPartners) {
+        upsertLocalPartner(payload);
+        return;
+      }
+      const authHeaders = await getAuthHeaders();
+      const response = await fetch('/.netlify/functions/admin-partners', {
+        method: payload.id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify(payload)
+      });
+      await parsePartnersResponse(response);
+    };
+
+    const persistActiveOrderFromDom = async () => {
+      if (!partnersContainer) return;
+      const activeIds = Array.from(
+        partnersContainer.querySelectorAll('[data-admin-partner-id][data-partner-active="true"]')
+      )
+        .map((card) => String(card.getAttribute('data-admin-partner-id') || '').trim())
+        .filter(Boolean);
+      if (activeIds.length < 2) return;
+      for (let index = 0; index < activeIds.length; index += 1) {
+        const partnerId = activeIds[index];
+        const partner = partnersById.get(partnerId);
+        if (!partner) continue;
+        await savePartnerPayload({ ...partner, sortOrder: index });
+      }
+      await loadPartners();
     };
 
     const setPartnerFormValues = (partner) => {
@@ -348,6 +380,57 @@ export const initAdmin = ({ formatMessage }) => {
           await loadPartners();
           if (activePartnerId === partnerId) resetPartnerForm();
         }
+      });
+
+      let draggedPartnerId = '';
+      partnersContainer.addEventListener('dragstart', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const card = target.closest('[data-admin-partner-id]');
+        if (!(card instanceof HTMLElement)) return;
+        if (card.dataset.partnerActive !== 'true') {
+          event.preventDefault();
+          return;
+        }
+        draggedPartnerId = String(card.dataset.adminPartnerId || '');
+        if (!draggedPartnerId) return;
+        card.classList.add('is-dragging');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', draggedPartnerId);
+        }
+      });
+
+      partnersContainer.addEventListener('dragover', (event) => {
+        if (!draggedPartnerId) return;
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const targetCard = target.closest('[data-admin-partner-id][data-partner-active="true"]');
+        if (!(targetCard instanceof HTMLElement)) return;
+        const draggingCard = partnersContainer.querySelector('.admin-partner-card.is-dragging');
+        if (!(draggingCard instanceof HTMLElement) || draggingCard === targetCard) return;
+        event.preventDefault();
+        const rect = targetCard.getBoundingClientRect();
+        const before = event.clientY < rect.top + rect.height / 2;
+        partnersContainer.insertBefore(draggingCard, before ? targetCard : targetCard.nextSibling);
+      });
+
+      partnersContainer.addEventListener('drop', async (event) => {
+        if (!draggedPartnerId) return;
+        event.preventDefault();
+        try {
+          await persistActiveOrderFromDom();
+        } catch (error) {
+          console.error('partner reorder failed', error);
+          showPartnersError('Не вдалося зберегти новий порядок партнерів.');
+        }
+      });
+
+      partnersContainer.addEventListener('dragend', () => {
+        draggedPartnerId = '';
+        partnersContainer
+          .querySelectorAll('.admin-partner-card.is-dragging')
+          .forEach((card) => card.classList.remove('is-dragging'));
       });
     }
 
