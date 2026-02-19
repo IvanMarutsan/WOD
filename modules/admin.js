@@ -44,6 +44,25 @@ export const initAdmin = ({ formatMessage }) => {
     let useLocalPartners = isLocalHost;
     let partnersById = new Map();
     let activePartnerId = null;
+    let partnersErrorShown = false;
+
+    const parsePartnersResponse = async (response) => {
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload?.ok === false) {
+        const message = String(payload?.error || 'partners_failed');
+        throw new Error(message);
+      }
+      return payload;
+    };
+
+    const showPartnersError = (message = 'Не вдалося зберегти партнера. Перевірте налаштування backend.') => {
+      if (partnersErrorShown) return;
+      partnersErrorShown = true;
+      window.alert(message);
+      window.setTimeout(() => {
+        partnersErrorShown = false;
+      }, 1200);
+    };
 
     const getAuthHeaders = async () => {
       const token = user?.token?.access_token || (await getIdentityToken());
@@ -253,12 +272,17 @@ export const initAdmin = ({ formatMessage }) => {
         const response = await fetch('/.netlify/functions/admin-partners', {
           headers: { 'Content-Type': 'application/json', ...authHeaders }
         });
-        if (!response.ok) throw new Error('partners_failed');
-        const payload = await response.json();
+        const payload = await parsePartnersResponse(response);
         renderPartnersList(Array.isArray(payload?.partners) ? payload.partners : []);
       } catch (error) {
-        useLocalPartners = true;
-        renderPartnersList(getLocalPartners());
+        if (isLocalHost) {
+          useLocalPartners = true;
+          renderPartnersList(getLocalPartners());
+          return;
+        }
+        console.error('load partners failed', error);
+        renderPartnersList([]);
+        showPartnersError('Не вдалося завантажити партнерів із сервера.');
       }
     };
 
@@ -288,14 +312,15 @@ export const initAdmin = ({ formatMessage }) => {
           }
           try {
             const authHeaders = await getAuthHeaders();
-            await fetch('/.netlify/functions/admin-partners', {
+            const response = await fetch('/.netlify/functions/admin-partners', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json', ...authHeaders },
               body: JSON.stringify(payload)
             });
+            await parsePartnersResponse(response);
           } catch (error) {
-            useLocalPartners = true;
-            upsertLocalPartner(payload);
+            console.error('toggle partner failed', error);
+            showPartnersError();
           }
           await loadPartners();
           return;
@@ -311,13 +336,14 @@ export const initAdmin = ({ formatMessage }) => {
           }
           try {
             const authHeaders = await getAuthHeaders();
-            await fetch(`/.netlify/functions/admin-partners?id=${encodeURIComponent(partnerId)}`, {
+            const response = await fetch(`/.netlify/functions/admin-partners?id=${encodeURIComponent(partnerId)}`, {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json', ...authHeaders }
             });
+            await parsePartnersResponse(response);
           } catch (error) {
-            useLocalPartners = true;
-            deleteLocalPartner(partnerId);
+            console.error('delete partner failed', error);
+            showPartnersError('Не вдалося видалити партнера на сервері.');
           }
           await loadPartners();
           if (activePartnerId === partnerId) resetPartnerForm();
@@ -351,31 +377,37 @@ export const initAdmin = ({ formatMessage }) => {
         }
         try {
           const authHeaders = await getAuthHeaders();
-          await fetch('/.netlify/functions/admin-partners', {
+          const response = await fetch('/.netlify/functions/admin-partners', {
             method: payload.id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify(payload)
           });
+          await parsePartnersResponse(response);
           resetPartnerForm();
           await loadPartners();
         } catch (error) {
-          useLocalPartners = true;
-          const localId =
-            payload.id || `partner-local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-          const logoUrl = payload.logoDataUrl || payload.logoUrl || '';
-          upsertLocalPartner({
-            id: localId,
-            name: payload.name,
-            slug: payload.slug,
-            logoUrl,
-            websiteUrl: payload.websiteUrl,
-            hasDetailPage: payload.hasDetailPage,
-            isActive: payload.isActive,
-            sortOrder: payload.sortOrder,
-            detailContent: payload.detailContent
-          });
-          resetPartnerForm();
-          await loadPartners();
+          if (isLocalHost) {
+            useLocalPartners = true;
+            const localId =
+              payload.id || `partner-local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const logoUrl = payload.logoDataUrl || payload.logoUrl || '';
+            upsertLocalPartner({
+              id: localId,
+              name: payload.name,
+              slug: payload.slug,
+              logoUrl,
+              websiteUrl: payload.websiteUrl,
+              hasDetailPage: payload.hasDetailPage,
+              isActive: payload.isActive,
+              sortOrder: payload.sortOrder,
+              detailContent: payload.detailContent
+            });
+            resetPartnerForm();
+            await loadPartners();
+            return;
+          }
+          console.error('save partner failed', error);
+          showPartnersError('Партнер не збережений на сервері. Перевірте slug/доступи та спробуйте ще раз.');
         }
       });
     }
