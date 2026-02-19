@@ -3516,6 +3516,14 @@ import {
       shareMessengerLink.addEventListener('click', async (event) => {
         event.preventDefault();
         const shareUrl = String(shareMessengerLink.dataset.shareUrl || '').trim();
+        const sharedNatively =
+          shareUrl && activeEventData
+            ? await tryShareWithWebApi(activeEventData, shareUrl, { preferUrlOnly: true })
+            : false;
+        if (sharedNatively) {
+          setShareMenuOpen(false);
+          return;
+        }
         const copied = shareUrl ? await copyToClipboard(shareUrl) : false;
         const opened = openMessengerShare(shareMessengerLink.href);
         if (copied) {

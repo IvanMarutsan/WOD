@@ -50,7 +50,6 @@ test('admin can create active partner with logo and it appears on homepage', asy
   await form.locator('input[name="name"]').fill(partnerName);
   await form.locator('input[name="slug"]').fill(partnerSlug);
   await form.locator('input[name="website_url"]').fill('https://example.com/qa');
-  await form.locator('input[name="sort_order"]').fill('1');
   await form.locator('textarea[name="detail_description"]').fill('QA description for partner detail page.');
   await form.locator('textarea[name="detail_for_whom"]').fill('Для тестування');
   await form.locator('input[name="detail_cta_label"]').fill('Відкрити сайт');
@@ -195,7 +194,4 @@ test('admin normalizes duplicate partner order and persists after refresh', asyn
   await expect(cardsAfterReload.first()).toContainText('Partner A');
   await expect(cardsAfterReload.nth(1)).toContainText('Partner B');
   await expect(cardsAfterReload.nth(2)).toContainText('Partner C');
-  await expect(cardsAfterReload.first()).toContainText('sort 1');
-  await expect(cardsAfterReload.nth(1)).toContainText('sort 2');
-  await expect(cardsAfterReload.nth(2)).toContainText('sort 3');
 });

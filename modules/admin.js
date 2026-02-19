@@ -109,8 +109,6 @@ export const initAdmin = ({ formatMessage }) => {
       partnerForm.reset();
       const idField = partnerForm.elements.namedItem('id');
       if (idField instanceof HTMLInputElement) idField.value = '';
-      const sortField = partnerForm.elements.namedItem('sort_order');
-      if (sortField instanceof HTMLInputElement) sortField.value = '0';
       const activeField = partnerForm.elements.namedItem('is_active');
       if (activeField instanceof HTMLInputElement) activeField.checked = true;
       const detailField = partnerForm.elements.namedItem('has_detail_page');
@@ -151,8 +149,6 @@ export const initAdmin = ({ formatMessage }) => {
       const websiteUrl = websiteUrlInput || String(existing?.websiteUrl || '').trim();
       const logoUrlInput = String(formData.get('logo_url') || '').trim();
       const logoUrl = logoUrlInput || String(existing?.logoUrl || '').trim();
-      const sortRaw = String(formData.get('sort_order') || '').trim();
-      const sortOrder = sortRaw ? Number(sortRaw) : Number(existing?.sortOrder ?? 0);
       const hasDetailPageRaw = formData.get('has_detail_page') === 'on';
       const isActive = formData.get('is_active') === 'on';
       const forWhom = String(formData.get('detail_for_whom') || '')
@@ -183,7 +179,7 @@ export const initAdmin = ({ formatMessage }) => {
         websiteUrl,
         logoUrl,
         logoDataUrl,
-        sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+        sortOrder: getPartnerOrderValue(existing),
         hasDetailPage,
         isActive,
         detailContent
@@ -210,7 +206,7 @@ export const initAdmin = ({ formatMessage }) => {
             <article class="admin-partner-card" data-admin-partner-id="${partner.id}" data-partner-active="${isActive ? 'true' : 'false'}" draggable="${isActive ? 'true' : 'false'}">
               <div>
                 <strong>${partner.name || '—'}</strong>
-                <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel} · sort ${partner.sortOrder ?? 0}</p>
+                <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel}</p>
                 <p>${partner.websiteUrl || ''}</p>
               </div>
               <div>
@@ -248,6 +244,8 @@ export const initAdmin = ({ formatMessage }) => {
       }
       return normalized;
     };
+
+    const getCurrentOrderedPartners = () => sortPartners(Array.from(partnersById.values()));
 
     const needsOrderNormalization = (partners = []) => {
       const sorted = sortPartners(partners);
@@ -291,7 +289,6 @@ export const initAdmin = ({ formatMessage }) => {
       setValue('slug', partner.slug || '');
       setValue('website_url', partner.websiteUrl || '');
       setValue('logo_url', partner.logoUrl || '');
-      setValue('sort_order', String(partner.sortOrder ?? 0));
       const activeField = partnerForm.elements.namedItem('is_active');
       if (activeField instanceof HTMLInputElement) activeField.checked = partner.isActive !== false;
       const detailField = partnerForm.elements.namedItem('has_detail_page');
@@ -442,6 +439,7 @@ export const initAdmin = ({ formatMessage }) => {
 
       partnersContainer.addEventListener('dragover', (event) => {
         if (!draggedPartnerId) return;
+        event.preventDefault();
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
         const targetCard = target.closest('[data-admin-partner-id][data-partner-active="true"]');
@@ -478,33 +476,26 @@ export const initAdmin = ({ formatMessage }) => {
         event.preventDefault();
         const payload = await mapPartnerFromForm();
         if (!payload?.name || !payload?.slug) return;
-        if (useLocalPartners) {
-          const localId =
-            payload.id || `partner-local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-          const logoUrl = payload.logoDataUrl || payload.logoUrl || '';
-          upsertLocalPartner({
-            id: localId,
-            name: payload.name,
-            slug: payload.slug,
-            logoUrl,
-            websiteUrl: payload.websiteUrl,
-            hasDetailPage: payload.hasDetailPage,
-            isActive: payload.isActive,
-            sortOrder: payload.sortOrder,
-            detailContent: payload.detailContent
-          });
-          resetPartnerForm();
-          await loadPartners();
-          return;
-        }
         try {
-          const authHeaders = await getAuthHeaders();
-          const response = await fetch('/.netlify/functions/admin-partners', {
-            method: payload.id ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json', ...authHeaders },
-            body: JSON.stringify(payload)
-          });
-          await parsePartnersResponse(response);
+          const isCreate = !payload.id;
+          const draftPayload =
+            useLocalPartners && isCreate
+              ? {
+                  ...payload,
+                  id: `partner-local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+                }
+              : payload;
+
+          const savedPartner = await savePartnerPayload(draftPayload);
+          if (isCreate && savedPartner?.id) {
+            const current = getCurrentOrderedPartners().filter(
+              (partner) => String(partner?.id || '') !== String(savedPartner.id)
+            );
+            await persistPartnersOrder([
+              { ...savedPartner, sortOrder: 1 },
+              ...current
+            ]);
+          }
           resetPartnerForm();
           await loadPartners();
         } catch (error) {
@@ -1462,7 +1453,7 @@ export const initAdmin = ({ formatMessage }) => {
             <article class="admin-partner-card" data-admin-partner-id="${partner.id}">
               <div>
                 <strong>${partner.name || '—'}</strong>
-                <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel} · sort ${partner.sortOrder ?? 0}</p>
+                <p>${partner.slug || '—'} · ${activeLabel} · ${detailLabel}</p>
                 <p>${partner.websiteUrl || ''}</p>
               </div>
               <div>
