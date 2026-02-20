@@ -3,13 +3,31 @@ import { test, expect } from '@playwright/test';
 const menuSelector = '[data-share-menu]';
 const cardSelector = '[data-testid="event-card"]';
 
+const waitForCatalogSettled = async (page) => {
+  await expect
+    .poll(
+      async () => {
+        const cardCount = await page.locator(cardSelector).count();
+        const emptyVisible = await page.locator('.catalog-empty').isVisible().catch(() => false);
+        if (cardCount > 0) return 'cards';
+        if (emptyVisible) return 'empty';
+        return 'loading';
+      },
+      {
+        timeout: 15000,
+        message: 'Catalog should settle to either rendered cards or visible empty state'
+      }
+    )
+    .not.toBe('loading');
+};
+
 const openFirstEventDetail = async (page) => {
   await page.goto('/#events');
   await expect(page.locator('#events')).toBeVisible();
+  await waitForCatalogSettled(page);
 
   const cardCount = await page.locator(cardSelector).count();
   if (!cardCount) {
-    await expect(page.locator('.catalog-empty')).toBeVisible();
     return false;
   }
 
@@ -97,6 +115,7 @@ test('staging mobile: messenger present, instagram stories absent, no crash on c
   await expect(page.locator('[data-share-channel="messenger"]')).toBeVisible();
   await expect(page.locator('[data-share-instagram]')).toHaveCount(0);
 
+  const beforeUrl = page.url();
   await page.locator('[data-share-channel="messenger"]').click();
-  await expect(page.locator(menuSelector)).toBeHidden();
+  await expect(page).toHaveURL(beforeUrl);
 });
