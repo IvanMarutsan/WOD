@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   getPublicPartners,
   normalizePartnersOrder,
+  normalizePartnersOrderInPlace,
   normalizePartnerSlug,
   sortPartners
 } from '../../modules/partners.mjs';
@@ -62,6 +63,23 @@ test('normalizePartnersOrder reassigns unique sequential positions 1..N', () => 
   assert.deepEqual(
     normalized.map((item) => item.id),
     ['a', 'b', 'z']
+  );
+  assert.deepEqual(
+    normalized.map((item) => item.sortOrder),
+    [1, 2, 3]
+  );
+});
+
+test('normalizePartnersOrderInPlace keeps incoming order and reassigns positions 1..N', () => {
+  const list = [
+    { id: 'b', name: 'Beta', isActive: true, sortOrder: 7 },
+    { id: 'a', name: 'Alpha', isActive: true, sortOrder: 2 },
+    { id: 'z', name: 'Zulu', isActive: false, sortOrder: 1 }
+  ];
+  const normalized = normalizePartnersOrderInPlace(list);
+  assert.deepEqual(
+    normalized.map((item) => item.id),
+    ['b', 'a', 'z']
   );
   assert.deepEqual(
     normalized.map((item) => item.sortOrder),

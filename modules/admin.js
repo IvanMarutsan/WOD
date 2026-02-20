@@ -10,6 +10,7 @@ import {
   deleteLocalPartner,
   getLocalPartners,
   normalizePartnersOrder,
+  normalizePartnersOrderInPlace,
   normalizePartnerSlug,
   sortPartners,
   upsertLocalPartner
@@ -251,7 +252,7 @@ export const initAdmin = ({ formatMessage }) => {
     };
 
     const persistPartnersOrder = async (orderedPartners) => {
-      const normalized = normalizePartnersOrder(orderedPartners);
+      const normalized = normalizePartnersOrderInPlace(orderedPartners);
       for (const partner of normalized) {
         const current = partnersById.get(partner.id);
         const nextOrder = getPartnerOrderValue(partner);

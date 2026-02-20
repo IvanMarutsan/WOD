@@ -51,6 +51,17 @@ export const normalizePartnersOrder = (partners = []) => {
   });
 };
 
+// Re-number partners preserving the incoming array order (used for drag-and-drop).
+export const normalizePartnersOrderInPlace = (partners = []) =>
+  (Array.isArray(partners) ? partners : []).map((partner, index) => {
+    const nextOrder = index + 1;
+    return {
+      ...partner,
+      sortOrder: nextOrder,
+      sort_order: nextOrder
+    };
+  });
+
 export const filterActivePartners = (partners = []) =>
   partners.filter((partner) => partner && partner.is_active !== false);
 
