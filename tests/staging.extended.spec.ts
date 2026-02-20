@@ -2,16 +2,34 @@ import { test, expect } from '@playwright/test';
 
 const cardSelector = '[data-testid="event-card"]';
 
+const waitForCatalogSettled = async (page) => {
+  await expect
+    .poll(
+      async () => {
+        const cardCount = await page.locator(cardSelector).count();
+        const emptyVisible = await page.locator('.catalog-empty').isVisible().catch(() => false);
+        if (cardCount > 0) return 'cards';
+        if (emptyVisible) return 'empty';
+        return 'loading';
+      },
+      {
+        timeout: 15000,
+        message: 'Catalog should settle to either rendered cards or visible empty state'
+      }
+    )
+    .not.toBe('loading');
+};
+
 const openCatalog = async (page) => {
   await page.goto('/#events');
   await expect(page.locator('#events')).toBeVisible();
+  await waitForCatalogSettled(page);
 };
 
 const openFirstEventDetail = async (page) => {
   await openCatalog(page);
   const cardCount = await page.locator(cardSelector).count();
   if (!cardCount) {
-    await expect(page.locator('.catalog-empty')).toBeVisible();
     return false;
   }
 
